@@ -1,0 +1,8 @@
+[user]
+	name = Matheus Afonso Martins Moreira
+	email = matheus.a.m.moreira@gmail.com
+[alias]
+	l = log --oneline --graph --decorate --stat
+	s = status
+	c = commit
+	p = push
