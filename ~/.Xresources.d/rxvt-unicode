@@ -1,0 +1,10 @@
+! Fonts
+URxvt.font: xft:Noto Mono:size=9
+
+! Scrolling behavior
+URxvt.secondaryScreen: 1
+URxvt.secondaryScroll: 0
+URxvt.secondaryWheel: 1
+
+! Perl extensions
+URxvt.perl-ext-common: selection-to-clipboard
