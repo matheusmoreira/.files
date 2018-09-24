@@ -1,0 +1,8 @@
+if [ -z "$1" ]
+then
+    search_root=/
+else
+    search_root="$1"
+fi
+
+find "$search_root" -regextype posix-extended -regex ".+\.pac(new|save)"
