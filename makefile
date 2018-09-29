@@ -22,6 +22,9 @@ force:
 	$(call ensure_directory_exists,$@)
 	$(call link,$<,$@)
 
+all += bash
+bash : ~/.bashrc
+
 all += git
 git : ~/.gitconfig
 
