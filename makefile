@@ -44,6 +44,11 @@ Xresources: ~/.Xresources $(.Xresources.d)
 all += urxvt
 urxvt : Xresources
 
+kitty_conf := $(call to_home_directory,$(wildcard $(~)/.config/kitty/*.conf))
+kitty_themes := $(call to_home_directory,$(wildcard $(~)/.config/kitty/themes/*.conf))
+all += kitty
+kitty : $(kitty_conf) $(kitty_themes)
+
 all += i3
 i3 : ~/.config/i3/config
 
