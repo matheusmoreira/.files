@@ -21,3 +21,7 @@ force:
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$@)
 	$(call link,$<,$@)
+
+all : $(all)
+
+.PHONY: all $(all)
