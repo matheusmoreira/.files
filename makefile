@@ -22,6 +22,8 @@ force:
 	$(call ensure_directory_exists,$@)
 	$(call link,$<,$@)
 
+to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(1))
+
 all += bash
 bash : ~/.bashrc
 
