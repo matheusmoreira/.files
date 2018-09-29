@@ -16,3 +16,8 @@ make_directory_unless_home = $(if $(call not_equal?,$(abspath $(1)),$(abspath $(
 ensure_directory_exists = $(call make_directory_unless_home,$(dir $(1)))
 
 link = $(ln) $(1) $(2)
+
+force:
+~/% : $(~)/% force
+	$(call ensure_directory_exists,$@)
+	$(call link,$<,$@)
