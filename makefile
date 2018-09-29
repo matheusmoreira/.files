@@ -33,6 +33,13 @@ git : ~/.gitconfig
 all += vim
 vim : ~/.vimrc
 
+.Xresources.d := $(call to_home_directory,$(wildcard $(~)/.Xresources.d/*))
+all += Xresources
+Xresources: ~/.Xresources $(.Xresources.d)
+
+all += urxvt
+urxvt : Xresources
+
 all : $(all)
 
 .PHONY: all $(all)
