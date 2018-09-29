@@ -44,6 +44,9 @@ Xresources: ~/.Xresources $(.Xresources.d)
 all += urxvt
 urxvt : Xresources
 
+all += i3
+i3 : ~/.config/i3/config
+
 all : $(all)
 
 .PHONY: all $(all)
