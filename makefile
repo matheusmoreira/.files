@@ -28,6 +28,9 @@ bash : ~/.bashrc
 all += git
 git : ~/.gitconfig
 
+all += vim
+vim : ~/.vimrc
+
 all : $(all)
 
 .PHONY: all $(all)
