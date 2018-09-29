@@ -22,6 +22,9 @@ force:
 	$(call ensure_directory_exists,$@)
 	$(call link,$<,$@)
 
+all += git
+git : ~/.gitconfig
+
 all : $(all)
 
 .PHONY: all $(all)
