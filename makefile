@@ -4,3 +4,5 @@ dotfiles := $(abspath $(dir $(makefile)))
 
 mkdir := mkdir -p
 ln := ln -snf
+
+link = $(ln) $(1) $(2)
