@@ -4,6 +4,7 @@ font pango:Noto Mono 12
 floating_modifier $mod
 
 bindsym $mod+Return exec kitty
+bindsym $mod+c exec chromium
 bindsym $mod+d exec dmenu_run
 
 bindsym $mod+Shift+q kill
