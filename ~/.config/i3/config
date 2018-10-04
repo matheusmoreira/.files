@@ -95,3 +95,8 @@ mode "resize" {
 bar {
         status_command i3status
 }
+
+# Keyboard audio controls for ALSA mixer
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -M Master 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -M Master 5%-
+bindsym XF86AudioMute exec --no-startup-id amixer set Master toggle
