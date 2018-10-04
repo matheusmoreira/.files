@@ -58,7 +58,7 @@ all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
 all += i3
-i3 : ~/.config/i3/config
+i3 : ~/.config/i3/config ~/.config/i3status/config
 
 all : $(all)
 
