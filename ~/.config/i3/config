@@ -85,6 +85,10 @@ bar {
         status_command i3status
 }
 
+# i3lock.png should be a symbolic link pointing to a PNG image
+# whose size matches the screen's resolution
+bindsym $mod+l exec --no-startup-id i3lock --image ~/.config/i3/i3lock.png
+
 # Keyboard audio controls for ALSA mixer
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -M Master 5%+
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -M Master 5%-
