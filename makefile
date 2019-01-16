@@ -5,10 +5,6 @@ dotfiles := $(abspath $(dir $(makefile)))
 mkdir := mkdir -p
 ln := ln -snf
 
-# x - y = 0 ∴ x = y
-equal? = $(if $(subst $(1),,$(2)),,equal)
-not_equal? = $(if $(call equal?,$(1),$(2)),,not_equal)
-
 # Generates a command to create the specified directory.
 # Generates the empty string if the directory has already been created.
 # Assumes user's home directory has already been created.
