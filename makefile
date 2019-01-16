@@ -59,3 +59,4 @@ i3 : ~/.config/i3/config ~/.config/i3status/config
 all : $(all)
 
 .PHONY: all $(all)
+.DEFAULT_GOAL := all
