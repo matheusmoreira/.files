@@ -1,6 +1,6 @@
 set $mod Mod4
 
-font pango:Noto Mono 12 
+font pango:Noto Mono 9
 floating_modifier $mod
 
 bindsym $mod+Return exec kitty
