@@ -56,6 +56,9 @@ kitty : $(kitty_conf) $(kitty_themes)
 all += i3
 i3 : ~/.config/i3/config ~/.config/i3status/config
 
+all += mpv
+mpv : ~/.config/mpv/mpv.conf
+
 all : $(all)
 
 .PHONY: all $(all)
