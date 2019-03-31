@@ -29,7 +29,7 @@ all += bin
 bin : $(user_binaries)
 
 all += bash
-bash : ~/.bashrc
+bash : ~/.bash_profile ~/.bashrc
 
 all += git
 git : ~/.gitconfig

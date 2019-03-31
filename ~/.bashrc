@@ -1,5 +1,5 @@
 # ~/.bashrc
-# Interactive shell configuration script for bash
+# Executed by interactive non-login shells
 
 # These settings only make sense for interactive shells.
 # Do nothing if shell is not interactive.
