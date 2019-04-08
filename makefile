@@ -37,6 +37,9 @@ git : ~/.gitconfig
 all += vim
 vim : ~/.vimrc
 
+all += gpg
+gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
+
 sublime_text_3_user_preferences := $(call to_home_directory,$(wildcard $(~)/.config/sublime-text-3/Packages/User/*.sublime-settings))
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
