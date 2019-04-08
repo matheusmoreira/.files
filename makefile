@@ -48,6 +48,9 @@ sublime-text-3 : $(sublime_text_3_user_preferences)
 all += Xresources
 Xresources: ~/.Xresources $(.Xresources.d)
 
+all += xinitrc
+xinitrc : ~/.xinitrc
+
 all += urxvt
 urxvt : Xresources
 
