@@ -89,6 +89,10 @@ bar {
 # whose size matches the screen's resolution
 bindsym $mod+l exec --no-startup-id i3lock --image ~/.config/i3/i3lock.png
 
+# Keyboard screen brightness controls
+bindsysm XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 10
+bindsysm XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 10
+
 # Keyboard audio controls for ALSA mixer
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -M Master 5%+
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -M Master 5%-
