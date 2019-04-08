@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+fingerprint=0x8344BB880289F665FC7EF8D85B9928A7DE0F97D5
+id=${1:-"$fingerprint"}
+
+gpg --armor --export "$id" | xclip -selection clipboard
