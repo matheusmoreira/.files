@@ -51,6 +51,9 @@ Xresources: ~/.Xresources $(.Xresources.d)
 all += xinitrc
 xinitrc : ~/.xinitrc
 
+all += X
+X : Xresources xinitrc
+
 all += urxvt
 urxvt : Xresources
 
