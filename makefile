@@ -24,6 +24,8 @@ force:
 
 to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(1))
 
+# Phony targets
+
 user_binaries := $(call to_home_directory,$(wildcard $(~)/bin/*))
 all += bin
 bin : $(user_binaries)
