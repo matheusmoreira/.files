@@ -5,21 +5,19 @@ dotfiles := $(abspath $(dir $(makefile)))
 mkdir := mkdir -p
 ln := ln -snf
 
-# Generates a command to create the specified directory.
-# Generates the empty string if the directory has already been created.
-# Assumes user's home directory has already been created.
-created_directories := $(HOME)
-define make_directory_once
-$(if $(findstring $(1),$(created_directories)),,$(eval created_directories += $(1))$(mkdir) $(1))
-endef
+# Determines whether the given path exists and is a directory.
+# Only existing directories contain a "." entry.
+directory? = $(wildcard $(1)/.)
 
-ensure_directory_exists = $(call make_directory_once,$(abspath $(dir $(1))))
+# Generates a command that creates the given directory.
+# Generates the empty string if the directory already exists.
+ensure_directory_exists = $(if $(call directory?,$(1)),,$(mkdir) $(1))
 
 link = $(ln) $(1) $(2)
 
 force:
 ~/% : $(~)/% force
-	$(call ensure_directory_exists,$@)
+	$(call ensure_directory_exists,$(@D))
 	$(call link,$<,$@)
 
 to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(1))
