@@ -2,6 +2,8 @@ makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 dotfiles := $(abspath $(dir $(makefile)))
 ~ := $(abspath $(dotfiles)/~)
 
+to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
+
 mkdir := mkdir -p
 ln := ln -snf
 
@@ -19,8 +21,6 @@ force:
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
 	$(call link,$<,$@)
-
-to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
 
 # Phony targets
 
