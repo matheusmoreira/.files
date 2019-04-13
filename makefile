@@ -47,7 +47,8 @@ sublime-text-3 : $(sublime_text_3_user_preferences)
 
 .Xresources.d := $(call to_home_directory,.Xresources.d/*)
 all += Xresources
-Xresources: ~/.Xresources $(.Xresources.d)
+~/.Xresources : $(.Xresources.d)
+Xresources: ~/.Xresources
 
 all += xinitrc
 xinitrc : ~/.xinitrc
