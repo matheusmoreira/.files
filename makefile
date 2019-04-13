@@ -20,11 +20,11 @@ force:
 	$(call ensure_directory_exists,$(@D))
 	$(call link,$<,$@)
 
-to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(1))
+to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
 
 # Phony targets
 
-user_binaries := $(call to_home_directory,$(wildcard $(~)/bin/*))
+user_binaries := $(call to_home_directory,bin/*)
 all += bin
 bin : $(user_binaries)
 
@@ -40,11 +40,11 @@ vim : ~/.vimrc
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
-sublime_text_3_user_preferences := $(call to_home_directory,$(wildcard $(~)/.config/sublime-text-3/Packages/User/*.sublime-settings))
+sublime_text_3_user_preferences := $(call to_home_directory,.config/sublime-text-3/Packages/User/*.sublime-settings)
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
 
-.Xresources.d := $(call to_home_directory,$(wildcard $(~)/.Xresources.d/*))
+.Xresources.d := $(call to_home_directory,.Xresources.d/*)
 all += Xresources
 Xresources: ~/.Xresources $(.Xresources.d)
 
@@ -57,8 +57,8 @@ X : Xresources xinitrc
 all += urxvt
 urxvt : Xresources
 
-kitty_conf := $(call to_home_directory,$(wildcard $(~)/.config/kitty/*.conf))
-kitty_themes := $(call to_home_directory,$(wildcard $(~)/.config/kitty/themes/*.conf))
+kitty_conf := $(call to_home_directory,.config/kitty/*.conf)
+kitty_themes := $(call to_home_directory,.config/kitty/themes/*.conf)
 all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
