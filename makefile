@@ -4,7 +4,7 @@ dotfiles := $(abspath $(dir $(makefile)))
 
 # Convert a list of paths to files in $(~) to paths in the user's home directory.
 # All arguments are relative to the $(~) directory.
-to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
+to_user_home = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
 
 # Commands to use for directory and symbolic link creation.
 mkdir := mkdir -p
@@ -29,7 +29,7 @@ force:
 
 # Phony targets
 
-user_binaries := $(call to_home_directory,bin/*)
+user_binaries := $(call to_user_home,bin/*)
 all += bin
 bin : $(user_binaries)
 
@@ -45,11 +45,11 @@ vim : ~/.vimrc
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
-sublime_text_3_user_preferences := $(call to_home_directory,.config/sublime-text-3/Packages/User/*.sublime-settings)
+sublime_text_3_user_preferences := $(call to_user_home,.config/sublime-text-3/Packages/User/*.sublime-settings)
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
 
-.Xresources.d := $(call to_home_directory,.Xresources.d/*)
+.Xresources.d := $(call to_user_home,.Xresources.d/*)
 all += Xresources
 ~/.Xresources : $(.Xresources.d)
 Xresources: ~/.Xresources
@@ -63,8 +63,8 @@ X : Xresources xinitrc
 all += urxvt
 urxvt : Xresources
 
-kitty_conf := $(call to_home_directory,.config/kitty/*.conf)
-kitty_themes := $(call to_home_directory,.config/kitty/themes/*.conf)
+kitty_conf := $(call to_user_home,.config/kitty/*.conf)
+kitty_themes := $(call to_user_home,.config/kitty/themes/*.conf)
 all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
