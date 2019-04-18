@@ -58,7 +58,7 @@ ensure_directory_exists = $(if $(call directory?,$(1)),,$(mkdir) $(1))
 # Generates a command to link $(2) to $(1).
 link = $(ln) $(1) $(2)
 
-# Map files in the repository to the user's home directory.
+# Map files in $(~) to $(HOME).
 force:
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
