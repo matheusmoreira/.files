@@ -7,12 +7,16 @@ dotfiles := $(abspath $(dir $(makefile)))
 convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 
 # Convert a list of paths to files in the user's home directory to paths in $(~).
-# All arguments are relative to the user's home directory directory.
-to_dotfiles_home = $(call convert_prefix,$(HOME),$(~),$(wildcard $(addprefix $(HOME)/,$(1))))
+~.to_dotfiles = $(call convert_prefix,$(HOME),$(~),$(1))
 
 # Convert a list of paths to files in $(~) to paths in the user's home directory.
-# All arguments are relative to the $(~) directory.
-to_user_home = $(call convert_prefix,$(~),$(HOME),$(wildcard $(addprefix $(~)/,$(1))))
+~.to_user = $(call convert_prefix,$(~),$(HOME),$(1))
+
+# Converts paths relative to $(HOME) to absolute paths in $(~).
+~.user_to_dotfiles = $(call ~.to_dotfiles,$(wildcard $(addprefix $(HOME)/,$(1))))
+
+# Converts paths relative to $(~) to absolute paths in $(HOME).
+~.dotfiles_to_user = $(call ~.to_user,$(wildcard $(addprefix $(~)/,$(1))))
 
 # Commands to use for directory and symbolic link creation.
 mkdir := mkdir -p
@@ -37,7 +41,7 @@ force:
 
 # Phony targets
 
-user_binaries := $(call to_user_home,bin/*)
+user_binaries := $(call ~.dotfiles_to_user,bin/*)
 all += bin
 bin : $(user_binaries)
 
@@ -53,11 +57,11 @@ vim : ~/.vimrc
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
-sublime_text_3_user_preferences := $(call to_user_home,.config/sublime-text-3/Packages/User/*.sublime-settings)
+sublime_text_3_user_preferences := $(call ~.dotfiles_to_user,.config/sublime-text-3/Packages/User/*.sublime-settings)
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
 
-.Xresources.d := $(call to_user_home,.Xresources.d/*)
+.Xresources.d := $(call ~.dotfiles_to_user,.Xresources.d/*)
 all += Xresources
 ~/.Xresources : $(.Xresources.d)
 Xresources: ~/.Xresources
@@ -71,8 +75,8 @@ X : Xresources xinitrc
 all += urxvt
 urxvt : Xresources
 
-kitty_conf := $(call to_user_home,.config/kitty/*.conf)
-kitty_themes := $(call to_user_home,.config/kitty/themes/*.conf)
+kitty_conf := $(call ~.dotfiles_to_user,.config/kitty/*.conf)
+kitty_themes := $(call ~.dotfiles_to_user,.config/kitty/themes/*.conf)
 all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
