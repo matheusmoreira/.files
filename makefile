@@ -18,6 +18,28 @@ convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 # Converts paths relative to $(~) to absolute paths in $(HOME).
 ~.dotfiles_to_user = $(call ~.to_user,$(wildcard $(addprefix $(~)/,$(1))))
 
+# XDG Base Directory Specification
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+#
+# Files in the repository are stored in the default directories.
+# Links in $(HOME) take the XDG variables into account.
+
+# Variable definition template for XDG directories.
+define XDG.template
+XDG_$(1)_HOME.default := $$(HOME)/$(2)
+XDG_$(1)_HOME.dotfiles := $$(call ~.to_dotfiles,$$(XDG_$(1)_HOME.default))
+XDG_$(1)_HOME ?= $$(XDG_$(1)_HOME.default)
+
+$(1).to_dotfiles = $$(call convert_prefix,$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles),$$(1))
+$(1).to_user = $$(call convert_prefix,$$(XDG_$(1)_HOME.dotfiles),$$(XDG_$(1)_HOME),$$(1))
+
+$(1).user_to_dotfiles = $$(call $(1).to_dotfiles,$$(wildcard $$(addprefix $$(XDG_$(1)_HOME)/,$$(1))))
+$(1).dotfiles_to_user = $$(call $(1).to_user,$$(wildcard $$(addprefix $$(XDG_$(1)_HOME.dotfiles)/,$$(1))))
+endef
+
+# Defines XDG variables for the given type and default directory.
+XDG.define = $(eval $(call XDG.template,$(1),$(2)))
+
 # Commands to use for directory and symbolic link creation.
 mkdir := mkdir -p
 ln := ln -snf
