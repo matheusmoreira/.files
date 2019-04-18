@@ -58,8 +58,12 @@ ensure_directory_exists = $(if $(call directory?,$(1)),,$(mkdir) $(1))
 # Generates a command to link $(2) to $(1).
 link = $(ln) $(1) $(2)
 
+# Map files in $(XDG_CONFIG_HOME.dotfiles) to $(XDG_CONFIG_HOME).
+$(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
+	$(call ensure_directory_exists,$(@D))
+	$(call link,$<,$@)
+
 # Map files in $(~) to $(HOME).
-force:
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
 	$(call link,$<,$@)
@@ -113,5 +117,6 @@ mpv : ~/.config/mpv/mpv.conf
 
 all : $(all)
 
+force:
 .PHONY: all $(all)
 .DEFAULT_GOAL := all
