@@ -6,10 +6,10 @@ dotfiles := $(abspath $(dir $(makefile)))
 # to paths prefixed by $(2).
 convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 
-# Convert a list of paths to files in the user's home directory to paths in $(~).
+# Converts paths to files in $(HOME) to paths in $(~).
 ~.to_dotfiles = $(call convert_prefix,$(HOME),$(~),$(1))
 
-# Convert a list of paths to files in $(~) to paths in the user's home directory.
+# Converts paths to files in $(~) to paths in $(HOME).
 ~.to_user = $(call convert_prefix,$(~),$(HOME),$(1))
 
 # Converts paths relative to $(HOME) to absolute paths in $(~).
