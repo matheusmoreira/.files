@@ -40,6 +40,7 @@ endef
 # Defines XDG variables for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
 
+$(call XDG.define,DATA,.local/share)
 $(call XDG.define,CONFIG,.config)
 
 # Commands to use for directory and symbolic link creation.
