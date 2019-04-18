@@ -6,6 +6,7 @@ dotfiles := $(abspath $(dir $(makefile)))
 # All arguments are relative to the $(~) directory.
 to_home_directory = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
 
+# Commands to use for directory and symbolic link creation.
 mkdir := mkdir -p
 ln := ln -snf
 
@@ -17,6 +18,7 @@ directory? = $(wildcard $(1)/.)
 # Generates the empty string if the directory already exists.
 ensure_directory_exists = $(if $(call directory?,$(1)),,$(mkdir) $(1))
 
+# Generates a command to link $(2) to $(1).
 link = $(ln) $(1) $(2)
 
 # Map files in the repository to the user's home directory.
