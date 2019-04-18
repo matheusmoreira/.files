@@ -1,0 +1,4 @@
+#/usr/bin/bash
+
+# Encode binary data with high level of error correction.
+qrencode --8bit --level H "$@"
