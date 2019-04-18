@@ -2,6 +2,10 @@ makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 dotfiles := $(abspath $(dir $(makefile)))
 ~ := $(abspath $(dotfiles)/~)
 
+# Convert a list of paths to files in the user's home directory to paths in $(~).
+# All arguments are relative to the user's home directory directory.
+to_dotfiles_home = $(patsubst $(HOME)/%,$(~)/%,$(wildcard $(addprefix $(HOME)/,$(1))))
+
 # Convert a list of paths to files in $(~) to paths in the user's home directory.
 # All arguments are relative to the $(~) directory.
 to_user_home = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
