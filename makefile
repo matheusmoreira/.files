@@ -86,7 +86,7 @@ vim : ~/.vimrc
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
-sublime_text_3_user_preferences := $(call ~.dotfiles_to_user,.config/sublime-text-3/Packages/User/*.sublime-settings)
+sublime_text_3_user_preferences := $(call CONFIG.dotfiles_to_user,sublime-text-3/Packages/User/*.sublime-settings)
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
 
@@ -104,16 +104,16 @@ X : Xresources xinitrc
 all += urxvt
 urxvt : Xresources
 
-kitty_conf := $(call ~.dotfiles_to_user,.config/kitty/*.conf)
-kitty_themes := $(call ~.dotfiles_to_user,.config/kitty/themes/*.conf)
+kitty_conf := $(call CONFIG.dotfiles_to_user,kitty/*.conf)
+kitty_themes := $(call CONFIG.dotfiles_to_user,kitty/themes/*.conf)
 all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
 all += i3
-i3 : ~/.config/i3/config ~/.config/i3status/config
+i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config)
 
 all += mpv
-mpv : ~/.config/mpv/mpv.conf
+mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 
 all : $(all)
 
