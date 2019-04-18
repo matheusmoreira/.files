@@ -2,13 +2,17 @@ makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 dotfiles := $(abspath $(dir $(makefile)))
 ~ := $(abspath $(dotfiles)/~)
 
+# Converts the list of paths specified in $(3) from paths prefixed by $(1)
+# to paths prefixed by $(2).
+convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
+
 # Convert a list of paths to files in the user's home directory to paths in $(~).
 # All arguments are relative to the user's home directory directory.
-to_dotfiles_home = $(patsubst $(HOME)/%,$(~)/%,$(wildcard $(addprefix $(HOME)/,$(1))))
+to_dotfiles_home = $(call convert_prefix,$(HOME),$(~),$(wildcard $(addprefix $(HOME)/,$(1))))
 
 # Convert a list of paths to files in $(~) to paths in the user's home directory.
 # All arguments are relative to the $(~) directory.
-to_user_home = $(patsubst $(~)/%,$(HOME)/%,$(wildcard $(addprefix $(~)/,$(1))))
+to_user_home = $(call convert_prefix,$(~),$(HOME),$(wildcard $(addprefix $(~)/,$(1))))
 
 # Commands to use for directory and symbolic link creation.
 mkdir := mkdir -p
