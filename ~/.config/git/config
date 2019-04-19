@@ -22,3 +22,5 @@
 	extendedRegexp = true    # Use POSIX extended regular expressions
 [gui]
 	commitMsgWidth = 72
+[rebase]
+	autoStash = true               # Automatically stash changes before rebasing
