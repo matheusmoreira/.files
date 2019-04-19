@@ -44,8 +44,8 @@ $(call XDG.define,DATA,.local/share)
 $(call XDG.define,CONFIG,.config)
 
 # Commands to use for directory and symbolic link creation.
-mkdir := mkdir -p
-ln := ln -snf
+mkdir ?= mkdir -p $(1)
+ln ?= ln -snf $(1) $(2)
 
 # Determines whether the given path exists and is a directory.
 # Only existing directories contain a "." entry.
@@ -53,20 +53,20 @@ directory? = $(wildcard $(1)/.)
 
 # Generates a command that creates the given directory.
 # Generates the empty string if the directory already exists.
-ensure_directory_exists = $(if $(call directory?,$(1)),,$(mkdir) $(1))
+ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
 
-# Generates a command to link $(2) to $(1).
-link = $(ln) $(1) $(2)
+# Generates a command to link $(1) to $(2).
+link = $(call ln,$(2),$(1))
 
 # Map files in $(XDG_CONFIG_HOME.dotfiles) to $(XDG_CONFIG_HOME).
 $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
 	$(call ensure_directory_exists,$(@D))
-	$(call link,$<,$@)
+	$(call link,$@,$<)
 
 # Map files in $(~) to $(HOME).
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
-	$(call link,$<,$@)
+	$(call link,$@,$<)
 
 # Phony targets
 
