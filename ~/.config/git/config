@@ -28,3 +28,5 @@
 [status]
 	showStash = true            # Show changes stored in the git stash
 	showUntrackedFiles = all    # Show all files in an untracked directory
+[tag]
+	forceSignAnnotated = true    # Sign all annotated tags
