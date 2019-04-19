@@ -7,3 +7,4 @@
 	c = commit
 	p = push
 	co = checkout
+	r = rebase
