@@ -2,6 +2,7 @@
 	name = Matheus Afonso Martins Moreira
 	email = matheus.a.m.moreira@gmail.com
 [core]
+	eol = lf
 	autocrlf = input
 [alias]
 	l = log --oneline --graph --decorate --stat
