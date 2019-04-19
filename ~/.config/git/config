@@ -13,6 +13,7 @@
 	co = checkout
 	r = rebase
 	d = diff
+	ds = diff --staged
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
