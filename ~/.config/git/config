@@ -4,7 +4,7 @@
 [core]
 	eol = lf            # Use LF for text files in the working directory
 	autocrlf = input    # Convert line endings to LF before committing
-	compression = 9
+	compression = 9     # Maximum compression
 [alias]
 	l = log --oneline --graph --decorate --stat
 	s = status
