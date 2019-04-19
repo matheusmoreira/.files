@@ -25,3 +25,5 @@
 [rebase]
 	autoStash = true               # Automatically stash changes before rebasing
 	missingCommitsCheck = error    # Abort rebase if commits are missing
+[status]
+	showStash = true            # Show changes stored in the git stash
