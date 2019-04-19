@@ -4,6 +4,7 @@
 [core]
 	eol = lf
 	autocrlf = input
+	compression = 9
 [alias]
 	l = log --oneline --graph --decorate --stat
 	s = status
