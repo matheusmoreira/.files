@@ -44,8 +44,8 @@ $(call XDG.define,DATA,.local/share)
 $(call XDG.define,CONFIG,.config)
 
 # Commands to use for directory and symbolic link creation.
-mkdir := mkdir -p
-ln := ln -snf
+mkdir ?= mkdir -p
+ln ?= ln -snf
 
 # Determines whether the given path exists and is a directory.
 # Only existing directories contain a "." entry.
