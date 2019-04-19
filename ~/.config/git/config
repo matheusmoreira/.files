@@ -21,7 +21,7 @@
 	lineNumber = true        # Show line numbers
 	extendedRegexp = true    # Use POSIX extended regular expressions
 [gui]
-	commitMsgWidth = 72
+	commitMsgWidth = 72    # Helps keep lines under 72 characters
 [rebase]
 	autoStash = true               # Automatically stash changes before rebasing
 	missingCommitsCheck = error    # Abort rebase if commits are missing
