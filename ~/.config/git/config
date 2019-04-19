@@ -3,7 +3,7 @@
 	email = matheus.a.m.moreira@gmail.com
 [core]
 	eol = lf
-	autocrlf = input
+	autocrlf = input    # Convert line endings to LF before committing
 	compression = 9
 [alias]
 	l = log --oneline --graph --decorate --stat
