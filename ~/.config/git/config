@@ -18,3 +18,5 @@
 [grep]
 	lineNumber = true        # Show line numbers
 	extendedRegexp = true    # Use POSIX extended regular expressions
+[gui]
+	commitMsgWidth = 72
