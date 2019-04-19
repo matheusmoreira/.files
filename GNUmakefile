@@ -78,7 +78,7 @@ all += bash
 bash : ~/.bash_profile ~/.bashrc
 
 all += git
-git : ~/.gitconfig
+git : $(call CONFIG.dotfiles_to_user,git/config)
 
 all += vim
 vim : ~/.vimrc
