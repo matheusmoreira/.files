@@ -6,3 +6,4 @@
 	s = status
 	c = commit
 	p = push
+	co = checkout
