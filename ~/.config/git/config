@@ -15,3 +15,5 @@
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
+[grep]
+	lineNumber = true        # Show line numbers
