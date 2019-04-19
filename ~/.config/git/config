@@ -12,3 +12,5 @@
 	p = push
 	co = checkout
 	r = rebase
+[commit]
+	status = true    # Show status information
