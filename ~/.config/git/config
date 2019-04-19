@@ -2,7 +2,7 @@
 	name = Matheus Afonso Martins Moreira
 	email = matheus.a.m.moreira@gmail.com
 [core]
-	eol = lf
+	eol = lf            # Use LF for text files in the working directory
 	autocrlf = input    # Convert line endings to LF before committing
 	compression = 9
 [alias]
