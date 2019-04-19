@@ -55,18 +55,18 @@ directory? = $(wildcard $(1)/.)
 # Generates the empty string if the directory already exists.
 ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
 
-# Generates a command to link $(2) to $(1).
-link = $(call ln,$(1),$(2))
+# Generates a command to link $(1) to $(2).
+link = $(call ln,$(2),$(1))
 
 # Map files in $(XDG_CONFIG_HOME.dotfiles) to $(XDG_CONFIG_HOME).
 $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
 	$(call ensure_directory_exists,$(@D))
-	$(call link,$<,$@)
+	$(call link,$@,$<)
 
 # Map files in $(~) to $(HOME).
 ~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
-	$(call link,$<,$@)
+	$(call link,$@,$<)
 
 # Phony targets
 
