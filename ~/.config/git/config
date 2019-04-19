@@ -17,3 +17,4 @@
 	verbose = 2      # Show staged and unstaged changes
 [grep]
 	lineNumber = true        # Show line numbers
+	extendedRegexp = true    # Use POSIX extended regular expressions
