@@ -12,6 +12,7 @@
 	p = push
 	co = checkout
 	r = rebase
+	d = diff
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
