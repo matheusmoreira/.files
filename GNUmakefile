@@ -77,7 +77,24 @@ endef
 # Defines XDG variables for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
 
+# XDG_DATA_HOME
+# XDG_DATA_HOME.default
+# XDG_DATA_HOME.dotfiles
+#
+# DATA.to_dotfiles
+# DATA.to_user
+# DATA.user_to_dotfiles
+# DATA.dotfiles_to_user
 $(call XDG.define,DATA,.local/share)
+
+# XDG_CONFIG_HOME
+# XDG_CONFIG_HOME.default
+# XDG_CONFIG_HOME.dotfiles
+#
+# CONFIG.to_dotfiles
+# CONFIG.to_user
+# CONFIG.user_to_dotfiles
+# CONFIG.dotfiles_to_user
 $(call XDG.define,CONFIG,.config)
 
 # Commands to use for directory and symbolic link creation.
