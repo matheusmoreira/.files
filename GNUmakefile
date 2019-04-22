@@ -6,17 +6,36 @@ dotfiles := $(abspath $(dir $(makefile)))
 # to paths prefixed by $(2).
 convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 
-# Converts paths to files in $(HOME) to paths in $(~).
-~.to_dotfiles = $(call convert_prefix,$(HOME),$(~),$(1))
+# Template for the definition of prefix conversion functions
+# that convert between the user's home directory and dotfiles repository.
+#
+# $(1) = Type of prefix conversion
+# $(2) = Home directory prefix
+# $(3) = Dotfiles repository prefix
+#
+# Functions generated:
+#
+#     $(1).to_dotfiles         Converts paths to files in $(2) to paths in $(3).
+#     $(1).to_user             Converts paths to files in $(3) to paths in $(2).
+#     $(1).user_to_dotfiles    Converts paths relative to $(2) to absolute paths in $(3).
+#     $(1).dotfiles_to_user    Converts paths relative to $(3) to absolute paths in $(2).
+#
+define prefix_conversion_functions.template
+$(1).to_dotfiles = $$(call convert_prefix,$(2),$(3),$$(1))
+$(1).to_user = $$(call convert_prefix,$(3),$(2),$$(1))
 
-# Converts paths to files in $(~) to paths in $(HOME).
-~.to_user = $(call convert_prefix,$(~),$(HOME),$(1))
+$(1).user_to_dotfiles = $$(call $(1).to_dotfiles,$$(wildcard $$(addprefix $(2)/,$$(1))))
+$(1).dotfiles_to_user = $$(call $(1).to_user,$$(wildcard $$(addprefix $(3)/,$$(1))))
+endef
 
-# Converts paths relative to $(HOME) to absolute paths in $(~).
-~.user_to_dotfiles = $(call ~.to_dotfiles,$(wildcard $(addprefix $(HOME)/,$(1))))
+# Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
+prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
 
-# Converts paths relative to $(~) to absolute paths in $(HOME).
-~.dotfiles_to_user = $(call ~.to_user,$(wildcard $(addprefix $(~)/,$(1))))
+# ~.to_dotfiles
+# ~.to_user
+# ~.user_to_dotfiles
+# ~.dotfiles_to_user
+$(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
 # XDG Base Directory Specification
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -30,11 +49,7 @@ XDG_$(1)_HOME.default := $$(HOME)/$(2)
 XDG_$(1)_HOME.dotfiles := $$(call ~.to_dotfiles,$$(XDG_$(1)_HOME.default))
 XDG_$(1)_HOME ?= $$(XDG_$(1)_HOME.default)
 
-$(1).to_dotfiles = $$(call convert_prefix,$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles),$$(1))
-$(1).to_user = $$(call convert_prefix,$$(XDG_$(1)_HOME.dotfiles),$$(XDG_$(1)_HOME),$$(1))
-
-$(1).user_to_dotfiles = $$(call $(1).to_dotfiles,$$(wildcard $$(addprefix $$(XDG_$(1)_HOME)/,$$(1))))
-$(1).dotfiles_to_user = $$(call $(1).to_user,$$(wildcard $$(addprefix $$(XDG_$(1)_HOME.dotfiles)/,$$(1))))
+$(call prefix_conversion_functions.template,$(1),$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
 endef
 
 # Defines XDG variables for the given type and default directory.
