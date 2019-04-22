@@ -43,7 +43,29 @@ $(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 # Files in the repository are stored in the default directories.
 # Links in $(HOME) take the XDG variables into account.
 
-# Variable definition template for XDG directories.
+# Template for the definition of variables and path conversion functions
+# for the user's XDG directories.
+#
+# $(1) = Type of XDG directory
+# $(2) = Default directory, used if XDG variable not set
+#
+# Variables generated:
+#
+#     XDG_$(1)_HOME             Directory set by user or the default directory
+#     XDG_$(1)_HOME.default     Default XDG_$(1)_HOME directory
+#     XDG_$(1)_HOME.dotfiles    The XDG_$(1)_HOME directory in the dotfiles repository
+#
+# Functions generated:
+#
+#     $(1).to_dotfiles         Converts paths to files in $(XDG_$(1)_HOME)
+#                              to paths in $(XDG_$(1)_HOME.dotfiles).
+#     $(1).to_user             Converts paths to files in $(XDG_$(1)_HOME.dotfiles)
+#                              to paths in $(XDG_$(1)_HOME).
+#     $(1).user_to_dotfiles    Converts paths relative to $(XDG_$(1)_HOME)
+#                              to absolute paths in $(XDG_$(1)_HOME.dotfiles).
+#     $(1).dotfiles_to_user    Converts paths relative to $(XDG_$(1)_HOME.dotfiles)
+#                              to absolute paths in $(XDG_$(1)_HOME).
+#
 define XDG.template
 XDG_$(1)_HOME.default := $$(HOME)/$(2)
 XDG_$(1)_HOME.dotfiles := $$(call ~.to_dotfiles,$$(XDG_$(1)_HOME.default))
