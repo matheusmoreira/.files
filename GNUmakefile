@@ -76,6 +76,7 @@ XDG_$(1)_HOME.dotfiles := $$(call ~.to_dotfiles,$$(XDG_$(1)_HOME.default))
 XDG_$(1)_HOME ?= $$(XDG_$(1)_HOME.default)
 
 $(call prefix_conversion_functions.template,$(1),$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
+$(call rule.template,$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
 endef
 
 # Defines a rule that links all targets in $(1) to their counterparts in $(2).
@@ -146,11 +147,6 @@ ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
 
 # Generates a command to link $(1) to $(2).
 link = $(call ln,$(2),$(1))
-
-# Map files in $(XDG_CONFIG_HOME.dotfiles) to $(XDG_CONFIG_HOME).
-$(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
-	$(call ensure_directory_exists,$(@D))
-	$(call link,$@,$<)
 
 # Phony targets
 
