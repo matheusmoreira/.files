@@ -74,7 +74,7 @@ endef
 #
 # Rules generated:
 #
-#     $(XDG_$(1)_HOME)/% : $(XDG_$(1)_HOME.dotfiles)
+#     $(XDG_$(1)_HOME)/% : $(XDG_$(1)_HOME.dotfiles)/%
 #
 # Variables generated:
 #
@@ -120,7 +120,7 @@ $(call rule.define,$(HOME),$(~))
 # ~.dotfiles_to_user
 $(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
-# $(XDG_DATA_HOME)/% : $(XDG_DATA_HOME.dotfiles)
+# $(XDG_DATA_HOME)/% : $(XDG_DATA_HOME.dotfiles)/%
 #
 # XDG_DATA_HOME
 # XDG_DATA_HOME.default
@@ -132,7 +132,7 @@ $(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 # DATA.dotfiles_to_user
 $(call XDG.define,DATA,.local/share)
 
-# $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)
+# $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/%
 #
 # XDG_CONFIG_HOME
 # XDG_CONFIG_HOME.default
@@ -150,7 +150,7 @@ $(call XDG.define,CONFIG,.config)
 #     $ systemd-path user-binaries
 #     ~/.local/bin
 
-# $(XDG_BIN_HOME)/% : $(XDG_BIN_HOME.dotfiles)
+# $(XDG_BIN_HOME)/% : $(XDG_BIN_HOME.dotfiles)/%
 #
 # XDG_BIN_HOME
 # XDG_BIN_HOME.default
