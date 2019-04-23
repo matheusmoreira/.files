@@ -78,6 +78,9 @@ XDG_$(1)_HOME ?= $$(XDG_$(1)_HOME.default)
 $(call prefix_conversion_functions.template,$(1),$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
 endef
 
+# Defines a rule that links all targets in $(1) to their counterparts in $(2).
+rule.define = $(eval $(call rule.template,$(1),$(2)))
+
 # Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
 prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
 
