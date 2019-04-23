@@ -2,6 +2,21 @@ makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 dotfiles := $(abspath $(dir $(makefile)))
 ~ := $(abspath $(dotfiles)/~)
 
+# Commands to use for directory and symbolic link creation.
+mkdir ?= mkdir -p $(1)
+ln ?= ln -snf $(1) $(2)
+
+# Determines whether the given path exists and is a directory.
+# Only existing directories contain a "." entry.
+directory? = $(wildcard $(1)/.)
+
+# Generates a command that creates the given directory.
+# Generates the empty string if the directory already exists.
+ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
+
+# Generates a command to link $(1) to $(2).
+link = $(call ln,$(2),$(1))
+
 # Converts the list of paths specified in $(3) from paths prefixed by $(1)
 # to paths prefixed by $(2).
 convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
@@ -132,21 +147,6 @@ $(call XDG.define,CONFIG,.config)
 # BIN.user_to_dotfiles
 # BIN.dotfiles_to_user
 $(call XDG.define,BIN,.local/bin)
-
-# Commands to use for directory and symbolic link creation.
-mkdir ?= mkdir -p $(1)
-ln ?= ln -snf $(1) $(2)
-
-# Determines whether the given path exists and is a directory.
-# Only existing directories contain a "." entry.
-directory? = $(wildcard $(1)/.)
-
-# Generates a command that creates the given directory.
-# Generates the empty string if the directory already exists.
-ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
-
-# Generates a command to link $(1) to $(2).
-link = $(call ln,$(2),$(1))
 
 # Phony targets
 
