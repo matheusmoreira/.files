@@ -6,6 +6,19 @@ dotfiles := $(abspath $(dir $(makefile)))
 # to paths prefixed by $(2).
 convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 
+# Template for the definition of symbolic link creation rules.
+# The recipe links all targets in $(1) to their counterparts in $(2).
+# The targets are always updated. The target's directory is created if needed.
+#
+# $(1) = Prefix of the symbolic link
+# $(2) = Prefix of the symbolic link's target
+#
+define rule.template
+$(1)/% : $(2)/% force
+	$$(call ensure_directory_exists,$$(@D))
+	$$(call link,$$@,$$<)
+endef
+
 # Template for the definition of prefix conversion functions
 # that convert between the user's home directory and dotfiles repository.
 #
