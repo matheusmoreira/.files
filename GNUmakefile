@@ -97,6 +97,22 @@ $(call XDG.define,DATA,.local/share)
 # CONFIG.dotfiles_to_user
 $(call XDG.define,CONFIG,.config)
 
+# Some directories are not part of the XDG specification
+# but are widely used in practice.
+#
+#     $ systemd-path user-binaries
+#     ~/.local/bin
+
+# XDG_BIN_HOME
+# XDG_BIN_HOME.default
+# XDG_BIN_HOME.dotfiles
+#
+# BIN.to_dotfiles
+# BIN.to_user
+# BIN.user_to_dotfiles
+# BIN.dotfiles_to_user
+$(call XDG.define,BIN,.local/bin)
+
 # Commands to use for directory and symbolic link creation.
 mkdir ?= mkdir -p $(1)
 ln ?= ln -snf $(1) $(2)
@@ -124,7 +140,7 @@ $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
 
 # Phony targets
 
-user_binaries := $(call ~.dotfiles_to_user,bin/*)
+user_binaries := $(call BIN.dotfiles_to_user,*)
 all += bin
 bin : $(user_binaries)
 
