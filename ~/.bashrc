@@ -26,6 +26,8 @@ function paths.add {
   esac
 }
 
+paths.add PATH $(systemd-path user-binaries)
+
 # These settings only make sense for interactive shells.
 # Do nothing if shell is not interactive.
 [[ $- != *i* ]] && return
