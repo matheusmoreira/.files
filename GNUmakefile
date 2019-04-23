@@ -28,15 +28,6 @@ $(1).user_to_dotfiles = $$(call $(1).to_dotfiles,$$(wildcard $$(addprefix $(2)/,
 $(1).dotfiles_to_user = $$(call $(1).to_user,$$(wildcard $$(addprefix $(3)/,$$(1))))
 endef
 
-# Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
-prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
-
-# ~.to_dotfiles
-# ~.to_user
-# ~.user_to_dotfiles
-# ~.dotfiles_to_user
-$(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
-
 # XDG Base Directory Specification
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 #
@@ -74,8 +65,17 @@ XDG_$(1)_HOME ?= $$(XDG_$(1)_HOME.default)
 $(call prefix_conversion_functions.template,$(1),$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
 endef
 
+# Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
+prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
+
 # Defines XDG variables for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
+
+# ~.to_dotfiles
+# ~.to_user
+# ~.user_to_dotfiles
+# ~.dotfiles_to_user
+$(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
 # XDG_DATA_HOME
 # XDG_DATA_HOME.default
