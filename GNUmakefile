@@ -87,6 +87,9 @@ prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.t
 # Defines XDG variables for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
 
+# Create symbolic links in $(HOME) pointing at their counterparts in $(~).
+$(call rule.define,$(HOME),$(~))
+
 # ~.to_dotfiles
 # ~.to_user
 # ~.user_to_dotfiles
@@ -146,11 +149,6 @@ link = $(call ln,$(2),$(1))
 
 # Map files in $(XDG_CONFIG_HOME.dotfiles) to $(XDG_CONFIG_HOME).
 $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)/% force
-	$(call ensure_directory_exists,$(@D))
-	$(call link,$@,$<)
-
-# Map files in $(~) to $(HOME).
-~/% : $(~)/% force
 	$(call ensure_directory_exists,$(@D))
 	$(call link,$@,$<)
 
