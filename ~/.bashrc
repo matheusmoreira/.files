@@ -9,6 +9,23 @@ function paths.list {
   echo $variable | tr : '\n'
 }
 
+function paths.add {
+  declare -n variable=$1
+
+  case ":${variable}:" in
+    *:"$2":*)
+      ;;
+    *)
+      if [ "$3" = "after" ]
+      then
+        variable="${variable:+${variable}:}$2"
+      else
+        variable="$2${variable:+:${variable}}"
+      fi
+      ;;
+  esac
+}
+
 # These settings only make sense for interactive shells.
 # Do nothing if shell is not interactive.
 [[ $- != *i* ]] && return
