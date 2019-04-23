@@ -28,6 +28,10 @@ convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 # $(1) = Prefix of the symbolic link
 # $(2) = Prefix of the symbolic link's target
 #
+# Rules generated:
+#
+#     $(1)/% : $(2)/%
+#
 define rule.template
 $(1)/% : $(2)/% force
 	$$(call ensure_directory_exists,$$(@D))
@@ -62,11 +66,15 @@ endef
 # Files in the repository are stored in the default directories.
 # Links in $(HOME) take the XDG variables into account.
 
-# Template for the definition of variables and path conversion functions
+# Template for the definition of rules, variables and path conversion functions
 # for the user's XDG directories.
 #
 # $(1) = Type of XDG directory
 # $(2) = Default directory, used if XDG variable not set
+#
+# Rules generated:
+#
+#     $(XDG_$(1)_HOME)/% : $(XDG_$(1)_HOME.dotfiles)
 #
 # Variables generated:
 #
@@ -100,7 +108,7 @@ rule.define = $(eval $(call rule.template,$(1),$(2)))
 # Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
 prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
 
-# Defines XDG variables for the given type and default directory.
+# Defines XDG rules, variables and functions for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
 
 # Create symbolic links in $(HOME) pointing at their counterparts in $(~).
@@ -112,6 +120,8 @@ $(call rule.define,$(HOME),$(~))
 # ~.dotfiles_to_user
 $(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
+# $(XDG_DATA_HOME)/% : $(XDG_DATA_HOME.dotfiles)
+#
 # XDG_DATA_HOME
 # XDG_DATA_HOME.default
 # XDG_DATA_HOME.dotfiles
@@ -122,6 +132,8 @@ $(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 # DATA.dotfiles_to_user
 $(call XDG.define,DATA,.local/share)
 
+# $(XDG_CONFIG_HOME)/% : $(XDG_CONFIG_HOME.dotfiles)
+#
 # XDG_CONFIG_HOME
 # XDG_CONFIG_HOME.default
 # XDG_CONFIG_HOME.dotfiles
@@ -138,6 +150,8 @@ $(call XDG.define,CONFIG,.config)
 #     $ systemd-path user-binaries
 #     ~/.local/bin
 
+# $(XDG_BIN_HOME)/% : $(XDG_BIN_HOME.dotfiles)
+#
 # XDG_BIN_HOME
 # XDG_BIN_HOME.default
 # XDG_BIN_HOME.dotfiles
