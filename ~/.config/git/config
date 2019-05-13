@@ -13,6 +13,7 @@
 	co = checkout
 	r = rebase
 	ri = rebase --interactive
+	rc = rebase --continue
 	d = diff
 	ds = diff --staged
 	b = branch
