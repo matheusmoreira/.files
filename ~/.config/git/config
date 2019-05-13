@@ -12,6 +12,7 @@
 	p = push
 	co = checkout
 	r = rebase
+	ri = rebase --interactive
 	d = diff
 	ds = diff --staged
 	b = branch
