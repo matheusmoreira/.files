@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+setxkbmap -layout "${1:-us}"
