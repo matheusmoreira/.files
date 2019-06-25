@@ -204,7 +204,7 @@ all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
 all += i3
-i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config)
+i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfiles_to_user,nvidia-smi.py)
 
 all += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)

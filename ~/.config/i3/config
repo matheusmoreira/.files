@@ -82,7 +82,10 @@ mode "resize" {
 }
 
 bar {
-        status_command i3status
+        # What happens if the computer doesn't have an NVIDIA GPU?
+        # Should probably wrap this up in a script
+        # that detects whether an NVIDIA GPU is present.
+        status_command i3status | ~/.local/bin/nvidia-smi.py --index 6
 }
 
 # i3lock.png should be a symbolic link pointing to a PNG image
