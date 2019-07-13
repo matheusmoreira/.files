@@ -35,6 +35,7 @@ paths.add PATH $(systemd-path user-binaries)
 # Aliases
 
 alias ls='ls -lahp --group-directories-first --color=auto'
+alias tree='tree -l --dirsfirst'
 
 # Prompt
 
