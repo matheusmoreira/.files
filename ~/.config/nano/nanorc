@@ -1,0 +1,14 @@
+set atblanks
+set autoindent
+unset breaklonglines
+set constantshow
+set guidestripe 72
+set indicator
+set linenumbers
+set nohelp
+set regexp
+set saveonexit
+unset softwrap
+set trimblanks
+set unix
+set zero

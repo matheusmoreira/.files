@@ -177,6 +177,9 @@ git : $(call CONFIG.dotfiles_to_user,git/config)
 all += vim
 vim : ~/.vimrc
 
+all += nano
+nano : $(call CONFIG.dotfiles_to_user,nano/nanorc)
+
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
