@@ -1,3 +1,6 @@
+# Disable built-in make variables and rules
+MAKEFLAGS += --no-builtin-variables --no-builtin-rules
+
 makefile := $(abspath $(lastword $(MAKEFILE_LIST)))
 dotfiles := $(abspath $(dir $(makefile)))
 ~ := $(abspath $(dotfiles)/~)
