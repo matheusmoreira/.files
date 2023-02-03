@@ -212,6 +212,9 @@ i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfil
 all += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 
+all += termux
+termux : ~/.termux/termux.properties
+
 all : $(all)
 
 force:
