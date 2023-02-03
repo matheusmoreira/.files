@@ -219,7 +219,8 @@ all += termux
 termux : ~/.termux/termux.properties
 
 all : $(all)
+basic : bash git vim nano
 
 force:
 .PHONY: all $(all)
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := basic
