@@ -26,7 +26,7 @@ function paths.add {
   esac
 }
 
-paths.add PATH $(systemd-path user-binaries)
+paths.add PATH ~/.local/bin/
 
 # These settings only make sense for interactive shells.
 # Do nothing if shell is not interactive.
