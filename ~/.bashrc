@@ -141,9 +141,23 @@ prompt-error-code() {
   fi
 }
 
+prompt-git() {
+  local prompt=''
+
+  local git_directory
+  if ! git_directory="$(git rev-parse --git-dir 2>/dev/null)" || [[ -z "${git_directory}" ]]
+  then
+    return 1
+  fi
+  prompt+="$(terminal-format foreground=yellow ± reset)"
+
+  prompt-pad "${prompt}"
+}
+
 PS1=''
 PS1+="$(prompt-working-directory)"
 PS1+='$(prompt-error-code)'
+PS1+='$(prompt-git)'
 PS1+='\n'
 PS1+='\$ '
 
