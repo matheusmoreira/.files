@@ -152,10 +152,13 @@ prompt-git() {
   prompt+="$(terminal-format foreground=yellow ± reset)"
 
   local commit branch
-  commit="$(git rev-parse --short HEAD 2>/dev/null)"
-  branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
-  prompt+=" $(terminal-format dim foreground=cyan "${commit}" reset)"
-  prompt+=" $(terminal-format bold "${branch}" reset)"
+  if commit="$(git rev-parse --short HEAD 2>/dev/null)" && [[ -n "${commit}" ]]; then
+    branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
+    prompt+=" $(terminal-format dim foreground=cyan "${commit}" reset)"
+    prompt+=" $(terminal-format bold "${branch}" reset)"
+  else
+    prompt+=" $(terminal-format dim ∅ reset)"
+  fi
 
   prompt-pad "${prompt}"
 }
