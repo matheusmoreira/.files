@@ -160,6 +160,18 @@ prompt-git() {
     return
   fi
 
+  local upstream_status
+  if upstream_status="$(git rev-list --count --left-right 'HEAD...@{upstream}' 2>/dev/null)"
+  then
+    local ahead behind
+    read -r ahead behind <<< "${upstream_status}"
+    if [[ "${ahead}" -gt 0 ]]; then
+      prompt-pad "$(terminal-format foreground=green '+' reset "${ahead}")"
+    fi
+    if [[ "${behind}" -gt 0 ]]; then
+      prompt-pad "$(terminal-format foreground=red   '-' reset "${behind}")"
+    fi
+  fi
 }
 
 PS1=''
