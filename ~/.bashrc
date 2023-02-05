@@ -143,11 +143,11 @@ prompt-error-code() {
 
 prompt-git() {
   local git_directory
-  if ! git_directory="$(git rev-parse --git-dir 2>/dev/null)" || [[ -z "${git_directory}" ]]
+  if git_directory="$(git rev-parse --git-dir 2>/dev/null)" && [[ -n "${git_directory}" ]]
   then
-    return 1
-  else
     prompt-pad "$(terminal-format foreground=yellow ± reset)"
+  else
+    return 1
   fi
 
   local commit branch
