@@ -69,6 +69,56 @@ declare -A terminal=(
   [attributes.blink]=$(tput blink)
 )
 
+terminal-format() {
+  local output=''
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      foreground=* | fg=*)
+        output+="${terminal[ansi.foreground.${1#*=}]}"
+        ;;
+      background=* | bg=*)
+        output+="${terminal[ansi.background.${1#*=}]}"
+        ;;
+      reset)
+        output+="${terminal[attributes.reset]}"
+        ;;
+      bold | bright)
+        output+="${terminal[attributes.bold]}"
+        ;;
+      dim)
+        output+="${terminal[attributes.dim]}"
+        ;;
+      italics)
+        output+="${terminal[attributes.italics]}"
+        ;;
+      underline | underlined)
+        output+="${terminal[attributes.underline]}"
+        ;;
+      reverse | reversed | reverse-video | reversed-video)
+        output+="${terminal[attributes.reverse]}"
+        ;;
+      standout | highlight | highlighted)
+        output+="${terminal[attributes.standout]}"
+        ;;
+      invis | invisible)
+        output+="${terminal[attributes.invisible]}"
+        ;;
+      blink | blinking)
+        output+="${terminal[attributes.blink]}"
+        ;;
+      *)
+        output+="$1"
+        ;;
+    esac
+    shift
+  done
+
+  printf '%b' "${output}"
+}
+
+alias tty-fmt=terminal-format
+
 # Prompt
 
 PS1='[\W]\$ '
