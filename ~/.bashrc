@@ -121,6 +121,12 @@ alias tty-fmt=terminal-format
 
 # Prompt
 
+prompt-pad() {
+  if [[ -n "$1" ]]; then
+    printf " %s" "$1"
+  fi
+}
+
 prompt-working-directory() {
   terminal-format '[ ' foreground=green '\w' reset ' ]'
 }
