@@ -16,7 +16,7 @@ function paths.add {
     *:"$2":*)
       ;;
     *)
-      if [ "$3" = "after" ]
+      if [[ "$3" = "after" ]]
       then
         variable="${variable:+${variable}:}$2"
       else
