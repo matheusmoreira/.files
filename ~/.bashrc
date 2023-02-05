@@ -157,6 +157,7 @@ prompt-git() {
     prompt-pad "$(terminal-format bold "${branch}" reset)"
   else
     prompt-pad "$(terminal-format dim ∅ reset)"
+    return
   fi
 
 }
