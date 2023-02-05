@@ -131,8 +131,19 @@ prompt-working-directory() {
   terminal-format '[ ' foreground=green '\w' reset ' ]'
 }
 
+prompt-error-code() {
+  local code="$?"
+
+  if [[ "${code}" -ne 0 ]]; then
+    local prompt
+    prompt="$(terminal-format foreground=red "${code}" reset)"
+    prompt-pad "${prompt}"
+  fi
+}
+
 PS1=''
 PS1+="$(prompt-working-directory)"
+PS1+='$(prompt-error-code)'
 PS1+='\n'
 PS1+='\$ '
 
