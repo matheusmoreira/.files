@@ -121,7 +121,14 @@ alias tty-fmt=terminal-format
 
 # Prompt
 
-PS1='[\W]\$ '
+prompt-working-directory() {
+  terminal-format '[ ' foreground=green '\w' reset ' ]'
+}
+
+PS1=''
+PS1+="$(prompt-working-directory)"
+PS1+='\n'
+PS1+='\$ '
 
 # Exported environment variables
 
