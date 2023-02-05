@@ -151,6 +151,10 @@ prompt-git() {
   fi
   prompt+="$(terminal-format foreground=yellow ± reset)"
 
+  local branch
+  branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
+  prompt+=" $(terminal-format bold "${branch}" reset)"
+
   prompt-pad "${prompt}"
 }
 
