@@ -33,3 +33,5 @@
 	showUntrackedFiles = all    # Show all files in an untracked directory
 [tag]
 	forceSignAnnotated = true    # Sign all annotated tags
+[init]
+	defaultBranch = master    # I just like the name 'master'
