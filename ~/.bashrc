@@ -142,25 +142,23 @@ prompt-error-code() {
 }
 
 prompt-git() {
-  local prompt=''
-
   local git_directory
   if ! git_directory="$(git rev-parse --git-dir 2>/dev/null)" || [[ -z "${git_directory}" ]]
   then
     return 1
+  else
+    prompt-pad "$(terminal-format foreground=yellow ± reset)"
   fi
-  prompt+="$(terminal-format foreground=yellow ± reset)"
 
   local commit branch
   if commit="$(git rev-parse --short HEAD 2>/dev/null)" && [[ -n "${commit}" ]]; then
     branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
-    prompt+=" $(terminal-format dim foreground=cyan "${commit}" reset)"
-    prompt+=" $(terminal-format bold "${branch}" reset)"
+    prompt-pad "$(terminal-format dim foreground=cyan "${commit}" reset)"
+    prompt-pad "$(terminal-format bold "${branch}" reset)"
   else
-    prompt+=" $(terminal-format dim ∅ reset)"
+    prompt-pad "$(terminal-format dim ∅ reset)"
   fi
 
-  prompt-pad "${prompt}"
 }
 
 PS1=''
