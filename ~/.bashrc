@@ -162,29 +162,71 @@ prompt-git() {
     return 1
   fi
 
-  local commit branch
-  if commit="$(git rev-parse --short HEAD 2>/dev/null)" && [[ -n "${commit}" ]]; then
-    branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
-    prompt-format "${commit}" dim foreground=cyan
-    prompt-format "${branch}" bold
+  local status commit branch upstream ab modified untracked
+  if status="$(git status --porcelain=v2 --branch)"; then
+    local line
+    while read -r line; do
+      case "${line}" in
+        '# branch.oid '*)
+          commit="${line#'# branch.oid '}" ; ;;
+        '# branch.head '*)
+          branch="${line#'# branch.head '}" ; ;;
+        '# branch.upstream '*)
+          upstream="${line#'# branch.upstream '}" ; ;;
+        '# branch.ab '*)
+          ab="${line#'# branch.ab '}" ; ;;
+        '1 '* | '2 '*)
+          modified='*' ; ;;
+        '? '*)
+          untracked='?' ; ;;
+        *)
+          :
+      esac
+    done <<< "${status}"
+  fi
+
+  if [[ -n "${untracked}" || -n "${modified}" ]]; then
+    prompt-write ' '
+    if [[ -n "${untracked}" ]]; then
+      prompt-write foreground=blue "${untracked}" reset
+    fi
+    if [[ -n "${modified}" ]]; then
+      prompt-write foreground=red  "${modified}" reset
+    fi
+  fi
+
+  if [[ "${commit}" != "(initial)"  ]]; then
+    if commit="$(git rev-parse --short "${commit}" 2>/dev/null)"; then
+      prompt-format "${commit}" dim foreground=cyan
+    fi
   else
     prompt-format ∅ dim
     return
   fi
 
-  local upstream_status
-  if upstream_status="$(git rev-list --count --left-right 'HEAD...@{upstream}' 2>/dev/null)"
-  then
-    local ahead behind
-    read -r ahead behind <<< "${upstream_status}"
-    if [[ "${ahead}" -gt 0 ]]; then
-      prompt-format '+' foreground=green
-      prompt-write "${ahead}"
-    fi
-    if [[ "${behind}" -gt 0 ]]; then
-      prompt-format '-' foreground=red
-      prompt-write "${behind}"
-    fi
+  if [[ "${branch}" != "(detached)" ]]; then
+    prompt-format "${branch}" bright
+  else
+    return
+  fi
+
+  if [[ -n "${upstream}" ]]; then
+    prompt-format "${upstream}" dim
+  else
+    return
+  fi
+
+  local ahead behind
+  read -r ahead behind <<< "${ab}"
+  ahead="${ahead#+}"
+  behind="${behind#-}"
+  if [[ "${ahead}" -gt 0 ]]; then
+    prompt-format + foreground=green
+    prompt-write "${ahead}"
+  fi
+  if [[ "${behind}" -gt 0 ]]; then
+    prompt-format - foreground=red
+    prompt-write "${behind}"
   fi
 }
 
