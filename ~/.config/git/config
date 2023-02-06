@@ -17,6 +17,7 @@
 	d = diff
 	ds = diff --staged
 	b = branch
+	ap = add --patch
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
