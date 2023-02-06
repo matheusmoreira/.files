@@ -6,7 +6,7 @@
 function paths.list {
   declare -n variable=$1
 
-  echo $variable | tr : '\n'
+  echo "${variable}" | tr : '\n'
 }
 
 function paths.add {
