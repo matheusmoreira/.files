@@ -69,7 +69,7 @@ declare -A terminal=(
   [attributes.blink]=$(tput blink)
 )
 
-terminal-format() {
+terminal-write() {
   local output=''
 
   while [[ "$#" -gt 0 ]]; do
@@ -117,27 +117,39 @@ terminal-format() {
   printf '%b' "${output}"
 }
 
-alias tty-fmt=terminal-format
+terminal-format() {
+  if [[ -n "$1" ]]; then
+    local input
+    input="$1"
+    shift
+    terminal-write "$@" "${input}" reset
+  fi
+}
+
+alias tty-write=terminal-write tty-fmt=terminal-format
 
 # Prompt
 
-prompt-pad() {
+alias prompt-write=terminal-write
+
+prompt-format() {
   if [[ -n "$1" ]]; then
-    printf " %s" "$1"
+    local input="$1"
+    shift
+    terminal-write ' '
+    terminal-format "${input}" "$@"
   fi
 }
 
 prompt-working-directory() {
-  terminal-format '[ ' foreground=green '\w' reset ' ]'
+  terminal-write '[ ' foreground=green '\w' reset ' ]'
 }
 
 prompt-error-code() {
   local code="$?"
 
   if [[ "${code}" -ne 0 ]]; then
-    local prompt
-    prompt="$(terminal-format foreground=red "${code}" reset)"
-    prompt-pad "${prompt}"
+    prompt-format "${code}" foreground=red
   fi
 }
 
@@ -145,7 +157,7 @@ prompt-git() {
   local git_directory
   if git_directory="$(git rev-parse --git-dir 2>/dev/null)" && [[ -n "${git_directory}" ]]
   then
-    prompt-pad "$(terminal-format foreground=yellow ± reset)"
+    prompt-format ± foreground=yellow
   else
     return 1
   fi
@@ -153,10 +165,10 @@ prompt-git() {
   local commit branch
   if commit="$(git rev-parse --short HEAD 2>/dev/null)" && [[ -n "${commit}" ]]; then
     branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)"
-    prompt-pad "$(terminal-format dim foreground=cyan "${commit}" reset)"
-    prompt-pad "$(terminal-format bold "${branch}" reset)"
+    prompt-format "${commit}" dim foreground=cyan
+    prompt-format "${branch}" bold
   else
-    prompt-pad "$(terminal-format dim ∅ reset)"
+    prompt-format ∅ dim
     return
   fi
 
@@ -166,10 +178,12 @@ prompt-git() {
     local ahead behind
     read -r ahead behind <<< "${upstream_status}"
     if [[ "${ahead}" -gt 0 ]]; then
-      prompt-pad "$(terminal-format foreground=green '+' reset "${ahead}")"
+      prompt-format '+' foreground=green
+      prompt-write "${ahead}"
     fi
     if [[ "${behind}" -gt 0 ]]; then
-      prompt-pad "$(terminal-format foreground=red   '-' reset "${behind}")"
+      prompt-format '-' foreground=red
+      prompt-write "${behind}"
     fi
   fi
 }
