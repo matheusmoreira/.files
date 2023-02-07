@@ -162,8 +162,8 @@ prompt-git() {
     return 1
   fi
 
-  local status commit branch upstream ab modified untracked
-  if status="$(git status --porcelain=v2 --branch)"; then
+  local status commit branch upstream ab stashed modified untracked
+  if status="$(git status --porcelain=v2 --branch --show-stash)"; then
     local line
     while read -r line; do
       case "${line}" in
@@ -175,6 +175,8 @@ prompt-git() {
           upstream="${line#'# branch.upstream '}" ; ;;
         '# branch.ab '*)
           ab="${line#'# branch.ab '}" ; ;;
+        '# stash '*)
+          stashed="${line#'# stash '}" ; ;;
         '1 '* | '2 '*)
           modified='*' ; ;;
         '? '*)
