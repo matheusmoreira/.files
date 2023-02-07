@@ -10,3 +10,4 @@ set whichwrap=b,s,<,>,[,]
 set linebreak
 
 autocmd BufWritePre * %s/\s\+$//e
+autocmd FileType html setlocal expandtab shiftwidth=2 softtabstop=2
