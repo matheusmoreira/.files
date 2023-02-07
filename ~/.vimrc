@@ -1,6 +1,7 @@
 filetype plugin on
 syntax on
 
+set list
 set number
 set mouse=a
 set spell
