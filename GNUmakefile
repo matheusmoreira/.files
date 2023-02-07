@@ -189,6 +189,9 @@ gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 all += shellcheck
 shellcheck : $(call CONFIG.dotfiles_to_user,shellcheckrc)
 
+all += tidy
+tidy : ~/.tidyrc
+
 sublime_text_3_user_preferences := $(call CONFIG.dotfiles_to_user,sublime-text-3/Packages/User/*.sublime-settings)
 all += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)

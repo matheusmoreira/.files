@@ -1,0 +1,11 @@
+quiet: true
+tidy-mark: false
+doctype: auto
+char-encoding: utf8
+newline: LF
+indent: auto
+indent-spaces: 2
+indent-with-tabs: false
+wrap: 72
+clean: true
+accessibility-check: 3
