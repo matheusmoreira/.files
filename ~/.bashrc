@@ -142,7 +142,7 @@ prompt-format() {
 }
 
 prompt-working-directory() {
-  terminal-write '[ ' foreground=green '\w' reset ' ]'
+  prompt-write '[ ' foreground=green '\w' reset ' ]'
 }
 
 prompt-error-code() {
