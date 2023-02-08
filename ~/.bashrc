@@ -163,10 +163,16 @@ prompt-working-directory() {
 
 prompt-error-code() {
   local code="$1"
+  local format
 
   if [[ "${code}" -ne 0 ]]; then
-    prompt-write foreground=red "${code}" reset ' '
+    format='foreground=red'
+  else
+    format='dim'
   fi
+
+  code="$(printf '%03d' "${code}")"
+  prompt-write "${format}" "${code}" reset ' '
 }
 
 prompt-git() {
