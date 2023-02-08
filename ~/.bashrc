@@ -144,14 +144,16 @@ alias tty-write=terminal-write tty-fmt=terminal-format
 
 # Prompt
 
-alias prompt-write=terminal-write
+prompt-write() {
+  terminal-write escape=bash "$@"
+}
 
 prompt-format() {
   if [[ -n "$1" ]]; then
     local input="$1"
     shift
-    terminal-write ' '
-    terminal-format "${input}" "$@"
+    terminal-write escape=bash ' '
+    terminal-format "${input}" escape=bash "$@"
   fi
 }
 
