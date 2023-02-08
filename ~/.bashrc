@@ -149,7 +149,7 @@ prompt-error-code() {
   local code="$1"
 
   if [[ "${code}" -ne 0 ]]; then
-    prompt-format "${code}" foreground=red
+    prompt-write foreground=red "${code}" reset ' '
   fi
 }
 
@@ -237,9 +237,9 @@ prompt-command() {
 
   PS1=''
   PS1+="$(prompt-working-directory)"
-  PS1+="$(prompt-error-code "${status}")"
   PS1+="$(prompt-git)"
   PS1+='\n'
+  PS1+="$(prompt-error-code "${status}")"
   PS1+='\$ '
 }
 
