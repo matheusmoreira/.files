@@ -232,12 +232,18 @@ prompt-git() {
   fi
 }
 
-PS1=''
-PS1+="$(prompt-working-directory)"
-PS1+='$(prompt-error-code "$?")'
-PS1+='$(prompt-git)'
-PS1+='\n'
-PS1+='\$ '
+prompt-command() {
+  local status="$?"
+
+  PS1=''
+  PS1+="$(prompt-working-directory)"
+  PS1+="$(prompt-error-code "${status}")"
+  PS1+="$(prompt-git)"
+  PS1+='\n'
+  PS1+='\$ '
+}
+
+PROMPT_COMMAND=prompt-command
 
 # Exported environment variables
 
