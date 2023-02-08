@@ -79,46 +79,52 @@ done
 
 terminal-write() {
   local output=''
+  local selector=''
+
+  # Current escaping mode for non-printable characters.
+  # If escape=mode is passed as argument, turn on the specified
+  # escaping mode. Currently supported modes are bash and readline.
+  #
+  # Bash and readline need this for line editing and cursor positions.
+  # If non-printable characters aren't escaped, these programs can get
+  # confused and overwrite part of the screen. Really aggravating.
+  local escaping_mode=''
 
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
+      escape=bash | escape=readline | escape='')
+        escaping_mode="${1#*=}"; shift; continue; ;;
       foreground=* | fg=*)
-        output+="${terminal[ansi.foreground.${1#*=}]}"
-        ;;
+        selector="ansi.foreground.${1#*=}"; ;;
       background=* | bg=*)
-        output+="${terminal[ansi.background.${1#*=}]}"
-        ;;
+        selector="ansi.background.${1#*=}"; ;;
       reset)
-        output+="${terminal[attributes.reset]}"
-        ;;
+        selector='attributes.reset'; ;;
       bold | bright)
-        output+="${terminal[attributes.bold]}"
-        ;;
+        selector='attributes.bold'; ;;
       dim)
-        output+="${terminal[attributes.dim]}"
-        ;;
+        selector='attributes.dim'; ;;
       italics)
-        output+="${terminal[attributes.italics]}"
-        ;;
+        selector='attributes.italics'; ;;
       underline | underlined)
-        output+="${terminal[attributes.underline]}"
-        ;;
+        selector='attributes.underline'; ;;
       reverse | reversed | reverse-video | reversed-video)
-        output+="${terminal[attributes.reverse]}"
-        ;;
+        selector='attributes.reverse'; ;;
       standout | highlight | highlighted)
-        output+="${terminal[attributes.standout]}"
-        ;;
+        selector='attributes.standout'; ;;
       invis | invisible)
-        output+="${terminal[attributes.invisible]}"
-        ;;
+        selector='attributes.invisible'; ;;
       blink | blinking)
-        output+="${terminal[attributes.blink]}"
-        ;;
+        selector='attributes.blink'; ;;
       *)
-        output+="$1"
-        ;;
+        output+="${1}"; shift; continue; ;;
     esac
+
+    if [[ -n "${escaping_mode}" ]]; then
+      selector+=".escaped.${escaping_mode}"
+    fi
+    output+="${terminal[${selector}]}"
+
     shift
   done
 
