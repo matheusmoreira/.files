@@ -171,7 +171,7 @@ prompt-error-code() {
     format='dim'
   fi
 
-  code="$(printf '%03d' "${code}")"
+  code="$(printf '%3d' "${code}")"
   prompt-write "${format}" "${code}" reset ' '
 }
 
