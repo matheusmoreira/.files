@@ -69,6 +69,14 @@ declare -A terminal=(
   [attributes.blink]=$(tput blink)
 )
 
+# Bash and readline need these codes to be escaped by surrounding them
+# with \[ \] and \x01 and \x02 respectively to indicate they are
+# non-printing characters, lest they interfere with their own codes.
+for key in "${!terminal[@]}"; do
+  terminal[${key}.escaped.bash]="\[${terminal[${key}]}\]"
+  terminal[${key}.escaped.readline]="\x01${terminal[${key}]}\x02"
+done
+
 terminal-write() {
   local output=''
 
