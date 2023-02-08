@@ -209,13 +209,17 @@ prompt-git() {
     done <<< "${status}"
   fi
 
-  if [[ -n "${untracked}" || -n "${modified}" ]]; then
+  if [[ -n "${untracked}" || -n "${modified}" || -n "${stashed}" ]]
+  then
     prompt-write ' '
     if [[ -n "${untracked}" ]]; then
       prompt-write foreground=blue "${untracked}" reset
     fi
     if [[ -n "${modified}" ]]; then
       prompt-write foreground=red  "${modified}" reset
+    fi
+    if [[ -n "${stashed}" ]]; then
+      prompt-write foreground=green "${stashed}" reset
     fi
   fi
 
