@@ -12,7 +12,7 @@
 	p = push
 	co = checkout
 	r = rebase
-	ri = rebase --interactive
+	ri = rebase --interactive --rebase-merges
 	rc = rebase --continue
 	d = diff
 	ds = diff --staged
