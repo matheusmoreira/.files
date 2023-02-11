@@ -36,6 +36,7 @@ paths.add PATH ~/.local/bin/
 
 alias ls='ls -lahp --group-directories-first --color=auto'
 alias tree='tree -l --dirsfirst'
+alias g=git
 
 # Terminal escape sequences
 
