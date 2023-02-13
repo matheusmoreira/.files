@@ -9,6 +9,9 @@ set spelllang=en,pt
 set whichwrap=b,s,<,>,[,]
 set linebreak
 
+hi clear SpellBad
+hi SpellBad cterm=underline
+
 autocmd BufWritePre * %s/\s\+$//e
 
 autocmd FileType c    setlocal noexpandtab tabstop=8 softtabstop=8 shiftwidth=8 textwidth=80
