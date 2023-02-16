@@ -186,6 +186,9 @@ nano : $(call CONFIG.dotfiles_to_user,nano/nanorc)
 all += gpg
 gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf
 
+all += gdb
+gdb : $(call CONFIG.dotfiles_to_user,gdb/*)
+
 all += shellcheck
 shellcheck : $(call CONFIG.dotfiles_to_user,shellcheckrc)
 
