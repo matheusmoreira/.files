@@ -5,6 +5,7 @@
 	eol = lf            # Use LF for text files in the working directory
 	autocrlf = input    # Convert line endings to LF before committing
 	compression = 9     # Maximum compression
+	pager = cat         # Disable pager
 [alias]
 	l = log --oneline --graph --decorate --stat
 	s = status
