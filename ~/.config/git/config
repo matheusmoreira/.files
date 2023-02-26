@@ -10,6 +10,7 @@
 	l = log --oneline --graph --decorate --stat
 	s = status
 	c = commit
+	ca = commit --amend
 	p = push
 	co = checkout
 	r = rebase
