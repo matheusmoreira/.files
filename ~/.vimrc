@@ -3,7 +3,7 @@ syntax on
 
 set nocompatible
 set list
-set number
+set number relativenumber
 set mouse=a
 set spell
 set spelllang=en,pt
