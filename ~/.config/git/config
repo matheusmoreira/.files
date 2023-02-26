@@ -13,6 +13,7 @@
 	ca = commit --amend
 	p = push
 	co = checkout
+	cob = checkout -b
 	r = rebase
 	ri = rebase --interactive --rebase-merges
 	rc = rebase --continue
