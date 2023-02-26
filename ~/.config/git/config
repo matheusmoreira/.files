@@ -24,6 +24,8 @@
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
+[push]
+	autoSetupRemote = true    # Track remote branch automatically on push
 [grep]
 	lineNumber = true        # Show line numbers
 	extendedRegexp = true    # Use POSIX extended regular expressions
