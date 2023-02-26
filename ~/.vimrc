@@ -1,6 +1,7 @@
 filetype plugin on
 syntax on
 
+set nocompatible
 set list
 set number
 set mouse=a
