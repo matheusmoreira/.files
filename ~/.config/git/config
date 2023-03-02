@@ -41,3 +41,10 @@
 	forceSignAnnotated = true    # Sign all annotated tags
 [init]
 	defaultBranch = master    # I just like the name 'master'
+[sendemail]
+	smtpServer = smtp.gmail.com
+	smtpServerPort = 587
+	smtpEncryption = tls
+	smtpUser = matheus.a.m.moreira@gmail.com
+[credential]
+	helper = store
