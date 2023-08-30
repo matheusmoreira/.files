@@ -231,6 +231,10 @@ all += irc irssi
 irc : irssi
 irssi : ~/.irssi/config
 
+all += email msmtp
+email : msmtp
+msmtp : ~/.msmtprc
+
 all : $(all)
 basic : bash git vim nano
 
