@@ -2,6 +2,7 @@ filetype plugin on
 syntax on
 
 set nocompatible
+set hidden
 set list
 set number relativenumber
 set mouse=a
