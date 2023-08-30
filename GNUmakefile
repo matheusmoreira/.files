@@ -227,6 +227,10 @@ mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 all += termux
 termux : ~/.termux/termux.properties
 
+all += irc irssi
+irc : irssi
+irssi : ~/.irssi/config
+
 all : $(all)
 basic : bash git vim nano
 

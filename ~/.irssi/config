@@ -1,0 +1,98 @@
+settings = {
+  core = {
+    real_name = "Matheus Afonso Martins Moreira";
+    user_name = "matheusmoreira";
+    nick = "matheusmoreira";
+  };
+  "fe-text" = {
+    paste_ignore_first_nl = "yes";
+    paste_verify_line_count = "1";
+  };
+};
+
+servers = (
+  {
+    address = "irc.libera.chat";
+    chatnet = "liberachat";
+    port = "6697";
+    use_tls = "yes";
+    tls_cert = "~/.irssi/certs/matheusmoreira/libera.pem";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.oftc.net";
+    chatnet = "OFTC";
+    port = "6697";
+    use_tls = "yes";
+    tls_cert = "~/.irssi/certs/matheusmoreira/oftc.pem";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.rizon.net";
+    chatnet = "Rizon";
+    port = "6697";
+    use_tls = "yes";
+    tls_verify = "yes";
+  },
+  {
+    address = "irc.undernet.org";
+    chatnet = "Undernet";
+    port = "6667";
+  },
+);
+
+chatnets = {
+  liberachat = {
+    type = "IRC";
+    max_kicks = "1";
+    max_msgs = "4";
+    max_whois = "1";
+  };
+  OFTC = {
+    type = "IRC";
+    max_kicks = "1";
+    max_msgs = "1";
+    max_whois = "1";
+  };
+  Rizon = {
+    type = "IRC";
+    max_kicks = "1";
+    max_msgs = "1";
+    max_whois = "1";
+  };
+  Undernet = {
+    type = "IRC";
+    max_kicks = "1";
+    max_msgs = "1";
+    max_whois = "1";
+  };
+};
+
+channels = (
+  { name = "#linux"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "##programming"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#c"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#javascript"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#proglangdesign"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#termux"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#git"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#lisp"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#datahoarder"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "##English"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "##japanese"; chatnet = "liberachat"; autojoin = "yes"; },
+  { name = "#fdroid"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#postmarketos"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#postmarketos-porting"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#postmarketos-mainline"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#postmarketos-devel"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#postmarketos-lowlevel"; chatnet = "oftc"; autojoin = "yes"; },
+  { name = "#archlinux"; chatnet = "liberachat"; autojoin = "no"; },
+  { name = "#archlinux-offtopic"; chatnet = "liberachat"; autojoin = "no"; },
+  { name = "#python"; chatnet = "liberachat"; autojoin = "no"; },
+  { name = "#gnupg"; chatnet = "liberachat"; autojoin = "no"; },
+  { name = "#osm"; chatnet = "oftc"; autojoin = "yes"; },
+);
+
+ignores = ( { level = "JOINS PARTS QUITS"; } );
