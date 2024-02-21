@@ -21,6 +21,7 @@
 	ds = diff --staged
 	b = branch
 	ap = add --patch
+	copyrights = shortlog --group='Copyright © %ad %aN <%aE>' --date=format:%Y --summary --numbered
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
