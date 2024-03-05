@@ -24,6 +24,7 @@
 	ap = add --patch
 	copyrights = log --follow --format='Copyright © %ad %aN <%aE>' --date='format:%Y'
 	last-commit-message = log -1 --format='%B'
+	lcm = last-commit-message
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
