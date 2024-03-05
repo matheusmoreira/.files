@@ -12,6 +12,7 @@
 	c = commit
 	ca = commit --amend
 	p = push
+	m = merge
 	co = checkout
 	cob = checkout -b
 	r = rebase
