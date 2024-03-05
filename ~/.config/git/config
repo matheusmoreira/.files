@@ -50,3 +50,5 @@
 	smtpUser = matheus.a.m.moreira@gmail.com
 [credential]
 	helper = store
+[merge]
+	ff = false
