@@ -80,6 +80,7 @@ channels = (
   { name = "#git"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#lisp"; chatnet = "liberachat"; autojoin = "yes"; },
 
+  { name = "#css"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#gcc"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#qemu"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#datahoarder"; chatnet = "liberachat"; autojoin = "no"; },
