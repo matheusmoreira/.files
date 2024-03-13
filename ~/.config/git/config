@@ -54,3 +54,5 @@
 	helper = store
 [merge]
 	ff = false
+[pull]
+	ff = only
