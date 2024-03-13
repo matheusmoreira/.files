@@ -74,12 +74,12 @@ channels = (
   { name = "#linux"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "##programming"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#c"; chatnet = "liberachat"; autojoin = "yes"; },
-  { name = "#javascript"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#proglangdesign"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#termux"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#git"; chatnet = "liberachat"; autojoin = "yes"; },
   { name = "#lisp"; chatnet = "liberachat"; autojoin = "yes"; },
 
+  { name = "#javascript"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#css"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#gcc"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#qemu"; chatnet = "liberachat"; autojoin = "no"; },
