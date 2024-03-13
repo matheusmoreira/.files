@@ -82,7 +82,7 @@ channels = (
   { name = "#javascript"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#css"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "#gcc"; chatnet = "liberachat"; autojoin = "no"; },
-  { name = "#qemu"; chatnet = "liberachat"; autojoin = "no"; },
+  { name = "#qemu"; chatnet = "oftc"; autojoin = "no"; },
   { name = "#datahoarder"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "##English"; chatnet = "liberachat"; autojoin = "no"; },
   { name = "##japanese"; chatnet = "liberachat"; autojoin = "no"; },
