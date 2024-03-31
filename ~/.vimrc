@@ -13,8 +13,10 @@ set spelllang=en,pt
 set whichwrap=b,s,<,>,[,]
 set linebreak
 
-hi clear SpellBad
-hi SpellBad cterm=underline
+highlight SpellBad   term=underline cterm=underline ctermbg=NONE
+highlight SpellCap   term=underline cterm=underline ctermbg=NONE
+highlight SpellRare  term=underline cterm=underline ctermbg=NONE
+highlight SpellLocal term=underline cterm=underline ctermbg=NONE
 
 fun! StripTrailingWhitespace()
     if &filetype =~ 'diff'
