@@ -13,6 +13,12 @@ set spelllang=en,pt
 set whichwrap=b,s,<,>,[,]
 set linebreak
 
+set tabstop=8
+set textwidth=80
+autocmd FileType c          setlocal noexpandtab softtabstop=8 shiftwidth=8
+autocmd FileType html       setlocal expandtab   softtabstop=2 shiftwidth=2 textwidth=0
+autocmd FileType javascript setlocal expandtab   softtabstop=4 shiftwidth=4
+
 highlight SpecialKey term=NONE cterm=NONE
 
 highlight SpellBad   term=underline cterm=underline ctermbg=NONE
@@ -28,7 +34,3 @@ fun! StripTrailingWhitespace()
 endfun
 
 autocmd BufWritePre * call StripTrailingWhitespace()
-
-autocmd FileType c    setlocal noexpandtab tabstop=8 softtabstop=8 shiftwidth=8 textwidth=80
-autocmd FileType html setlocal expandtab shiftwidth=2 softtabstop=2
-autocmd FileType javascript setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4 textwidth=80
