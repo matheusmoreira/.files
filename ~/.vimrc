@@ -5,6 +5,7 @@ set encoding=utf-8
 set nocompatible
 set hidden
 set list
+set listchars=tab:>\ ,lead:-,leadmultispace:---\ ,trail:-
 set number relativenumber
 set mouse=a
 set spell
