@@ -13,6 +13,8 @@ set spelllang=en,pt
 set whichwrap=b,s,<,>,[,]
 set linebreak
 
+highlight SpecialKey term=NONE cterm=NONE
+
 highlight SpellBad   term=underline cterm=underline ctermbg=NONE
 highlight SpellCap   term=underline cterm=underline ctermbg=NONE
 highlight SpellRare  term=underline cterm=underline ctermbg=NONE
