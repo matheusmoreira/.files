@@ -6,7 +6,7 @@ syntax on
 set encoding=utf-8
 set hidden
 set list
-set listchars=tab:>\ ,lead:-,leadmultispace:---\ ,trail:-
+set listchars=tab:>\ ,trail:-
 set number relativenumber
 set mouse=a
 set spell
