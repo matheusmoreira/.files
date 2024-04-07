@@ -213,9 +213,13 @@ X : Xresources xinitrc
 all += urxvt
 urxvt : Xresources
 
+all += terminals kitty foot
+terminals : kitty foot
+
+foot : $(call CONFIG.dotfiles_to_user,foot/foot.ini)
+
 kitty_conf := $(call CONFIG.dotfiles_to_user,kitty/*.conf)
 kitty_themes := $(call CONFIG.dotfiles_to_user,kitty/themes/*.conf)
-all += kitty
 kitty : $(kitty_conf) $(kitty_themes)
 
 all += i3
