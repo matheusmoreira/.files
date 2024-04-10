@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+declare -a arguments=()
+
+for argument in "${@}"; do
+  if [[ "${argument}" =~ ^.+=.+$ ]]; then
+    arguments+=(--property "${argument}")
+  else
+    arguments+=("${argument}")
+  fi
+done
+
+systemd-run --user --scope --shell "${arguments[@]}"
