@@ -1,0 +1,42 @@
+#!/usr/bin/bash
+
+set -e
+
+url='A-Za-z0-9_~;:@=$,&%#/\-\.\!\?\*\+\[\]\(\)'"'"
+
+function download {
+    local page="${1}"
+    curl --silent "${page}"
+}
+
+function extract-mailto {
+    grep --ignore-case --perl-regexp --only-matching "mailto:[${url}]+"
+}
+
+function split-mailto {
+    tr '?&' '\n'
+}
+
+function delete-mailto {
+    sed 's/mailto://g'
+}
+
+function delete-subject {
+    grep --ignore-case --extended-regexp --invert-match 'Subject='
+}
+
+function fix-header {
+    sed 's/=/: /g'
+}
+
+function unescape {
+    sed --null-data 's/+/ /g; s/%/\\x/g' | xargs -0 printf '%b'
+}
+
+function process-mailto {
+    extract-mailto | split-mailto | delete-mailto
+}
+
+for page in "${@}"; do
+  download "${page}" | process-mailto | delete-subject | fix-header | unescape
+done
