@@ -8,6 +8,7 @@
 	pager = cat         # Disable pager
 [alias]
 	l = log --oneline --graph --decorate --stat
+	lp = l --patch
 	s = status
 	c = commit
 	ca = commit --amend
