@@ -6,27 +6,6 @@
 	autocrlf = input    # Convert line endings to LF before committing
 	compression = 9     # Maximum compression
 	pager = cat         # Disable pager
-[alias]
-	l = log --oneline --graph --decorate --stat
-	lp = l --patch
-	s = status
-	c = commit
-	ca = commit --amend
-	p = push
-	m = merge
-	co = checkout
-	cob = checkout -b
-	r = rebase
-	ri = rebase --interactive --rebase-merges
-	rc = rebase --continue
-	d = diff
-	ds = diff --staged
-	b = branch
-	ap = add --patch
-	copyrights = log --follow --format='Copyright © %ad %aN <%aE>' --date='format:%Y'
-	last-commit-message = log -1 --format='%B'
-	lcm = last-commit-message
-	local-branch-exists = show-ref --heads --quiet
 [commit]
 	status = true    # Show status information
 	verbose = 2      # Show staged and unstaged changes
@@ -58,3 +37,24 @@
 	ff = false
 [pull]
 	ff = only
+[alias]
+	l = log --oneline --graph --decorate --stat
+	lp = l --patch
+	s = status
+	c = commit
+	ca = commit --amend
+	p = push
+	m = merge
+	co = checkout
+	cob = checkout -b
+	r = rebase
+	ri = rebase --interactive --rebase-merges
+	rc = rebase --continue
+	d = diff
+	ds = diff --staged
+	b = branch
+	ap = add --patch
+	copyrights = log --follow --format='Copyright © %ad %aN <%aE>' --date='format:%Y'
+	last-commit-message = log -1 --format='%B'
+	lcm = last-commit-message
+	local-branch-exists = show-ref --heads --quiet
