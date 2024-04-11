@@ -1,0 +1,62 @@
+#!/usr/bin/python
+
+import sys
+import os
+import enum
+
+from PIL import Image
+
+def error(message):
+    print(message, file=sys.stderr)
+
+def error_and_exit(code, message):
+    try:
+        error(message)
+    finally:
+        sys.exit(code)
+
+def print_usage_and_exit(code, program_name):
+    usage = '%s <rgba-image>' % os.path.basename(program_name)
+    error_and_exit(code, usage)
+
+def process_arguments(arguments):
+    if len(arguments) != 1:
+        return None
+
+    return arguments[0],
+
+def has_useless_alpha_channel(image):
+    alpha_channel = image.getchannel('A').getdata()
+    for alpha in alpha_channel:
+        if alpha != 255:
+            return False
+    return True
+
+def main(program_name, arguments):
+    arguments = process_arguments(arguments)
+
+    if not arguments:
+        print_usage_and_exit(1, program_name)
+
+    file, = arguments
+
+    rgb = None
+
+    with Image.open(file) as image:
+
+        if image.mode != 'RGBA':
+            error_and_exit(2, 'Image is not in RGBA color space')
+
+        image.load()
+
+        if not has_useless_alpha_channel(image):
+            error_and_exit(3, 'RGBA image does not have a useless alpha channel')
+
+        rgb = image.convert('RGB')
+
+    if not rgb:
+        error_and_exit(4, 'Error when converting RGBA image to RGB')
+
+    rgb.save(file)
+
+main(sys.argv[0], sys.argv[1:])
