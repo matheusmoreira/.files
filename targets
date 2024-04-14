@@ -1,3 +1,0 @@
-#!/usr/bin/bash
-
-grep --color=never --perl-regexp --only-matching 'all \+= \K.+' GNUmakefile

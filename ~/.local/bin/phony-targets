@@ -1,0 +1,92 @@
+#!/usr/bin/bash
+
+function print-make-database {
+  local -a options=(
+    --silent
+    --question
+    --just-print
+    --print-data-base
+    --no-builtin-rules
+    --no-builtin-variables
+  )
+
+  if [[ -n "${1}" ]]; then
+    options+=(--file="${1}")
+  fi
+
+  make "${options[@]}"
+}
+
+function delete-empty-lines {
+  grep --extended-regexp --invert-match '^$'
+}
+
+function delete-recipes {
+  grep --extended-regexp --invert-match '^'$'\t'
+}
+
+function delete-comments {
+  grep --extended-regexp --invert-match '^\s*#'
+}
+
+function delete-variable-assignments {
+  grep --extended-regexp --invert-match ':=|\?=|='
+}
+
+function delete-special-targets {
+  grep --extended-regexp --invert-match '^\..*'
+}
+
+function delete-unwanted-lines {
+  delete-empty-lines | delete-recipes | delete-comments | delete-variable-assignments
+}
+
+function select-rules {
+  grep --extended-regexp '^.+:'
+}
+
+function read-rules {
+  delete-unwanted-lines | select-rules
+}
+
+function find-special-target-prerequisites {
+  local target="${1}"
+  local regexp='^\.'"${target}"': '
+  grep --extended-regexp "${regexp}" | sed 's/'"${regexp}"'//g'
+}
+
+function process-rule {
+  local -a line
+  IFS=':' read -ra line
+
+  if [[ "${#line[@]}" -gt 2 ]]; then
+    >&2 printf "Multiple colons in line: %s\n" "${line[*]}"
+    exit 1
+  fi
+
+  local targets="${line[0]}" phonies="${1}"
+  if [[ ! " ${phonies[*]} " =~ ${targets} ]]; then
+    return
+  fi
+
+  local -a prerequisites
+  IFS=' ' read -ra prerequisites <<<"${line[1]}"
+
+  printf "%s\n" "${targets}"
+  for prerequisite in "${prerequisites[@]}"; do
+    printf "\t%s\n" "${prerequisite}"
+  done
+}
+
+function process-rules {
+  local line
+  while read -r line; do
+    process-rule "${@}" <<<"${line}"
+  done
+}
+
+makefile="${1}"
+rules="$(print-make-database "${makefile}" | read-rules)"
+phonies="$(find-special-target-prerequisites PHONY <<<"${rules}")"
+
+process-rules "${phonies}" < <(delete-special-targets <<<"${rules}")
