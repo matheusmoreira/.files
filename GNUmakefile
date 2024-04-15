@@ -221,7 +221,8 @@ foot : $(call CONFIG.dotfiles_to_user,foot/foot.ini)
 kitty_conf := $(call CONFIG.dotfiles_to_user,kitty/*.conf)
 kitty_themes := $(call CONFIG.dotfiles_to_user,kitty/themes/*.conf)
 kitty_fonts := $(call CONFIG.dotfiles_to_user,kitty/fonts/*.conf)
-kitty : $(kitty_conf) $(kitty_themes) $(kitty_fonts)
+kitty_performance := $(call CONFIG.dotfiles_to_user,kitty/performance/*.conf)
+kitty : $(kitty_conf) $(kitty_themes) $(kitty_fonts) $(kitty_performance)
 
 all += i3
 i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfiles_to_user,nvidia-smi.py)
