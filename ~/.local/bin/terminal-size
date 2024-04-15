@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+set -e
+
+columns="$(tput cols)"
+lines="$(tput lines)"
+
+printf "%sx%s\n" "${columns}" "${lines}"
