@@ -3,6 +3,7 @@
 # Obtain user name and email from git
 name="$(git config user.name)"
 email="$(git config user.email)"
+comment="${1}"
 
 # The master key is a certification key
 # using one of the following algorithms:
@@ -47,6 +48,16 @@ case "${mode}" in
     ;;
 esac
 
+comment_parameter=
+echoed_comment_parameter=
+
+if [[ -n "${comment}" ]]; then
+  echoed_comment_parameter="Comment: ${comment}"
+  comment_parameter="Name-Comment: ${comment}"
+else
+  echoed_comment_parameter='Comment:'
+fi
+
 gpg --batch --full-generate-key <<KEY_PARAMETERS
 
 %echo Generating primary key...
@@ -55,8 +66,9 @@ gpg --batch --full-generate-key <<KEY_PARAMETERS
 %echo ${echoed_cipher_parameter}
 %echo Usage:  ${usage}
 %echo
-%echo Name:  ${name}
-%echo Email: ${email}
+%echo Name:    ${name}
+%echo Email:   ${email}
+%echo ${echoed_comment_parameter}
 %echo
 %echo Expiration:  ${expire}
 %echo Key server:  ${keyserver}
@@ -73,6 +85,7 @@ Preferences: ${preferences}
 
 Name-Real: ${name}
 Name-Email: ${email}
+${comment_parameter}
 
 %commit
 %echo Primary key generated.
