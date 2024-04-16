@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Obtain user name and email from git
-name=$(git config user.name)
-email=$(git config user.email)
+name="$(git config user.name)"
+email="$(git config user.email)"
 
 # The primary key will be a 4096 bit RSA certification key
 cipher=RSA
@@ -15,34 +15,34 @@ keyserver=hkps://hkps.pool.sks-keyservers.net
 hash_algorithms='SHA512 SHA384 SHA256 SHA224'
 symmetric_algorithms='AES256 AES192 AES CAST5'
 compression_algorithms='BZIP2 ZLIB ZIP Uncompressed'
-preferences="$hash_algorithms $symmetric_algorithms $compression_algorithms"
+preferences="${hash_algorithms} ${symmetric_algorithms} ${compression_algorithms}"
 
 gpg --batch --full-generate-key <<KEY_PARAMETERS
 
 %echo Generating primary key...
 %echo
-%echo Cipher: $cipher
-%echo Length: $bits
-%echo Usage:  $usage
+%echo Cipher: ${cipher}
+%echo Length: ${bits}
+%echo Usage:  ${usage}
 %echo
-%echo Name:  $name
-%echo Email: $email
+%echo Name:  ${name}
+%echo Email: ${email}
 %echo
-%echo Expiration:  $expire
-%echo Key server:  $keyserver
-%echo Preferences: $preferences
+%echo Expiration:  ${expire}
+%echo Key server:  ${keyserver}
+%echo Preferences: ${preferences}
 %echo
 
-Key-Type: $cipher
-Key-Length: $bits
-Key-Usage: $usage
+Key-Type: ${cipher}
+Key-Length: ${bits}
+Key-Usage: ${usage}
 
-Expire-Date: $expire
-Keyserver: $keyserver
-Preferences: $preferences
+Expire-Date: ${expire}
+Keyserver: ${keyserver}
+Preferences: ${preferences}
 
-Name-Real: $name
-Name-Email: $email
+Name-Real: ${name}
+Name-Email: ${email}
 
 %commit
 %echo Primary key generated.
