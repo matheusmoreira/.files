@@ -4,11 +4,24 @@
 name="$(git config user.name)"
 email="$(git config user.email)"
 
-# The primary key will be a 4096 bit RSA certification key
-cipher=RSA
+# The master key is a certification key
+# using one of the following algorithms:
+#
+#   - Non-ECC
+#     - RSA
+#       - 4096 bits
+#   - ECC
+#     - EdDSA
+#       - Curve ed25519
+#
+ecc_cipher=EDDSA
+curve=ed25519
+non_ecc_cipher=RSA
 bits=4096
-usage=cert
 
+# Use elliptic curve cryptography by default
+mode=ecc
+usage=cert
 expire=0
 keyserver=hkps://keys.openpgp.org
 
@@ -17,12 +30,29 @@ digests='SHA512 SHA384 SHA256 SHA224'
 compressors='BZIP2 ZLIB ZIP Uncompressed'
 preferences="${digests} ${ciphers} ${compressors}"
 
+cipher=
+cipher_parameter=
+echoed_cipher_parameter=
+
+case "${mode}" in
+  ecc|ECC)
+    cipher="${ecc_cipher}"
+    echoed_cipher_parameter="Curve:  ${curve}"
+    cipher_parameter="Key-Curve: ${curve}"
+    ;;
+  *)
+    cipher="${non_ecc_cipher}"
+    echoed_cipher_parameter="Bits:   ${bits}"
+    cipher_parameter="Key-Length: ${bits}"
+    ;;
+esac
+
 gpg --batch --full-generate-key <<KEY_PARAMETERS
 
 %echo Generating primary key...
 %echo
 %echo Cipher: ${cipher}
-%echo Length: ${bits}
+%echo ${echoed_cipher_parameter}
 %echo Usage:  ${usage}
 %echo
 %echo Name:  ${name}
@@ -34,7 +64,7 @@ gpg --batch --full-generate-key <<KEY_PARAMETERS
 %echo
 
 Key-Type: ${cipher}
-Key-Length: ${bits}
+${cipher_parameter}
 Key-Usage: ${usage}
 
 Expire-Date: ${expire}
