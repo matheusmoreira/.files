@@ -10,7 +10,7 @@ bits=4096
 usage=cert
 
 expire=0
-keyserver=hkps://hkps.pool.sks-keyservers.net
+keyserver=hkps://keys.openpgp.org
 
 hash_algorithms='SHA512 SHA384 SHA256 SHA224'
 symmetric_algorithms='AES256 AES192 AES CAST5'
