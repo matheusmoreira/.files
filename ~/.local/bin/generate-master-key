@@ -12,10 +12,10 @@ usage=cert
 expire=0
 keyserver=hkps://keys.openpgp.org
 
-hash_algorithms='SHA512 SHA384 SHA256 SHA224'
-symmetric_algorithms='AES256 AES192 AES'
-compression_algorithms='BZIP2 ZLIB ZIP Uncompressed'
-preferences="${hash_algorithms} ${symmetric_algorithms} ${compression_algorithms}"
+ciphers='AES256 AES192 AES'
+digests='SHA512 SHA384 SHA256 SHA224'
+compressors='BZIP2 ZLIB ZIP Uncompressed'
+preferences="${digests} ${ciphers} ${compressors}"
 
 gpg --batch --full-generate-key <<KEY_PARAMETERS
 
