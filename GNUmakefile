@@ -20,10 +20,6 @@ ensure_directory_exists = $(if $(call directory?,$(1)),,$(call mkdir,$(1)))
 # Generates a command to link $(1) to $(2).
 link = $(call ln,$(2),$(1))
 
-# Converts the list of paths specified in $(3) from paths prefixed by $(1)
-# to paths prefixed by $(2).
-convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
-
 # Template for the definition of symbolic link creation rules.
 # The recipe links all targets in $(1) to their counterparts in $(2).
 # The targets are always updated. The target's directory is created if needed.
@@ -40,6 +36,13 @@ $(1)/% : $(2)/% force
 	$$(call ensure_directory_exists,$$(@D))
 	$$(call link,$$@,$$<)
 endef
+
+# Defines a rule that links all targets in $(1) to their counterparts in $(2).
+rule.define = $(eval $(call rule.template,$(1),$(2)))
+
+# Converts the list of paths specified in $(3) from paths prefixed by $(1)
+# to paths prefixed by $(2).
+convert_prefix = $(patsubst $(1)/%,$(2)/%,$(3))
 
 # Template for the definition of prefix conversion functions
 # that convert between the user's home directory and dotfiles repository.
@@ -62,6 +65,18 @@ $(1).to_user = $$(call convert_prefix,$(3),$(2),$$(1))
 $(1).user_to_dotfiles = $$(call $(1).to_dotfiles,$$(wildcard $$(addprefix $(2)/,$$(1))))
 $(1).dotfiles_to_user = $$(call $(1).to_user,$$(wildcard $$(addprefix $(3)/,$$(1))))
 endef
+
+# Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
+prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
+
+# Create symbolic links in $(HOME) pointing at their counterparts in $(~).
+$(call rule.define,$(HOME),$(~))
+
+# ~.to_dotfiles
+# ~.to_user
+# ~.user_to_dotfiles
+# ~.dotfiles_to_user
+$(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
 # XDG Base Directory Specification
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -105,23 +120,8 @@ $(call prefix_conversion_functions.template,$(1),$$(XDG_$(1)_HOME),$$(XDG_$(1)_H
 $(call rule.template,$$(XDG_$(1)_HOME),$$(XDG_$(1)_HOME.dotfiles))
 endef
 
-# Defines a rule that links all targets in $(1) to their counterparts in $(2).
-rule.define = $(eval $(call rule.template,$(1),$(2)))
-
-# Defines path conversion functions for the given type, home directory prefix and dotfiles repository prefix.
-prefix_conversion_functions.define = $(eval $(call prefix_conversion_functions.template,$(1),$(2),$(3)))
-
 # Defines XDG rules, variables and functions for the given type and default directory.
 XDG.define = $(eval $(call XDG.template,$(1),$(2)))
-
-# Create symbolic links in $(HOME) pointing at their counterparts in $(~).
-$(call rule.define,$(HOME),$(~))
-
-# ~.to_dotfiles
-# ~.to_user
-# ~.user_to_dotfiles
-# ~.dotfiles_to_user
-$(call prefix_conversion_functions.define,~,$$(HOME),$$(~))
 
 # $(XDG_DATA_HOME)/% : $(XDG_DATA_HOME.dotfiles)/%
 #
