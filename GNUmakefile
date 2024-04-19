@@ -165,6 +165,28 @@ $(call XDG.define,CONFIG,.config)
 # BIN.dotfiles_to_user
 $(call XDG.define,BIN,.local/bin)
 
+# GNU Privacy Guard
+# https://www.gnupg.org/documentation/manuals/gnupg/
+#
+# Files in the repository are stored in the default directories.
+# Links in $(GNUPGHOME) take the environment variable into account.
+
+# GNUPGHOME
+# GNUPGHOME.default
+# GNUPGHOME.dotfiles
+GNUPGHOME.default := $(HOME)/.gnupg
+GNUPGHOME.dotfiles := $(call ~.to_dotfiles,$(GNUPGHOME.default))
+GNUPGHOME ?= $(GNUPGHOME.default)
+
+# GNUPGHOME.to_dotfiles
+# GNUPGHOME.to_user
+# GNUPGHOME.user_to_dotfiles
+# GNUPGHOME.dotfiles_to_user
+$(call prefix_conversion_functions.define,GNUPGHOME,$(GNUPGHOME),$(GNUPGHOME.dotfiles))
+
+# $(GNUPGHOME)/% : $(GNUPGHOME.dotfiles)/%
+$(call rule.define,$(GNUPGHOME),$(GNUPGHOME.dotfiles))
+
 # Phony targets
 
 user_binaries := $(call BIN.dotfiles_to_user,*)
@@ -184,7 +206,7 @@ all += nano
 nano : $(call CONFIG.dotfiles_to_user,nano/nanorc)
 
 all += gpg
-gpg : ~/.gnupg/gpg.conf ~/.gnupg/dirmngr.conf ~/.gnupg/gpg-agent.conf ~/.gnupg/scdaemon.conf
+gpg : $(call GNUPGHOME.dotfiles_to_user,*.conf)
 
 all += gdb
 gdb : $(call CONFIG.dotfiles_to_user,gdb/*)
