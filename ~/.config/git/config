@@ -1,6 +1,6 @@
 [user]
 	name = Matheus Afonso Martins Moreira
-	email = matheus.a.m.moreira@gmail.com
+	email = matheus@matheusmoreira.com
 [core]
 	eol = lf            # Use LF for text files in the working directory
 	autocrlf = input    # Convert line endings to LF before committing
