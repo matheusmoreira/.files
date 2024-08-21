@@ -217,6 +217,9 @@ bash : ~/.bash_profile ~/.bashrc
 all += git
 git : $(call CONFIG.dotfiles_to_user,git/config)
 
+all += ssh
+ssh : ~/.ssh/config
+
 all += vim
 vim : ~/.vimrc
 
@@ -282,7 +285,7 @@ email : msmtp
 msmtp : ~/.msmtprc
 
 all : $(all)
-basic : bash git vim nano
+basic : bash git ssh vim nano
 
 force:
 .PHONY: all $(all)
