@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+set -eo pipefail
+
+url="${1}"
+name="${2}"
+
+if [[ -z "${url}" ]]; then
+  1>&2 echo 'Git URL not specified'
+  exit 1
+fi
+
+if [[ -z "${name}" ]]; then
+  1>&2 echo 'Repository name not specified'
+  exit 2
+fi
+
+GIT_DIR="${name}"/git
+
+key=remote.origin.fetch
+value='+refs/heads/*:refs/remotes/origin/*'
+
+git clone --bare \
+          --config "${key}"="${value}" \
+          "${url}" "${GIT_DIR}"
+
+export GIT_DIR
+
+git remote set-head origin --auto
+
+trees="${name}"/trees
+branch="$(git name-rev --name-only origin/HEAD)"
+
+git worktree add "${trees}"/"${branch}" "${branch}"
