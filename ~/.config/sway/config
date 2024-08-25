@@ -1,0 +1,134 @@
+# man 5 sway
+
+include @sysconfdir@/sway/config.d/*
+
+set $mod        Mod4
+set $menu       dmenu_path | wmenu | xargs swaymsg exec --
+set $term       kitty
+set $browser    firefox
+
+floating_modifier    $mod normal
+workspace_layout     tabbed
+
+bindsym $mod+Shift+q    kill
+bindsym $mod+Shift+c    reload
+bindsym $mod+f          fullscreen
+
+bindsym $mod+k          \
+        exec swaymsg input type:keyboard xkb_switch_layout next
+bindsym $mod+Shift+e    \
+        exec swaynag -t warning -m 'Exit sway?' -B 'Yes' 'swaymsg exit'
+
+bindsym $mod+d         exec $menu
+bindsym $mod+Return    exec $term
+bindsym $mod+b         exec $browser
+
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space       focus mode_toggle
+bindsym $mod+a           focus parent
+
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+bindsym $mod+h splith
+bindsym $mod+v splitv
+
+bindsym $mod+Up       focus up
+bindsym $mod+Down     focus down
+bindsym $mod+Left     focus left
+bindsym $mod+Right    focus right
+
+bindsym $mod+Shift+Up       move up
+bindsym $mod+Shift+Down     move down
+bindsym $mod+Shift+Left     move left
+bindsym $mod+Shift+Right    move right
+
+bindsym $mod+1    workspace number 1
+bindsym $mod+2    workspace number 2
+bindsym $mod+3    workspace number 3
+bindsym $mod+4    workspace number 4
+bindsym $mod+5    workspace number 5
+bindsym $mod+6    workspace number 6
+bindsym $mod+7    workspace number 7
+bindsym $mod+8    workspace number 8
+bindsym $mod+9    workspace number 9
+bindsym $mod+0    workspace number 10
+
+bindsym $mod+Shift+1    move container to workspace number 1
+bindsym $mod+Shift+2    move container to workspace number 2
+bindsym $mod+Shift+3    move container to workspace number 3
+bindsym $mod+Shift+4    move container to workspace number 4
+bindsym $mod+Shift+5    move container to workspace number 5
+bindsym $mod+Shift+6    move container to workspace number 6
+bindsym $mod+Shift+7    move container to workspace number 7
+bindsym $mod+Shift+8    move container to workspace number 8
+bindsym $mod+Shift+9    move container to workspace number 9
+bindsym $mod+Shift+0    move container to workspace number 10
+
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus       scratchpad show
+
+bindsym $mod+r mode "resize"
+
+mode "resize" {
+    bindsym Up        resize shrink height 10px
+    bindsym Down      resize grow   height 10px
+    bindsym Left      resize shrink width  10px
+    bindsym Right     resize grow   width  10px
+
+    bindsym Return    mode "default"
+    bindsym Escape    mode "default"
+}
+
+# man 5 sway-bar
+bar {
+    position    top
+    mode        dock
+    modifier    $mod
+
+    status_command while date +'%Y-%m-%d %H:%M'; do sleep 60; done
+
+    colors {
+        background #333333
+        statusline #ffffff
+        separator  #ffffff
+    }
+}
+
+# man 5 sway-input
+# swaymsg -t get_inputs
+input type:keyboard {
+    repeat_delay        200
+    repeat_rate         40
+    xkb_capslock        disabled
+    xkb_numlock         disabled
+    xkb_layout          us,br
+}
+
+input type:touchpad {
+    dwt                 enabled
+    tap                 enabled
+    middle_emulation    enabled
+    natural_scroll      enabled
+    scroll_method       two_finger
+    tap_button_map      lrm
+}
+
+# man 5 sway-output
+# swaymsg -t get_outputs
+output * {
+    adaptive_sync on
+    max_render_time 1
+    bg wallpaper.png fill
+}
+
+bindsym --locked --inhibited \
+        XF86AudioRaiseVolume \
+        exec --no-startup-id amixer set -M Master 5%+
+bindsym --locked --inhibited \
+        XF86AudioLowerVolume \
+        exec --no-startup-id amixer set -M Master 5%-
+bindsym --locked --inhibited --no-repeat \
+        XF86AudioMute        \
+        exec --no-startup-id amixer set Master toggle

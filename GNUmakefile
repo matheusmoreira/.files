@@ -270,6 +270,9 @@ kitty : $(kitty_conf) $(kitty_themes) $(kitty_fonts) $(kitty_performance)
 all += i3
 i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfiles_to_user,nvidia-smi.py)
 
+all += sway
+sway : $(call CONFIG.dotfiles_to_user,sway/config)
+
 all += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 
