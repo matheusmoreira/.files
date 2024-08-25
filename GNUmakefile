@@ -272,6 +272,7 @@ i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfil
 
 all += sway
 sway : $(call CONFIG.dotfiles_to_user,sway/config)
+sway : $(call CONFIG.dotfiles_to_user,swaylock/config)
 
 all += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)

@@ -1,0 +1,6 @@
+font="Noto Mono"
+font-size=24
+ignore-empty-password
+show-failed-attempts
+show-keyboard-layout
+indicator-caps-lock
