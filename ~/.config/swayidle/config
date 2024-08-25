@@ -1,0 +1,2 @@
+before_sleep 'swaylock --daemonize'
+lock 'swaylock --daemonize'
