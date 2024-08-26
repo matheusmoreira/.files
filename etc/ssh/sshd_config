@@ -1,0 +1,43 @@
+# SSH daemon configuration
+#
+# man 5 sshd_config
+#
+# 2024-08-26 ssh-audit all green
+#
+
+# Port 22
+
+PubkeyAuthentication     yes
+HostKey                  /etc/ssh/ssh_host_ed25519_key
+AuthorizedKeysFile       /etc/ssh/authorized_keys.d/%u
+RequiredRSASize          4096
+Ciphers                  -*-cbc
+KexAlgorithms            -ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group14-sha256
+MACs                     -hmac-sha1,hmac-sha1-etm@openssh.com,hmac-sha2-256,hmac-sha2-512,umac-128@openssh.com,umac-64-etm@openssh.com,umac-64@openssh.com
+
+PasswordAuthentication       no
+KbdInteractiveAuthentication no
+KerberosAuthentication       no
+GSSAPIAuthentication         no
+HostbasedAuthentication      no
+UsePAM                       no
+
+AuthenticationMethods publickey
+
+AllowUsers matheus
+
+PermitRootLogin       no
+PermitUserEnvironment no
+PermitTunnel          no
+
+Banner          none
+VersionAddendum none
+PrintMotd       no
+PrintLastLog    yes
+
+TCPKeepAlive yes
+Compression  yes
+StrictModes  yes
+UseDNS       no
+LogLevel     VERBOSE
+Subsystem    sftp /usr/lib/ssh/sftp-server -l VERBOSE
