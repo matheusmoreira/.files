@@ -1,0 +1,40 @@
+#!/usr/bin/bash
+
+set -eo pipefail
+
+owner="${1}"
+repo="${2}"
+pr="${3}"
+origin="${4}"
+
+if [[ -z "${owner}" ]]; then
+  1>&2 echo 'Repository owner not specified'
+  exit 1
+fi
+
+if [[ -z "${repo}" ]]; then
+  1>&2 echo 'Repository name not specified'
+  exit 2
+fi
+
+if [[ -z "${pr}" ]]; then
+  1>&2 echo 'Pull request number not specified'
+  exit 3
+fi
+
+if [[ -z "${origin}" ]]; then
+  origin=origin
+fi
+
+request=/repos/"${owner}"/"${repo}"/pulls/"${pr}"
+
+response="$(gh api "${request}")"
+
+function extract {
+  jq --raw-output "${@}" <<<"${response}"
+}
+
+user="$(extract .head.user.login)"
+branch="$(extract .head.ref)"
+
+git fetch "${origin}" pull/"${pr}"/head:"${user}"-"${branch}"
