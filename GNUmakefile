@@ -208,55 +208,55 @@ $(call rule.define,$(GNUPGHOME),$(GNUPGHOME.dotfiles))
 # Phony targets
 
 user_binaries := $(call BIN.dotfiles_to_user,*)
-all += bin
+phony += bin
 bin : $(user_binaries)
 
-all += bash
+phony += bash
 bash : ~/.bash_profile ~/.bashrc
 
-all += git
+phony += git
 git : $(call CONFIG.dotfiles_to_user,git/config)
 
-all += ssh
+phony += ssh
 ssh : ~/.ssh/config
 
-all += vim
+phony += vim
 vim : ~/.vimrc
 
-all += nano
+phony += nano
 nano : $(call CONFIG.dotfiles_to_user,nano/nanorc)
 
-all += gpg
+phony += gpg
 gpg : $(call GNUPGHOME.dotfiles_to_user,*.conf)
 
-all += gdb
+phony += gdb
 gdb : $(call CONFIG.dotfiles_to_user,gdb/*)
 
-all += shellcheck
+phony += shellcheck
 shellcheck : $(call CONFIG.dotfiles_to_user,shellcheckrc)
 
-all += tidy
+phony += tidy
 tidy : ~/.tidyrc
 
 sublime_text_3_user_preferences := $(call CONFIG.dotfiles_to_user,sublime-text-3/Packages/User/*.sublime-settings)
-all += sublime-text-3
+phony += sublime-text-3
 sublime-text-3 : $(sublime_text_3_user_preferences)
 
 .Xresources.d := $(call ~.dotfiles_to_user,.Xresources.d/*)
-all += Xresources
+phony += Xresources
 ~/.Xresources : $(.Xresources.d)
 Xresources: ~/.Xresources
 
-all += xinitrc
+phony += xinitrc
 xinitrc : ~/.xinitrc
 
-all += X
+phony += X
 X : Xresources xinitrc
 
-all += urxvt
+phony += urxvt
 urxvt : Xresources
 
-all += terminals kitty foot
+phony += terminals kitty foot
 terminals : kitty foot
 
 foot : $(call CONFIG.dotfiles_to_user,foot/foot.ini)
@@ -267,31 +267,31 @@ kitty_fonts := $(call CONFIG.dotfiles_to_user,kitty/fonts/*.conf)
 kitty_performance := $(call CONFIG.dotfiles_to_user,kitty/performance/*.conf)
 kitty : $(kitty_conf) $(kitty_themes) $(kitty_fonts) $(kitty_performance)
 
-all += i3
+phony += i3
 i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfiles_to_user,nvidia-smi.py)
 
-all += sway
+phony += sway
 sway : $(call CONFIG.dotfiles_to_user,sway/config)
 sway : $(call CONFIG.dotfiles_to_user,swaylock/config)
 sway : $(call CONFIG.dotfiles_to_user,swayidle/config)
 
-all += mpv
+phony += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 
-all += termux
+phony += termux
 termux : ~/.termux/termux.properties
 
-all += irc irssi
+phony += irc irssi
 irc : irssi
 irssi : ~/.irssi/config
 
-all += email msmtp
+phony += email msmtp
 email : msmtp
 msmtp : ~/.msmtprc
 
-all : $(all)
+phony += basic
 basic : bash git ssh vim nano
 
 force:
-.PHONY: all $(all)
+.PHONY: $(phony)
 .DEFAULT_GOAL := basic
