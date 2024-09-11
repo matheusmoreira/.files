@@ -292,6 +292,10 @@ msmtp : ~/.msmtprc
 phony += basic
 basic : bash git ssh vim nano
 
+phony += arch-linux
+arch-linux:
+	rsync --verbose --recursive --existing --no-perms $(dotfiles)/etc/ /etc
+
 force:
 .PHONY: $(phony)
 .DEFAULT_GOAL := basic
