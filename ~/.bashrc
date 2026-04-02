@@ -275,3 +275,4 @@ PROMPT_COMMAND=prompt-command
 # Exported environment variables
 
 export EDITOR=vim
+export LIBVIRT_DEFAULT_URI=qemu:///system
