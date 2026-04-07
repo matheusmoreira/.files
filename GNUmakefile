@@ -289,6 +289,10 @@ phony += email msmtp
 email : msmtp
 msmtp : ~/.msmtprc
 
+.claude := $(call ~.dotfiles_to_user,.claude/*.json)
+phony += claude
+claude : $(.claude)
+
 phony += basic
 basic : bash git ssh vim nano
 
