@@ -290,8 +290,10 @@ email : msmtp
 msmtp : ~/.msmtprc
 
 .claude := $(call ~.dotfiles_to_user,.claude/*.json)
-phony += claude
+.tweakcc := $(call ~.dotfiles_to_user,.tweakcc/system-prompts/*.md)
+phony += claude tweakcc
 claude : $(.claude)
+tweakcc : $(.tweakcc)
 
 phony += basic
 basic : bash git ssh vim nano
