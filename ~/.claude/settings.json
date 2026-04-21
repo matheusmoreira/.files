@@ -12,4 +12,5 @@
   "model": "opus[1m]",
   "effortLevel": "high",
   "showThinkingSummaries": true,
+  "skipDangerousModePermissionPrompt": true
 }
