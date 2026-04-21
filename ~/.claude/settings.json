@@ -1,7 +1,5 @@
 {
-  "model": "opus",
-  "effortLevel": "high",
-  "showThinkingSummaries": true,
+  "cleanupPeriodDays": 365,
   "env": {
     "ENABLE_TOOL_SEARCH": "true",
     "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "true",
@@ -11,5 +9,7 @@
     "commit": "",
     "pr": ""
   },
-  "cleanupPeriodDays": 365
+  "model": "opus[1m]",
+  "effortLevel": "high",
+  "showThinkingSummaries": true,
 }
