@@ -4,7 +4,7 @@
   "showThinkingSummaries": true,
   "env": {
     "ENABLE_TOOL_SEARCH": "true",
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": true
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "true",
   },
   "attribution": {
     "commit": "",
