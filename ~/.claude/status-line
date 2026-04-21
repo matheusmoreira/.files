@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# Claude Code status line
+# Format:
+#   [ <model> <ctx%> | <5h%> <reset5h> <reset7d> <7d%> ]
+#   [ <dur> | <in> ↑ ↓ <out> | <cost>$ <added>+ <removed>- ]
+
+input=$(cat)
+model=$(echo "$input"      | jq -r '.model.id // empty')
+remaining=$(echo "$input"  | jq -r '.context_window.remaining_percentage // empty')
+in_tokens=$(echo "$input"  | jq -r '.context_window.total_input_tokens // empty')
+out_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // empty')
+five_hour=$(echo "$input"  | jq -r '.rate_limits.five_hour.used_percentage // empty')
+seven_day=$(echo "$input"  | jq -r '.rate_limits.seven_day.used_percentage // empty')
+reset_5h=$(echo "$input"   | jq -r '.rate_limits.five_hour.resets_at // empty')
+reset_7d=$(echo "$input"   | jq -r '.rate_limits.seven_day.resets_at // empty')
+cost=$(echo "$input"       | jq -r '.cost.total_cost_usd // empty')
+duration=$(echo "$input"   | jq -r '.cost.total_duration_ms // empty')
+added=$(echo "$input"      | jq -r '.cost.total_lines_added // empty')
+removed=$(echo "$input"    | jq -r '.cost.total_lines_removed // empty')
+
+# Terminal colors (ANSI escape sequences).
+# faint = darker grey than dim, used to fade padding zeros so actual digits pop.
+# normal_color resets fg to default while leaving the dim intensity bit set.
+reset=$'\033[0m'
+bold=$'\033[1m'
+dim=$'\033[2m'
+faint=$'\033[38;5;238m'
+normal_color=$'\033[39m'
+
+# Render N dashes in faint color for missing values.
+# Used as the initial state of every column so layout width never shifts.
+faint_dashes() {
+  local var=$1 width=$2 dashes
+  printf -v dashes '%*s' "$width" ''
+  printf -v "$var" '%s%s%s' "${faint}" "${dashes// /-}" "${normal_color}"
+}
+
+# Convert leading spaces in $2 to faint zeros: "  12" -> [faint]00[default]12.
+# Used to make padding visually recede while keeping column widths stable.
+dim_pad() {
+  local var=$1 src=$2
+  local leading='' rest="$src"
+  while [[ "$rest" == ' '* ]]; do
+    leading+='0'
+    rest="${rest# }"
+  done
+  printf -v "$var" '%s%s%s%s' "${faint}" "${leading}" "${normal_color}" "${rest}"
+}
+
+# Fixed-width percentages: 4 chars including the '%'.
+# Missing values render as four faint dashes so the layout never shifts.
+fmt_pct() {
+  local var=$1 value=$2 formatted
+  if [[ -z "$value" ]]; then
+    faint_dashes "$var" 4
+    return
+  fi
+  printf -v formatted '%3.0f%%' "$value"
+  dim_pad "$var" "$formatted"
+}
+
+# Humanize counts with numfmt so "1234" -> "1.3k", "1000000" -> "1.0M".
+# Fixed 4-char width via --padding=4; leading spaces fade to faint zeros.
+fmt_tok() {
+  local var=$1 value=$2 src
+  if [[ -z "$value" ]]; then
+    faint_dashes "$var" 4
+    return
+  fi
+  src=$(numfmt --to=si --padding=4 "$value")
+  dim_pad "$var" "$src"
+}
+
+# Format USD cost as fixed 7-char "XXX.XX$"; leading spaces fade to faint zeros.
+# Width chosen so 0.00$..999.99$ fit without the column shifting. Past 1000$
+# the field widens by one char per order of magnitude and then stabilizes.
+# Sign suffix mirrors the +/- used on the line-count columns.
+fmt_cost() {
+  local var=$1 value=$2 formatted padded
+  if [[ -z "$value" ]]; then
+    faint_dashes "$var" 7
+    return
+  fi
+  printf -v formatted '%6.2f' "$value"
+  dim_pad padded "$formatted"
+  printf -v "$var" '%s$' "$padded"
+}
+
+# Format a signed line count: humanized 4-char number + sign suffix (5 chars total).
+# e.g. "2.3k+", "1.2M-". Missing renders as five faint dashes.
+fmt_lines() {
+  local var=$1 sign=$2 value=$3 src padded
+  if [[ -z "$value" ]]; then
+    faint_dashes "$var" 5
+    return
+  fi
+  src=$(numfmt --to=si --padding=4 "$value")
+  dim_pad padded "$src"
+  printf -v "$var" '%s%s' "$padded" "$sign"
+}
+
+# Format seconds-until-reset as "Xh YYm" for the 5h window.
+# The window is always <5h so hours is a single digit -> always 5 chars.
+fmt_5h_reset() {
+  local out=$1 target=$2 seconds h m
+  if [[ -z "$target" ]]; then
+    faint_dashes "$out" 5
+    return
+  fi
+  seconds=$((target - now_ts))
+  (( seconds < 0 )) && seconds=0
+  h=$((seconds / 3600))
+  m=$(((seconds % 3600) / 60))
+  printf -v "$out" '%dh%02dm' "$h" "$m"
+}
+
+# Format seconds-until-reset as "Xd YYh" for the 7d window.
+# The window is always <7d so days is a single digit -> always 5 chars.
+fmt_7d_reset() {
+  local out=$1 target=$2 seconds d h
+  if [[ -z "$target" ]]; then
+    faint_dashes "$out" 5
+    return
+  fi
+  seconds=$((target - now_ts))
+  (( seconds < 0 )) && seconds=0
+  d=$((seconds / 86400))
+  h=$(((seconds % 86400) / 3600))
+  printf -v "$out" '%dd%02dh' "$d" "$h"
+}
+
+# Humanize a duration (in milliseconds) using the same shape as the rate-limit
+# resets: "Xh YYm" while under 24h, "Xd YYh" once a session spans days. Always
+# 5 chars so the column never shifts.
+fmt_dur() {
+  local var=$1 ms=$2 seconds d h m
+  if [[ -z "$ms" ]]; then
+    faint_dashes "$var" 5
+    return
+  fi
+  seconds=$((ms / 1000))
+  if (( seconds >= 86400 )); then
+    d=$((seconds / 86400))
+    h=$(((seconds % 86400) / 3600))
+    printf -v "$var" '%dd%02dh' "$d" "$h"
+  else
+    h=$((seconds / 3600))
+    m=$(((seconds % 3600) / 60))
+    printf -v "$var" '%dh%02dm' "$h" "$m"
+  fi
+}
+
+now_ts=$(date +%s)
+
+fmt_pct      ctx         "${remaining}"
+fmt_pct      h5          "${five_hour}"
+fmt_pct      d7          "${seven_day}"
+fmt_5h_reset r5          "${reset_5h}"
+fmt_7d_reset r7          "${reset_7d}"
+fmt_tok      in_str      "${in_tokens}"
+fmt_tok      out_str     "${out_tokens}"
+fmt_dur      dur_str     "${duration}"
+fmt_cost     cost_str    "${cost}"
+fmt_lines    added_str   '+' "${added}"
+fmt_lines    removed_str '-' "${removed}"
+
+# Two lines split by '|'. Line 1: identity + rate-limit windows (right half
+# is a pct/time/time/pct mirror). Line 2: duration anchor, then token I/O,
+# then cumulative totals. The duration section parallels the model on line 1,
+# both acting as left-hand labels for the metrics that follow.
+# [ model ctx% | 5h% reset5h reset7d 7d% ]
+# [ dur | in ↑ ↓ out | cost$ added+ removed- ]
+printf '%s[ %s %s | %s %s %s %s ]\n[ %s | %s ↑ ↓ %s | %s %s %s ]%s' \
+  "${dim}" \
+  "${model}" "${ctx}" \
+  "${h5}" "${r5}" "${r7}" "${d7}" \
+  "${dur_str}" \
+  "${in_str}" "${out_str}" \
+  "${cost_str}" "${added_str}" "${removed_str}" \
+  "${reset}"
+
+# Preview the rendered status line (strip leading `# ` and run):
+#   echo '{}' | ~/.claude/status-line; echo
+#
+#   jq -cn --argjson now "$(date +%s)" '{model:{id:"claude-opus-4-7[1m]"},context_window:{remaining_percentage:73,total_input_tokens:12345,total_output_tokens:987},rate_limits:{five_hour:{used_percentage:42,resets_at:($now+7200)},seven_day:{used_percentage:18,resets_at:($now+345600)}},cost:{total_cost_usd:12.34,total_duration_ms:5400000,total_lines_added:2300,total_lines_removed:456}}' | ~/.claude/status-line; echo

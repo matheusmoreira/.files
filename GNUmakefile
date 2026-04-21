@@ -289,7 +289,7 @@ phony += email msmtp
 email : msmtp
 msmtp : ~/.msmtprc
 
-.claude := $(call ~.dotfiles_to_user,.claude/*.json)
+.claude := $(call ~.dotfiles_to_user,.claude/*.json .claude/status-line)
 .tweakcc := $(call ~.dotfiles_to_user,.tweakcc/system-prompts/*.md)
 phony += claude tweakcc
 claude : $(.claude)
