@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
+export GIT_SHIP_NAME="git peek"
+exec git ship --peek "$@"

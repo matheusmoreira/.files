@@ -1,0 +1,60 @@
+#!/usr/bin/bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -eo pipefail
+
+count=0
+finish=false
+upstream=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --finish)
+      finish=true
+      shift
+      ;;
+    -*)
+      if [[ "$1" =~ ^-([1-9][0-9]*)$ ]]; then
+        count="${BASH_REMATCH[1]}"
+        shift
+      else
+        1>&2 echo "git review: bad argument '$1' (expected -<n> or --finish)"
+        exit 64
+      fi
+      ;;
+    *)
+      upstream="$1"
+      shift
+      ;;
+  esac
+done
+
+gitdir="$(git rev-parse --git-dir)"
+
+if "${finish}"; then
+  if [[ ! -d "${gitdir}/rebase-merge" ]] && [[ ! -d "${gitdir}/rebase-apply" ]]; then
+    1>&2 echo "git review: no review in progress"
+    exit 1
+  fi
+  GIT_SEQUENCE_EDITOR='sed -i s/^edit/pick/' git rebase --edit-todo
+  exec git rebase --continue
+fi
+
+upstream="${upstream:-@{u}}"
+
+if [[ "${count}" -eq 0 ]]; then
+  editor='sed -i s/^pick/edit/'
+else
+  editor="awk -i inplace -v n=${count} '/^pick/ && c < n { sub(/^pick/, \"edit\"); c++ } { print }'"
+fi
+
+env GIT_SEQUENCE_EDITOR="${editor}" \
+    git rebase --interactive --rebase-merges "${upstream}"
+
+if [[ -d "${gitdir}/rebase-merge" ]]; then
+  msgnum="$(cat "${gitdir}/rebase-merge/msgnum" 2>/dev/null || echo '?')"
+  end="$(cat "${gitdir}/rebase-merge/end" 2>/dev/null || echo '?')"
+  echo
+  echo "Reviewing commit (step ${msgnum} of ${end}):"
+  git --no-pager show HEAD
+fi
