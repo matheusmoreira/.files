@@ -1,4 +1,4 @@
-#/usr/bin/bash
+#!/usr/bin/bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Encode binary data with high level of error correction.
