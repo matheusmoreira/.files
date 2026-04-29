@@ -274,7 +274,7 @@ i3 : $(call CONFIG.dotfiles_to_user,i3/config i3status/config) $(call BIN.dotfil
 phony += sway
 sway : $(call CONFIG.dotfiles_to_user,sway/config)
 sway : $(call CONFIG.dotfiles_to_user,swaylock/config)
-sway : $(call CONFIG.dotfiles_to_user,swayidle/config)
+sway : $(call CONFIG.dotfiles_to_user,systemd/user/swayidle.service)
 
 phony += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)

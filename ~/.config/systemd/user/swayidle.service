@@ -1,0 +1,16 @@
+[Unit]
+Description=Idle handler for Wayland
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/swayidle -w \
+    timeout 300 'swaylock -f' \
+    timeout 600 'swaymsg "output * dpms off"' \
+        resume 'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -f'
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

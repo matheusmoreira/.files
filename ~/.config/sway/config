@@ -7,6 +7,8 @@ set $menu       dmenu_path | wmenu | xargs swaymsg exec --
 set $term       kitty
 set $browser    firefox
 
+exec uwsm finalize
+
 floating_modifier    $mod normal
 workspace_layout     tabbed
 
