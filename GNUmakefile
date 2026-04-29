@@ -303,6 +303,8 @@ phony += arch-linux
 arch-linux:
 	rsync --verbose --recursive --existing --no-perms $(dotfiles)/etc/ /etc
 
+phony += force
 force:
+
 .PHONY: $(phony)
 .DEFAULT_GOAL := basic
