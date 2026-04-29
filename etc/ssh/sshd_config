@@ -29,6 +29,8 @@ AllowUsers matheus
 PermitRootLogin       no
 PermitUserEnvironment no
 PermitTunnel          no
+X11Forwarding         no
+AllowAgentForwarding  no
 
 Banner          none
 VersionAddendum none
