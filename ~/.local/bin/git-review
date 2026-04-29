@@ -40,7 +40,9 @@ if "${finish}"; then
   exec git rebase --continue
 fi
 
-upstream="${upstream:-@{u}}"
+if [[ -z "${upstream}" ]]; then
+  upstream='@{u}'
+fi
 
 if [[ "${count}" -eq 0 ]]; then
   editor='sed -i s/^pick/edit/'
