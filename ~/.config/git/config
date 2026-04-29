@@ -31,8 +31,6 @@
 	smtpServerPort = 587
 	smtpEncryption = tls
 	smtpUser = matheus.a.m.moreira@gmail.com
-[credential]
-	helper = store
 [merge]
 	ff = false
 [pull]
