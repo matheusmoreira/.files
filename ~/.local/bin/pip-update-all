@@ -1,1 +1,3 @@
+#!/usr/bin/bash
+
 pip list --outdated --format json | jq .[].name | xargs -r pip install --upgrade
