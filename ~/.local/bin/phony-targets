@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+set -eo pipefail
+
 function print-make-database {
   local -a options=(
     --silent
@@ -90,4 +92,5 @@ makefile="${1}"
 rules="$(print-make-database "${makefile}" | read-rules)"
 phonies="$(find-special-target-prerequisites PHONY <<<"${rules}")"
 
-process-rules "${phonies}" < <(delete-special-targets <<<"${rules}")
+processed_rules="$(delete-special-targets <<<"${rules}")"
+process-rules "${phonies}" <<<"${processed_rules}"

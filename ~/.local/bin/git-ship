@@ -109,17 +109,17 @@ if "${peek}"; then
   else
     resolve_upstream
 
-    mapfile -t all < <(git rev-list --reverse "${remote}/${remote_branch}..HEAD")
+    output="$(git rev-list --reverse "${remote}/${remote_branch}..HEAD")"
+    if [[ -z "${output}" ]]; then
+      1>&2 echo "${name}: nothing to ship (${branch} matches ${remote}/${remote_branch})"
+      exit 1
+    fi
+    mapfile -t all <<<"${output}"
 
     if [[ "${count}" -eq 0 ]]; then
       commits=("${all[@]}")
     else
       commits=("${all[@]:0:${count}}")
-    fi
-
-    if [[ ${#commits[@]} -eq 0 ]]; then
-      1>&2 echo "${name}: nothing to ship (${branch} matches ${remote}/${remote_branch})"
-      exit 1
     fi
 
     ahead="${#all[@]}"
@@ -146,7 +146,8 @@ fi
 # ── Ship mode: single push covering N commits ────────────────────────
 
 if in_rebase; then
-  head_name="$(cat "$(rebase_state_dir)/head-name")"
+  state="$(rebase_state_dir)"
+  head_name="$(cat "${state}/head-name")"
   branch="${head_name#refs/heads/}"
   remote="$(git config "branch.${branch}.remote")"
 
@@ -165,14 +166,18 @@ if in_rebase; then
 
   after="$(git rev-parse "${remote}/${branch}")"
   shipped="$(git rev-list --count "${before}..${last_sha}")"
+  short_before="$(short "${before}")"
+  short_after="$(short "${after}")"
   echo
   if [[ "${shipped}" -eq 1 ]]; then
-    echo "Shipped $(short "${last_sha}") \"$(git log -1 --format='%s' "${last_sha}")\""
+    short_sha="$(short "${last_sha}")"
+    subject="$(git log -1 --format='%s' "${last_sha}")"
+    echo "Shipped ${short_sha} \"${subject}\""
   else
     echo "Shipped ${shipped} commits:"
     git --no-pager log --format='  %h %s' "${before}..${last_sha}"
   fi
-  echo "  ${remote}/${branch}: $(short "${before}") -> $(short "${after}")"
+  echo "  ${remote}/${branch}: ${short_before} -> ${short_after}"
 
   # Advance to the next commit for review.
   if in_rebase; then
@@ -181,12 +186,12 @@ if in_rebase; then
 else
   resolve_upstream
 
-  mapfile -t unpushed < <(git rev-list --reverse "${remote}/${remote_branch}..HEAD")
-
-  if [[ ${#unpushed[@]} -eq 0 ]]; then
+  output="$(git rev-list --reverse "${remote}/${remote_branch}..HEAD")"
+  if [[ -z "${output}" ]]; then
     1>&2 echo "${name}: nothing to ship"
     exit 1
   fi
+  mapfile -t unpushed <<<"${output}"
 
   shipped="${count}"
   if [[ "${shipped}" -gt "${#unpushed[@]}" ]]; then
@@ -201,14 +206,18 @@ else
 
   after="$(git rev-parse "${remote}/${remote_branch}")"
   ahead="$(git rev-list --count "${remote}/${remote_branch}..HEAD")"
+  short_before="$(short "${before}")"
+  short_after="$(short "${after}")"
   echo
   if [[ "${shipped}" -eq 1 ]]; then
-    echo "Shipped $(short "${target}") \"$(git log -1 --format='%s' "${target}")\""
+    short_target="$(short "${target}")"
+    subject="$(git log -1 --format='%s' "${target}")"
+    echo "Shipped ${short_target} \"${subject}\""
   else
     echo "Shipped ${shipped} commits:"
     git --no-pager log --format='  %h %s' "${before}..${target}"
   fi
-  echo "  ${remote}/${remote_branch}: $(short "${before}") -> $(short "${after}")"
+  echo "  ${remote}/${remote_branch}: ${short_before} -> ${short_after}"
   echo "  ${branch}: ${ahead} commit(s) ahead of ${remote}/${remote_branch}"
 fi
 

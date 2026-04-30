@@ -1,3 +1,5 @@
 #!/usr/bin/bash
 
+set -eo pipefail
+
 pip list --outdated --format json | jq .[].name | xargs -r pip install --upgrade
