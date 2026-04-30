@@ -23,6 +23,11 @@ if [[ -z "${pr}" ]]; then
   exit 3
 fi
 
+if ! [[ "${pr}" =~ ^[1-9][0-9]*$ ]]; then
+  1>&2 echo 'Pull request number must be a positive integer'
+  exit 3
+fi
+
 if [[ -z "${origin}" ]]; then
   origin=origin
 fi
