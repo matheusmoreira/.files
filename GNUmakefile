@@ -303,6 +303,10 @@ phony += arch-linux
 arch-linux:
 	rsync --verbose --recursive --existing --no-perms $(dotfiles)/etc/ /etc
 
+phony += lint
+lint:
+	@grep -lE '^#!.*\b(bash|sh)\b' $(wildcard $(XDG_BIN_HOME.dotfiles)/*) $(wildcard $(dotfiles)/root/*) | xargs --no-run-if-empty shellcheck
+
 phony += force
 force:
 
