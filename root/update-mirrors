@@ -2,4 +2,4 @@
 
 mirrorlist=/etc/pacman.d/mirrorlist
 
-reflector --protocol https --sort rate --save "$mirrorlist"
+reflector --protocol https --sort rate --save "${mirrorlist}"

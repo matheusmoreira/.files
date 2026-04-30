@@ -101,7 +101,7 @@ if "${peek}"; then
         [[ "${i}" -gt 0 ]] && echo
         echo "Commit (step ${step} of ${end}):"
         echo
-        git --no-pager show "${commits[$i]}"
+        git --no-pager show "${commits[${i}]}"
       done
     fi
   else
@@ -133,7 +133,7 @@ if "${peek}"; then
         [[ "${i}" -gt 0 ]] && echo
         echo "Commit $((i + 1)) of ${#commits[@]} (${remaining} remaining):"
         echo
-        git --no-pager show "${commits[$i]}"
+        git --no-pager show "${commits[${i}]}"
       done
     fi
   fi
