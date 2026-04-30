@@ -30,7 +30,8 @@ export GIT_DIR
 git remote set-head origin --auto
 
 trees="${name}"/trees
-branch="$(git name-rev --name-only origin/HEAD)"
+ref="$(git symbolic-ref refs/remotes/origin/HEAD)"
+branch="${ref#refs/remotes/origin/}"
 
 if [[ -z "${branch}" ]]; then
   1>&2 echo 'Failed to determine default branch from origin/HEAD'
