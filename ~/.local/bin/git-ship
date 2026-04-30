@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# shellcheck disable=SC2310  # in_rebase and resolve_upstream are predicate helpers
+
 set -eo pipefail
 
 name="${GIT_SHIP_NAME:-git ship}"
