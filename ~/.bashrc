@@ -1,5 +1,5 @@
 # ~/.bashrc
-# Executed by interactive non-login shells
+# Sourced by all bash shells; everything past the PATH adjustment is interactive-only.
 
 # Functions
 
