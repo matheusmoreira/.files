@@ -213,14 +213,6 @@ def add_nvidia_metrics(json_array):
 
     json_array[index:index] = instances
 
-z = False
-if z:
-    x = []
-    add_nvidia_metrics(x)
-    for y in x:
-        print(y)
-    sys.exit()
-
 # i3bar protocol handling
 # https://i3wm.org/docs/i3bar-protocol.html
 
