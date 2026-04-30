@@ -216,7 +216,7 @@ bash : ~/.bash_profile ~/.bashrc
 
 phony += git
 git : $(call CONFIG.dotfiles_to_user,git/config)
-git : $(call BIN.dotfiles_to_user,git-peek git-review git-ship)
+git : $(call BIN.dotfiles_to_user,git-next git-peek git-review git-ship)
 
 phony += ssh
 ssh : ~/.ssh/config

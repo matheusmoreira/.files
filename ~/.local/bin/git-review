@@ -1,10 +1,15 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# shellcheck disable=SC2310  # in_rebase is a predicate helper
+
 set -eo pipefail
+
+name="${GIT_REVIEW_NAME:-git review}"
 
 count=0
 finish=false
+next=false
 upstream=""
 
 while [[ $# -gt 0 ]]; do
@@ -13,12 +18,16 @@ while [[ $# -gt 0 ]]; do
       finish=true
       shift
       ;;
+    --next)
+      next=true
+      shift
+      ;;
     -*)
       if [[ "$1" =~ ^-([1-9][0-9]*)$ ]]; then
         count="${BASH_REMATCH[1]}"
         shift
       else
-        1>&2 echo "git review: bad argument '$1' (expected -<n> or --finish)"
+        1>&2 echo "${name}: bad argument '$1' (expected -<n>, --finish, or --next)"
         exit 64
       fi
       ;;
@@ -31,13 +40,41 @@ done
 
 gitdir="$(git rev-parse --git-dir)"
 
+in_rebase() {
+  [[ -d "${gitdir}/rebase-merge" ]] || [[ -d "${gitdir}/rebase-apply" ]]
+}
+
+show_next_review() {
+  if [[ -d "${gitdir}/rebase-merge" ]]; then
+    msgnum="$(cat "${gitdir}/rebase-merge/msgnum" 2>/dev/null || echo '?')"
+    end="$(cat "${gitdir}/rebase-merge/end" 2>/dev/null || echo '?')"
+    echo
+    echo "Reviewing commit (step ${msgnum} of ${end}):"
+    git --no-pager show HEAD
+  fi
+}
+
 if "${finish}"; then
-  if [[ ! -d "${gitdir}/rebase-merge" ]] && [[ ! -d "${gitdir}/rebase-apply" ]]; then
-    1>&2 echo "git review: no review in progress"
+  if ! in_rebase; then
+    1>&2 echo "${name}: no review in progress"
     exit 1
   fi
   GIT_SEQUENCE_EDITOR='sed -i s/^edit/pick/' git rebase --edit-todo
   exec git rebase --continue
+fi
+
+if "${next}"; then
+  if ! in_rebase; then
+    1>&2 echo "${name}: no review in progress"
+    exit 1
+  fi
+  git rebase --continue
+  if in_rebase; then
+    show_next_review
+  else
+    echo "Review complete"
+  fi
+  exit 0
 fi
 
 if [[ -z "${upstream}" ]]; then
@@ -53,10 +90,4 @@ fi
 env GIT_SEQUENCE_EDITOR="${editor}" \
     git rebase --interactive --rebase-merges "${upstream}"
 
-if [[ -d "${gitdir}/rebase-merge" ]]; then
-  msgnum="$(cat "${gitdir}/rebase-merge/msgnum" 2>/dev/null || echo '?')"
-  end="$(cat "${gitdir}/rebase-merge/end" 2>/dev/null || echo '?')"
-  echo
-  echo "Reviewing commit (step ${msgnum} of ${end}):"
-  git --no-pager show HEAD
-fi
+show_next_review
