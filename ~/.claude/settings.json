@@ -22,6 +22,7 @@
     "superpowers@claude-plugins-official": true
   },
   "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true
 }
