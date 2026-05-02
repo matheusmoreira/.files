@@ -236,6 +236,9 @@ gdb : $(call CONFIG.dotfiles_to_user,gdb/*)
 phony += shellcheck
 shellcheck : $(call CONFIG.dotfiles_to_user,shellcheckrc)
 
+phony += npm
+npm : ~/.npmrc
+
 phony += tidy
 tidy : ~/.tidyrc
 
