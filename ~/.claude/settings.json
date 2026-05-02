@@ -3,7 +3,10 @@
   "env": {
     "ENABLE_TOOL_SEARCH": "true",
     "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "true",
-    "MAX_THINKING_TOKENS": "128000"
+    "MAX_THINKING_TOKENS": "128000",
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
   "attribution": {
     "commit": "",
