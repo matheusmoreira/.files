@@ -298,6 +298,9 @@ phony += claude
 claude : $(.claude)
 claude : $(call BIN.dotfiles_to_user,claudo-codo)
 
+phony += virtdev
+virtdev : $(call CONFIG.dotfiles_to_user,virtdev/projects/*/manifest)
+
 phony += basic
 basic : bash git ssh vim nano
 
