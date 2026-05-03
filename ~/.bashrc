@@ -1,5 +1,6 @@
 # ~/.bashrc
-# Sourced by all bash shells; everything past the PATH adjustment is interactive-only.
+# Sourced by all bash shells
+# Everything past the PATH adjustment is interactive-only
 
 # Functions
 
@@ -40,35 +41,47 @@ alias g=git
 
 # Terminal escape sequences
 
-declare -A terminal=(
-  [ansi.foreground.black]=$(tput setaf 0)
-  [ansi.foreground.red]=$(tput setaf 1)
-  [ansi.foreground.green]=$(tput setaf 2)
-  [ansi.foreground.yellow]=$(tput setaf 3)
-  [ansi.foreground.blue]=$(tput setaf 4)
-  [ansi.foreground.magenta]=$(tput setaf 5)
-  [ansi.foreground.cyan]=$(tput setaf 6)
-  [ansi.foreground.white]=$(tput setaf 7)
-
-  [ansi.background.black]=$(tput setab 0)
-  [ansi.background.red]=$(tput setab 1)
-  [ansi.background.green]=$(tput setab 2)
-  [ansi.background.yellow]=$(tput setab 3)
-  [ansi.background.blue]=$(tput setab 4)
-  [ansi.background.magenta]=$(tput setab 5)
-  [ansi.background.cyan]=$(tput setab 6)
-  [ansi.background.white]=$(tput setab 7)
-
-  [attributes.reset]=$(tput sgr0)
-  [attributes.bold]=$(tput bold)
-  [attributes.dim]=$(tput dim)
-  [attributes.italics]=$(tput sitm)
-  [attributes.underline]=$(tput smul)
-  [attributes.reverse]=$(tput rev)
-  [attributes.standout]=$(tput smso)
-  [attributes.invisible]=$(tput invis)
-  [attributes.blink]=$(tput blink)
-)
+# Single tput -S call for all capabilities. bel (0x07) is interleaved
+# as a record separator — it cannot appear in SGR sequences, so
+# splitting on it recovers each value.
+declare -A terminal=()
+terminal-init() {
+  local -a keys=(
+    ansi.foreground.black ansi.foreground.red
+    ansi.foreground.green ansi.foreground.yellow
+    ansi.foreground.blue  ansi.foreground.magenta
+    ansi.foreground.cyan  ansi.foreground.white
+    ansi.background.black ansi.background.red
+    ansi.background.green ansi.background.yellow
+    ansi.background.blue  ansi.background.magenta
+    ansi.background.cyan  ansi.background.white
+    attributes.reset
+    attributes.bold  attributes.dim
+    attributes.italics attributes.underline
+    attributes.reverse attributes.standout
+    attributes.invisible attributes.blink
+  )
+  local -a caps=(
+    'setaf 0' 'setaf 1' 'setaf 2' 'setaf 3'
+    'setaf 4' 'setaf 5' 'setaf 6' 'setaf 7'
+    'setab 0' 'setab 1' 'setab 2' 'setab 3'
+    'setab 4' 'setab 5' 'setab 6' 'setab 7'
+    sgr0 bold dim sitm smul rev smso invis blink
+  )
+  local raw
+  raw=$(printf '%s\nbel\n' "${caps[@]}" | tput -S 2>/dev/null || true)
+  local -a values=()
+  local value
+  while IFS= read -rd $'\a' value; do
+    values+=("${value}")
+  done <<< "${raw}"
+  local i
+  for (( i = 0; i < ${#keys[@]}; i++ )); do
+    terminal["${keys[i]}"]="${values[i]:-}"
+  done
+}
+terminal-init
+unset -f terminal-init
 
 # Bash and readline need these codes to be escaped by surrounding them
 # with \[ \] and \x01 and \x02 respectively to indicate they are
