@@ -21,8 +21,12 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true
   },
-  "effortLevel": "high",
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "showThinkingSummaries": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "preferredNotifChannel": "notifications_disabled",
+  "autoCompactEnabled": false,
+  "fileCheckpointingEnabled": false,
+  "remoteControlAtStartup": false
 }
