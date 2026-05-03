@@ -41,9 +41,10 @@ alias g=git
 
 # Terminal escape sequences
 
-# Single tput -S call for all capabilities. bel (0x07) is interleaved
-# as a record separator — it cannot appear in SGR sequences, so
-# splitting on it recovers each value.
+# Single tput -S call for all capabilities.
+# The bel (0x07) character is interleaved
+# as a record separator, since it cannot
+# appear in SGR sequences.
 declare -A terminal=()
 terminal-init() {
   local -a keys=(
@@ -55,21 +56,21 @@ terminal-init() {
     ansi.background.green ansi.background.yellow
     ansi.background.blue  ansi.background.magenta
     ansi.background.cyan  ansi.background.white
+    attributes.bold       attributes.dim
+    attributes.italics    attributes.underline
+    attributes.reverse    attributes.standout
+    attributes.invisible  attributes.blink
     attributes.reset
-    attributes.bold  attributes.dim
-    attributes.italics attributes.underline
-    attributes.reverse attributes.standout
-    attributes.invisible attributes.blink
   )
-  local -a caps=(
+  local -a capabilities=(
     'setaf 0' 'setaf 1' 'setaf 2' 'setaf 3'
     'setaf 4' 'setaf 5' 'setaf 6' 'setaf 7'
     'setab 0' 'setab 1' 'setab 2' 'setab 3'
     'setab 4' 'setab 5' 'setab 6' 'setab 7'
-    sgr0 bold dim sitm smul rev smso invis blink
+    bold dim sitm smul rev smso invis blink sgr0
   )
   local raw
-  raw=$(printf '%s\nbel\n' "${caps[@]}" | tput -S 2>/dev/null || true)
+  raw=$(printf '%s\nbel\n' "${capabilities[@]}" | tput -S 2>/dev/null)
   local -a values=()
   local value
   while IFS= read -rd $'\a' value; do
