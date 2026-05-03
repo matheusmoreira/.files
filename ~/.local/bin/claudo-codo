@@ -1,0 +1,350 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""claudo-codo — patch Claude Code's native binary, set env, exec claude.
+
+Binary patching requires same-length string replacements so no offsets shift
+and the file size never changes. Each patch's replacement is right-padded with
+spaces to match the original's byte length.
+
+Idempotent. Backs up to <binary>.original before first patch, and only if
+every patch target is present — never backs up a partially-corrupted state.
+
+Quiet on success (one line per binary). Loud on failure (refuses to exec).
+
+To restore:  cp <binary>.original <binary>
+Then re-run claudo-codo to repatch.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import sys
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+from typing import NamedTuple
+
+
+# ---------------------------------------------------------------------------
+# Patch model
+# ---------------------------------------------------------------------------
+
+class Status(Enum):
+    APPLICABLE = "OK"
+    ALREADY    = "ALREADY"
+    MISSING    = "NOT FOUND"
+
+
+class Result(NamedTuple):
+    """Classification of a single patch against a binary."""
+    status: Status
+    label: str
+    occurrences: int
+
+
+@dataclass(frozen=True)
+class Patch:
+    """A same-length binary string replacement.
+
+    Invariant: len(new) <= len(old).  Enforced at construction time so an
+    oversized replacement is caught immediately, not at patch time.
+    """
+
+    label: str
+    old: bytes
+    new: bytes
+
+    def __post_init__(self):
+        if len(self.new) > len(self.old):
+            raise ValueError(
+                f"{self.label}: replacement ({len(self.new)}B) "
+                f"exceeds original ({len(self.old)}B)"
+            )
+
+    @property
+    def replacement(self) -> bytes:
+        """The new string, right-padded with spaces to len(old)."""
+        return self.new + b' ' * (len(self.old) - len(self.new))
+
+    def classify(self, data: bytes) -> Result:
+        """Classify this patch against binary data.  Pure — no mutation."""
+        r = self.replacement
+        if data.find(r) >= 0:
+            return Result(Status.ALREADY, self.label, data.count(r))
+        if data.find(self.old) >= 0:
+            return Result(Status.APPLICABLE, self.label, data.count(self.old))
+        return Result(Status.MISSING, self.label, 0)
+
+    def apply_to(self, data: bytearray) -> int:
+        """Replace all occurrences in data (mutates).  Returns count."""
+        r = self.replacement
+        if data.find(r) >= 0:
+            return 0
+        count = 0
+        i = 0
+        while True:
+            j = data.find(self.old, i)
+            if j < 0:
+                break
+            data[j:j + len(self.old)] = r
+            count += 1
+            i = j + len(r)
+        return count
+
+
+# ---------------------------------------------------------------------------
+# Patch definitions — add, remove, or reorder entries here.
+#
+# Em-dashes in the binary appear as the JS escape \\u2014 (six bytes).
+#
+# To find new targets in a binary:
+#   strings <binary> | grep -E '<suspect phrase>'
+# ---------------------------------------------------------------------------
+
+PATCHES = [
+    Patch("#1  anti-gold-plating / three-lines",
+          old=b"Don't add features, refactor, or introduce abstractions beyond what the task requires. A bug fix doesn't need surrounding cleanup; a one-shot operation doesn't need a helper. Don't design for hypothetical future requirements. Three similar lines is better than a premature abstraction. No half-finished implementations either.",
+          new=b"Address the task completely, including adjacent code that is broken, fragile, or directly contributes to the problem. Use judgment about extracting shared logic; avoid abstractions only useful for hypothetical reuse. Do not add unrelated features or speculative refactors. Above all: no half-finished implementations either."),
+
+    Patch("#2  error handling — judgment, not blanket skip",
+          old=b"Don't add error handling, fallbacks, or validation for scenarios that can't happen. Trust internal code and framework guarantees. Only validate at system boundaries (user input, external APIs). Don't use feature flags or backwards-compatibility shims when you can just change the code.",
+          new=b"Add error handling and validation at boundaries where failures realistically occur (user input, external APIs, I/O, network). Trust internal code and framework guarantees on internal paths. Don't use feature flags or backwards-compatibility shims when you can change the code."),
+
+    Patch("#3  gold-plate subagent",
+          old=b"Complete the task fully\\u2014don't gold-plate, but don't leave it half-done.",
+          new=b"Complete the task as a careful senior developer would. No half-measures."),
+
+    Patch("#4  explore agent — thoroughness over speed",
+          old=b"NOTE: You are meant to be a fast agent that returns output as quickly as possible. In order to achieve this you must:\n- Make efficient use of the tools that you have at your disposal: be smart about how you search for files and implementations\n- Wherever possible you should try to spawn multiple parallel tool calls for grepping and reading files\n\nComplete the user's search request efficiently and report your findings clearly.",
+          new=b"NOTE: Be thorough. Use efficient strategies, but never sacrifice completeness for speed:\n- Make efficient use of the tools you have: be smart about how you search for files and implementations\n- Wherever possible spawn multiple parallel tool calls for grepping and reading files\n- Exhaust all reasonable search strategies before reporting back\n\nComplete the user's search request thoroughly and report findings clearly."),
+
+    Patch("#5  tone — appropriate detail",
+          old=b"Your responses should be short and concise.",
+          new=b"Responses should match task complexity."),
+
+    Patch("#6  subagent output — useful code context",
+          old=b"Include code snippets only when the exact text is load-bearing",
+          new=b"Include code snippets when they help convey context"),
+
+    Patch("#7  scope matching — adjacent fixes",
+          old=b"Match the scope of your actions to what was actually requested.",
+          new=b"Match scope to the request; address related issues you find."),
+
+    Patch("#8  thinking suppression — remove anti-thinking bias",
+          old=b"on simpler user messages, it's best to respond or act directly without thinking unless further reasoning is necessary. On more complex tasks, you should feel free to reason as much as needed for best results but without overthinking. Avoid unnecessary thinking in response to simple user messages.",
+          new=b"on every user message, you should reason as much as needed for best results. Use thinking to plan, anticipate problems, catch errors, and verify your work before acting. More thinking leads to better outcomes. Always think before acting on non-trivial work or when correctness matters most."),
+
+    Patch("#9  end-of-turn summary — scale to complexity",
+          old=b"End-of-turn summary: one or two sentences. What changed and what's next. Nothing else.\n\nMatch responses to the task: a simple question gets a direct answer, not headers and sections.",
+          new=b"End-of-turn summary: describe what changed, what's next, and any caveats found.\n\nMatch responses to the task: a simple question gets a direct answer, not headers and sections."),
+
+    Patch("#10 code comments — judgment, not blanket ban",
+          old=b"In code: default to writing no comments. Never write multi-paragraph docstrings or multi-line comment blocks \\u2014 one short line max. Don't create planning, decision, or analysis documents unless the user asks for them \\u2014 work from conversation context, not intermediate files.",
+          new=b"In code: prefer self-documenting code over comments. Add comments when logic is non-obvious or future readers need context for why, not what. Don't create planning, decision, or analysis documents unless the user asks for them \\u2014 work from conversation context, not files."),
+
+    Patch("#11 subagent report — richer reports",
+          old=b"the caller will relay this to the user, so it only needs the essentials.",
+          new=b"the caller will relay this; include essentials and useful caveats."),
+]
+
+
+# ---------------------------------------------------------------------------
+# Binary discovery
+# ---------------------------------------------------------------------------
+
+def discover() -> Path | None:
+    """Find the Claude Code binary that would run via PATH."""
+    claude = shutil.which('claude')
+    if claude is None:
+        return None
+    return Path(claude).resolve()
+
+
+# ---------------------------------------------------------------------------
+# Analyze and apply
+# ---------------------------------------------------------------------------
+
+def analyze(patches: list[Patch], data: bytes) -> list[Result]:
+    """Classify every patch against binary data.  Pure — no mutation."""
+    return [p.classify(data) for p in patches]
+
+
+def backup(path: Path) -> None:
+    """Create a .original backup if one doesn't already exist."""
+    dest = path.with_name(path.name + '.original')
+    if not dest.exists():
+        shutil.copy2(path, dest)
+
+
+def apply_all(patches: list[Patch], path: Path, data: bytearray) -> int:
+    """Backup, then apply every applicable patch.  Returns total replacements."""
+    backup(path)
+    total = sum(p.apply_to(data) for p in patches)
+    if total:
+        path.write_bytes(bytes(data))
+    return total
+
+
+def patch_binary(patches: list[Patch], path: Path) -> tuple[list[Result], bool]:
+    """Analyze and conditionally patch one binary.
+
+    Returns (results, success).  Only applies patches when every target is
+    present — never leaves a binary in a partially-patched state.
+    """
+    data = bytearray(path.read_bytes())
+    results = analyze(patches, data)
+
+    applicable = any(r.status is Status.APPLICABLE for r in results)
+    missing    = any(r.status is Status.MISSING    for r in results)
+
+    if applicable and not missing:
+        apply_all(patches, path, data)
+
+    return results, not missing
+
+
+# ---------------------------------------------------------------------------
+# Environment
+# ---------------------------------------------------------------------------
+
+ENV_SET = {
+    'DISABLE_AUTOUPDATER':              '1',     # pin version so patches stick
+    'ENABLE_TOOL_SEARCH':               '1',     # deferred tool loading
+    'CLAUDE_CODE_EFFORT_LEVEL':         'max',   # top tier; falls back to high on older models
+    'CLAUDE_CODE_ALWAYS_ENABLE_EFFORT': '1',     # honor effort even on models the allowlist would skip
+    'CLAUDE_CODE_INVESTIGATE_FIRST':    'additive', # investigate before asking clarifying questions (4.7)
+    'MAX_THINKING_TOKENS':              '128000', # server clamps to model max
+    'CLAUDE_CODE_MAX_OUTPUT_TOKENS':    '128000',
+    'API_TIMEOUT_MS':                   '600000',
+    'CLAUDE_STREAM_IDLE_TIMEOUT_MS':    '300000',
+    'DISABLE_TELEMETRY':                '1',     # no background phone-home
+    'DISABLE_ERROR_REPORTING':          '1',
+    'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC': '1', # also blocks metrics pipeline
+}
+
+ENV_CLEAR = [
+    'CLAUDE_CODE_DISABLE_THINKING',
+    'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING',
+    'DISABLE_INTERLEAVED_THINKING',
+    'CLAUDE_CODE_BRIEF',
+    'CLAUDE_CODE_BRIEF_UPLOAD',
+    'CLAUDE_CODE_SIMPLE',
+    'CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT',
+]
+
+
+def configure_env() -> None:
+    """Set capability env vars and clear any that would suppress features."""
+    os.environ.update(ENV_SET)
+    for var in ENV_CLEAR:
+        os.environ.pop(var, None)
+
+
+# ---------------------------------------------------------------------------
+# Reporting
+# ---------------------------------------------------------------------------
+
+def report_failure(path: Path, results: list[Result]) -> None:
+    """Dump per-patch details, then refuse to exec."""
+    print(f"claudo-codo: {path}", file=sys.stderr)
+    for r in results:
+        if r.status is Status.MISSING:
+            print(f"  NOT FOUND: {r.label}", file=sys.stderr)
+        else:
+            print(f"  {r.status.value} ({r.occurrences}x): {r.label}",
+                  file=sys.stderr)
+    a = sum(1 for r in results if r.status is Status.APPLICABLE)
+    y = sum(1 for r in results if r.status is Status.ALREADY)
+    m = sum(1 for r in results if r.status is Status.MISSING)
+    print(f"  applied={a} already={y} missing={m} of {len(results)}",
+          file=sys.stderr)
+    print("claudo-codo: refusing to exec — Anthropic likely rephrased "
+          "prompts; update PATCHES.", file=sys.stderr)
+
+
+def report_success(path: Path, results: list[Result]) -> None:
+    total = len(PATCHES)
+    a = sum(1 for r in results if r.status is Status.APPLICABLE)
+    y = sum(1 for r in results if r.status is Status.ALREADY)
+    print(f"claudo-codo: ✓ {path}", file=sys.stderr)
+    print(f"  {a} applied, {y} already, {total} total", file=sys.stderr)
+
+
+# ---------------------------------------------------------------------------
+# Model shorthand
+# ---------------------------------------------------------------------------
+
+def expand_model(name: str) -> str:
+    """Expand a bare version like '4-7' or '4.7' to 'claude-opus-4-7[1m]'."""
+    normalized = name.replace('.', '-')
+    if re.fullmatch(r'\d+-\d+', normalized):
+        return f'claude-opus-{normalized}[1m]'
+    return name
+
+
+# ---------------------------------------------------------------------------
+# Subcommands
+# ---------------------------------------------------------------------------
+
+def cmd_launch(model: str, extra_args: list[str]) -> None:
+    """Patch binary, configure environment, exec claude."""
+    path = discover()
+    if path is None:
+        print("claudo-codo: claude not found in PATH", file=sys.stderr)
+        sys.exit(1)
+
+    results, ok = patch_binary(PATCHES, path)
+
+    if not ok:
+        report_failure(path, results)
+        sys.exit(1)
+
+    report_success(path, results)
+    configure_env()
+
+    os.execvp('claude', [
+        'claude',
+        '--dangerously-skip-permissions',
+        '--effort', 'max',
+        '--model', model,
+        *extra_args,
+    ])
+
+
+def cmd_update() -> None:
+    """Let Claude Code update itself without patching or blocking."""
+    configure_env()
+    os.environ.pop('DISABLE_AUTOUPDATER', None)
+    os.execvp('claude', ['claude'])
+
+
+def usage() -> None:
+    print("Usage: claudo-codo <subcommand> [args...]", file=sys.stderr)
+    print(file=sys.stderr)
+    print("Subcommands:", file=sys.stderr)
+    print("  <version>   Patch and launch (e.g. 4.6, 4.7)", file=sys.stderr)
+    print("  update      Allow Claude Code to update itself", file=sys.stderr)
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        usage()
+        sys.exit(1)
+
+    subcmd = sys.argv[1]
+
+    if subcmd == 'update':
+        cmd_update()
+    else:
+        cmd_launch(expand_model(subcmd), sys.argv[2:])
+
+
+if __name__ == '__main__':
+    main()
