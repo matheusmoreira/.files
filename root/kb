@@ -4,14 +4,35 @@ set -euo pipefail
 color_scheme=vaporwave
 
 # ---------------------------------------------------------------------------
-# Key categories — shared across all schemes
+# Key categories
+#
+# Letters and specials are split by vim semantic role so the vim
+# scheme can color them differently. Other schemes just map all
+# subcategories to the same color.
 # ---------------------------------------------------------------------------
 
 fkeys=(f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12)
-alpha=(q w e r t y u i o p a s d f g h j k l z x c v b n m)
 numbers=(1 2 3 4 5 6 7 8 9 0 - =)
-special=(tilde semicolon quote comma period slash
-         brackets.opening brackets.closing pipe.1 pipe.2)
+
+# Letters by vim function
+motion_alpha=(h j k l w b e f t g)
+insert_alpha=(i a o s)
+operator_alpha=(d y c r)
+search_alpha=(n)
+visual_alpha=(v)
+paste_alpha=(p)
+undo_alpha=(u)
+macro_alpha=(q m)
+delete_alpha=(x)
+fold_alpha=(z)
+
+# Special chars by vim function
+repeat_special=(period comma semicolon)
+register_special=(quote)
+case_special=(tilde)
+bracket_special=(brackets.opening brackets.closing pipe.1 pipe.2)
+search_special=(slash)
+
 nav=(ins home end pgup pgdn)
 arrows=(arrows.up arrows.down arrows.left arrows.right)
 modifiers=(ctrl.left.1 ctrl.left.2 ctrl.right.1 ctrl.right.2
@@ -31,8 +52,11 @@ sysrq_key=(sysrq)
 meta_key=(meta)
 
 all_categories=(
-  fkeys alpha numbers special nav arrows modifiers
-  action destructive keypad_numbers spacebar status
+  fkeys numbers
+  motion_alpha insert_alpha operator_alpha search_alpha visual_alpha
+  paste_alpha undo_alpha macro_alpha delete_alpha fold_alpha
+  repeat_special register_special case_special bracket_special search_special
+  nav arrows modifiers action destructive keypad_numbers spacebar status
   misc_keys sysrq_key meta_key
 )
 
@@ -79,15 +103,82 @@ vapor_lavender='140 160 255'  # #8CA0FF  soft periwinkle
 vapor_crimson='255 20 60'     # #FF143C  aggressive red
 vapor_gold='255 200 50'       # #FFC832  special meta key
 
+# --- gruvbox (bright) ---
+# https://github.com/morhetz/gruvbox
+
+gruv_red='251 73 52'          # #FB4934
+gruv_green='184 187 38'       # #B8BB26
+gruv_yellow='250 189 47'      # #FABD2F
+gruv_blue='131 165 152'       # #83A598
+gruv_purple='211 134 155'     # #D3869B
+gruv_aqua='142 192 124'       # #8EC07C
+gruv_orange='254 128 25'      # #FE8019
+gruv_fg='235 219 178'         # #EBDBB2
+gruv_grey='146 131 116'       # #928374
+
+# --- nord ---
+# https://www.nordtheme.com
+
+nord_teal='143 188 187'       # #8FBCBB  frost
+nord_cyan='136 192 208'       # #88C0D0  frost
+nord_blue='129 161 193'       # #81A1C1  frost
+nord_deep='94 129 172'        # #5E81AC  frost
+nord_red='191 97 106'         # #BF616A  aurora
+nord_orange='208 135 112'     # #D08770  aurora
+nord_yellow='235 203 139'     # #EBCB8B  aurora
+nord_green='163 190 140'      # #A3BE8C  aurora
+nord_purple='180 142 173'     # #B48EAD  aurora
+nord_snow='216 222 233'       # #D8DEE9  snow storm
+nord_polar='76 86 106'        # #4C566A  polar night
+
+# --- dracula ---
+# https://draculatheme.com
+
+drac_cyan='139 233 253'       # #8BE9FD
+drac_green='80 250 123'       # #50FA7B
+drac_orange='255 184 108'     # #FFB86C
+drac_pink='255 121 198'       # #FF79C6
+drac_purple='189 147 249'     # #BD93F9
+drac_red='255 85 85'          # #FF5555
+drac_yellow='241 250 140'     # #F1FA8C
+drac_fg='248 248 242'         # #F8F8F2
+drac_comment='98 114 164'     # #6272A4
+
+# --- matrix ---
+
+matrix_bright='0 255 65'      # #00FF41
+matrix_medium='0 204 51'      # #00CC33
+matrix_dim='0 153 34'         # #009922
+matrix_glow='57 255 20'       # #39FF14
+
+# --- vim (one dark inspired) ---
+# https://github.com/joshdick/onedark.vim
+
+vim_red='224 108 117'          # #E06C75
+vim_green='152 195 121'        # #98C379
+vim_yellow='229 192 123'       # #E5C07B
+vim_blue='97 175 239'          # #61AFEF
+vim_magenta='198 120 221'      # #C678DD
+vim_cyan='86 182 194'          # #56B6C2
+vim_orange='209 154 102'       # #D19A66
+vim_white='171 178 191'        # #ABB2BF
+vim_grey='92 99 112'           # #5C6370
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
 
 declare -A neon=(
   [fkeys]="${neon_blue}"
-  [alpha]="${neon_dim_cyan}"
   [numbers]="${neon_amber}"
-  [special]="${neon_hot}"
+  [motion_alpha]="${neon_dim_cyan}"   [insert_alpha]="${neon_dim_cyan}"
+  [operator_alpha]="${neon_dim_cyan}" [search_alpha]="${neon_dim_cyan}"
+  [visual_alpha]="${neon_dim_cyan}"   [paste_alpha]="${neon_dim_cyan}"
+  [undo_alpha]="${neon_dim_cyan}"     [macro_alpha]="${neon_dim_cyan}"
+  [delete_alpha]="${neon_dim_cyan}"   [fold_alpha]="${neon_dim_cyan}"
+  [repeat_special]="${neon_hot}"      [register_special]="${neon_hot}"
+  [case_special]="${neon_hot}"        [bracket_special]="${neon_hot}"
+  [search_special]="${neon_hot}"
   [nav]="${neon_cyan}"
   [arrows]="${neon_dim_blue}"
   [modifiers]="${neon_pink}"
@@ -103,9 +194,15 @@ declare -A neon=(
 
 declare -A monokai=(
   [fkeys]="${mono_cyan}"
-  [alpha]="${mono_green}"
   [numbers]="${mono_yellow}"
-  [special]="${mono_pink}"
+  [motion_alpha]="${mono_green}"   [insert_alpha]="${mono_green}"
+  [operator_alpha]="${mono_green}" [search_alpha]="${mono_green}"
+  [visual_alpha]="${mono_green}"   [paste_alpha]="${mono_green}"
+  [undo_alpha]="${mono_green}"     [macro_alpha]="${mono_green}"
+  [delete_alpha]="${mono_green}"   [fold_alpha]="${mono_green}"
+  [repeat_special]="${mono_pink}"      [register_special]="${mono_pink}"
+  [case_special]="${mono_pink}"        [bracket_special]="${mono_pink}"
+  [search_special]="${mono_pink}"
   [nav]="${mono_orange}"
   [arrows]="${mono_purple}"
   [modifiers]="${mono_purple}"
@@ -121,9 +218,15 @@ declare -A monokai=(
 
 declare -A vaporwave=(
   [fkeys]="${vapor_blue}"
-  [alpha]="${vapor_lavender}"
   [numbers]="${vapor_yellow}"
-  [special]="${vapor_magenta}"
+  [motion_alpha]="${vapor_lavender}"   [insert_alpha]="${vapor_lavender}"
+  [operator_alpha]="${vapor_lavender}" [search_alpha]="${vapor_lavender}"
+  [visual_alpha]="${vapor_lavender}"   [paste_alpha]="${vapor_lavender}"
+  [undo_alpha]="${vapor_lavender}"     [macro_alpha]="${vapor_lavender}"
+  [delete_alpha]="${vapor_lavender}"   [fold_alpha]="${vapor_lavender}"
+  [repeat_special]="${vapor_magenta}"      [register_special]="${vapor_magenta}"
+  [case_special]="${vapor_magenta}"        [bracket_special]="${vapor_magenta}"
+  [search_special]="${vapor_magenta}"
   [nav]="${vapor_blue}"
   [arrows]="${vapor_green}"
   [modifiers]="${vapor_purple}"
@@ -135,6 +238,133 @@ declare -A vaporwave=(
   [misc_keys]="${vapor_purple}"
   [sysrq_key]="${vapor_green}"
   [meta_key]="${vapor_gold}"
+)
+
+declare -A gruvbox=(
+  [fkeys]="${gruv_aqua}"
+  [numbers]="${gruv_orange}"
+  [motion_alpha]="${gruv_fg}"   [insert_alpha]="${gruv_fg}"
+  [operator_alpha]="${gruv_fg}" [search_alpha]="${gruv_fg}"
+  [visual_alpha]="${gruv_fg}"   [paste_alpha]="${gruv_fg}"
+  [undo_alpha]="${gruv_fg}"     [macro_alpha]="${gruv_fg}"
+  [delete_alpha]="${gruv_fg}"   [fold_alpha]="${gruv_fg}"
+  [repeat_special]="${gruv_red}"      [register_special]="${gruv_red}"
+  [case_special]="${gruv_red}"        [bracket_special]="${gruv_red}"
+  [search_special]="${gruv_red}"
+  [nav]="${gruv_blue}"
+  [arrows]="${gruv_blue}"
+  [modifiers]="${gruv_purple}"
+  [action]="${gruv_green}"
+  [destructive]="${gruv_red}"
+  [keypad_numbers]="${gruv_orange}"
+  [spacebar]="${gruv_fg}"
+  [status]="${gruv_fg}"
+  [misc_keys]="${gruv_grey}"
+  [sysrq_key]="${gruv_green}"
+  [meta_key]="${gruv_aqua}"
+)
+
+declare -A nord=(
+  [fkeys]="${nord_blue}"
+  [numbers]="${nord_yellow}"
+  [motion_alpha]="${nord_snow}"   [insert_alpha]="${nord_snow}"
+  [operator_alpha]="${nord_snow}" [search_alpha]="${nord_snow}"
+  [visual_alpha]="${nord_snow}"   [paste_alpha]="${nord_snow}"
+  [undo_alpha]="${nord_snow}"     [macro_alpha]="${nord_snow}"
+  [delete_alpha]="${nord_snow}"   [fold_alpha]="${nord_snow}"
+  [repeat_special]="${nord_purple}"      [register_special]="${nord_purple}"
+  [case_special]="${nord_purple}"        [bracket_special]="${nord_purple}"
+  [search_special]="${nord_purple}"
+  [nav]="${nord_cyan}"
+  [arrows]="${nord_teal}"
+  [modifiers]="${nord_orange}"
+  [action]="${nord_green}"
+  [destructive]="${nord_red}"
+  [keypad_numbers]="${nord_yellow}"
+  [spacebar]="${nord_snow}"
+  [status]="${nord_snow}"
+  [misc_keys]="${nord_polar}"
+  [sysrq_key]="${nord_green}"
+  [meta_key]="${nord_deep}"
+)
+
+declare -A dracula=(
+  [fkeys]="${drac_purple}"
+  [numbers]="${drac_yellow}"
+  [motion_alpha]="${drac_fg}"   [insert_alpha]="${drac_fg}"
+  [operator_alpha]="${drac_fg}" [search_alpha]="${drac_fg}"
+  [visual_alpha]="${drac_fg}"   [paste_alpha]="${drac_fg}"
+  [undo_alpha]="${drac_fg}"     [macro_alpha]="${drac_fg}"
+  [delete_alpha]="${drac_fg}"   [fold_alpha]="${drac_fg}"
+  [repeat_special]="${drac_pink}"      [register_special]="${drac_pink}"
+  [case_special]="${drac_pink}"        [bracket_special]="${drac_pink}"
+  [search_special]="${drac_pink}"
+  [nav]="${drac_cyan}"
+  [arrows]="${drac_cyan}"
+  [modifiers]="${drac_orange}"
+  [action]="${drac_green}"
+  [destructive]="${drac_red}"
+  [keypad_numbers]="${drac_yellow}"
+  [spacebar]="${drac_fg}"
+  [status]="${drac_fg}"
+  [misc_keys]="${drac_comment}"
+  [sysrq_key]="${drac_green}"
+  [meta_key]="${drac_purple}"
+)
+
+declare -A matrix=(
+  [fkeys]="${matrix_bright}"
+  [numbers]="${matrix_bright}"
+  [motion_alpha]="${matrix_medium}"   [insert_alpha]="${matrix_medium}"
+  [operator_alpha]="${matrix_medium}" [search_alpha]="${matrix_medium}"
+  [visual_alpha]="${matrix_medium}"   [paste_alpha]="${matrix_medium}"
+  [undo_alpha]="${matrix_medium}"     [macro_alpha]="${matrix_medium}"
+  [delete_alpha]="${matrix_medium}"   [fold_alpha]="${matrix_medium}"
+  [repeat_special]="${matrix_dim}"      [register_special]="${matrix_dim}"
+  [case_special]="${matrix_dim}"        [bracket_special]="${matrix_dim}"
+  [search_special]="${matrix_dim}"
+  [nav]="${matrix_bright}"
+  [arrows]="${matrix_bright}"
+  [modifiers]="${matrix_dim}"
+  [action]="${matrix_glow}"
+  [destructive]="${matrix_bright}"
+  [keypad_numbers]="${matrix_bright}"
+  [spacebar]="${matrix_dim}"
+  [status]="${matrix_dim}"
+  [misc_keys]="${matrix_dim}"
+  [sysrq_key]="${matrix_glow}"
+  [meta_key]="${matrix_glow}"
+)
+
+declare -A vim=(
+  [fkeys]="${vim_grey}"
+  [numbers]="${vim_yellow}"
+  [motion_alpha]="${vim_blue}"
+  [insert_alpha]="${vim_green}"
+  [operator_alpha]="${vim_orange}"
+  [search_alpha]="${vim_magenta}"
+  [visual_alpha]="${vim_magenta}"
+  [paste_alpha]="${vim_cyan}"
+  [undo_alpha]="${vim_cyan}"
+  [macro_alpha]="${vim_grey}"
+  [delete_alpha]="${vim_red}"
+  [fold_alpha]="${vim_grey}"
+  [repeat_special]="${vim_yellow}"
+  [register_special]="${vim_grey}"
+  [case_special]="${vim_orange}"
+  [bracket_special]="${vim_blue}"
+  [search_special]="${vim_magenta}"
+  [nav]="${vim_blue}"
+  [arrows]="${vim_blue}"
+  [modifiers]="${vim_grey}"
+  [action]="${vim_green}"
+  [destructive]="${vim_red}"
+  [keypad_numbers]="${vim_yellow}"
+  [spacebar]="${vim_white}"
+  [status]="${vim_white}"
+  [misc_keys]="${vim_grey}"
+  [sysrq_key]="${vim_grey}"
+  [meta_key]="${vim_grey}"
 )
 
 # ---------------------------------------------------------------------------
@@ -201,11 +431,13 @@ apply-colors() {
 # Commands
 # ---------------------------------------------------------------------------
 
+schemes=(neon monokai vaporwave gruvbox nord dracula matrix vim)
+
 usage() {
   cat >&2 <<HELP
 Usage: kb [scheme] <command>...
 
-Schemes:  neon  monokai  vaporwave
+Schemes:  ${schemes[*]}
 
 Commands:
   reset                 Reset keyboard LEDs
@@ -215,6 +447,14 @@ Commands:
 
 Example: kb reset neon colors
 HELP
+}
+
+is-scheme() {
+  local name="${1}"
+  for s in "${schemes[@]}"; do
+    [[ "${name}" == "${s}" ]] && return 0
+  done
+  return 1
 }
 
 commands() {
@@ -262,13 +502,14 @@ commands() {
         apply-colors
         shift
         ;;
-      neon|monokai|vaporwave)
-        color_scheme="${1}"
-        shift
-        ;;
       *)
-        printf 'kb: unknown command: %s\n' "${1}" >&2
-        exit 1
+        if is-scheme "${1}"; then
+          color_scheme="${1}"
+          shift
+        else
+          printf 'kb: unknown command: %s\n' "${1}" >&2
+          exit 1
+        fi
         ;;
     esac
   done
