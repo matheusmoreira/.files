@@ -1,0 +1,12 @@
+# Clevo PA70ES (Avell C73)
+#
+# The ITE keyboard controller (firmware version 0xAB83) is shared with
+# the X+ piccolo series, which has no numpad. The piccolo's hwdb rule
+# in 60-keyboard.hwdb remaps KP_Enter (0x9c) to Enter because the
+# piccolo's main Enter key sends the wrong scan code. But the PA70ES
+# has a real numpad, so the remap breaks KP_Enter.
+#
+# This override restores the correct mapping.
+
+evdev:atkbd:dmi:bvn*:bvr*:bd*:svnNotebook:pnPA70ES:*
+ KEYBOARD_KEY_9c=kpenter
