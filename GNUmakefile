@@ -283,7 +283,7 @@ phony += mpv
 mpv : $(call CONFIG.dotfiles_to_user,mpv/mpv.conf)
 
 phony += termux
-termux : ~/.termux/termux.properties
+termux : ~/.termux/termux.properties ~/.termux/colors.properties
 
 phony += irc irssi
 irc : irssi
@@ -293,7 +293,7 @@ phony += email msmtp
 email : msmtp
 msmtp : ~/.msmtprc
 
-.claude := $(call ~.dotfiles_to_user,.claude/*.json .claude/status-line)
+.claude := $(call ~.dotfiles_to_user,.claude/*.json .claude/status-line .claude/themes/*.json)
 phony += claude
 claude : $(.claude)
 claude : $(call BIN.dotfiles_to_user,claudo-codo)
