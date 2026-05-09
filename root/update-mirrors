@@ -1,5 +1,9 @@
 #!/usr/bin/bash
+set -euo pipefail
 
 mirrorlist=/etc/pacman.d/mirrorlist
+tmp=$(mktemp)
+trap 'rm -f "${tmp}"' EXIT
 
-reflector --protocol https --sort rate --save "${mirrorlist}"
+reflector --protocol https --sort rate > "${tmp}"
+install -m 644 "${tmp}" "${mirrorlist}"
