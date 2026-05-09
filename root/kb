@@ -1310,22 +1310,6 @@ calibrate() {
 # Color application
 # ---------------------------------------------------------------------------
 
-apply-calibration() {
-  local -n scheme="${color_scheme}"
-
-  for category in "${all_categories[@]}"; do
-    local -n keys="${category}"
-    local fallback="${category_fallback[${category}]:-}"
-    local color="${scheme[${category}]:-${scheme[${fallback}]:-}}"
-
-    for key in "${keys[@]}"; do
-      local led="${keycodes[${key}]}"
-      [[ -v "led_calibration[${led}]" ]] || continue
-      calibrate "${led}" ${color}
-    done
-  done
-}
-
 apply-colors() {
   local -n scheme="${color_scheme}"
 
@@ -1339,6 +1323,168 @@ apply-colors() {
     done
   done
 }
+
+# ---------------------------------------------------------------------------
+# Interactive calibration
+# ---------------------------------------------------------------------------
+
+unique-leds() {
+  local -A seen=()
+  for led in "${keycodes[@]}"; do
+    [[ -v "seen[${led}]" ]] && continue
+    seen[${led}]=1
+    printf '%d\n' "${led}"
+  done
+}
+
+flood() {
+  local r="${1}" g="${2}" b="${3}" use_cal="${4}"
+
+  for led in $(unique-leds); do
+    if [[ "${use_cal}" -eq 1 ]]; then
+      calibrate "${led}" "${r}" "${g}" "${b}"
+    else
+      printf 'led %d %d %d %d\n' "${led}" "${r}" "${g}" "${b}"
+    fi
+  done
+}
+
+led-names() {
+  local target="${1}"
+  local first=1
+  for key in "${!keycodes[@]}"; do
+    if [[ "${keycodes[${key}]}" -eq "${target}" ]]; then
+      [[ ${first} -eq 0 ]] && printf '/'
+      printf '%s' "${key}"
+      first=0
+    fi
+  done
+}
+
+resolve-key() {
+  local name="${1}"
+  if [[ -v "keycodes[${name}]" ]]; then
+    printf '%d' "${keycodes[${name}]}"
+    return 0
+  fi
+  return 1
+}
+
+interactive-calibration() {
+  local r g b cal_on=1
+
+  randomize() {
+    r=$(( RANDOM % 256 ))
+    g=$(( RANDOM % 256 ))
+    b=$(( RANDOM % 256 ))
+  }
+
+  status() {
+    local cal_str; [[ ${cal_on} -eq 1 ]] && cal_str="ON" || cal_str="OFF"
+    printf '\033[1mColor: %3d %3d %3d    Calibration: %s\033[0m\n' \
+      "${r}" "${g}" "${b}" "${cal_str}" >&2
+  }
+
+  show-help() {
+    cat >&2 <<'CALHELP'
+
+  r                    Randomize color
+  R G B                Set specific color (0-255)
+  c                    Toggle calibration on/off
+  KEY SR SG SB         Set calibration for key (percentages, 100=no change)
+  d KEY                Delete calibration entry
+  p                    Print current calibration table
+  q                    Quit and print final settings
+
+  Key names: f1-f12, a-z, 0-9, esc, del, space.1, tab.1,
+             shift.left.1, ctrl.left.1, arrows.up, etc.
+
+CALHELP
+  }
+
+  print-table() {
+    if [[ ${#led_calibration[@]} -eq 0 ]]; then
+      printf '  (no calibration entries)\n' >&2
+    else
+      for led in $(printf '%s\n' "${!led_calibration[@]}" | sort -n); do
+        printf '  [%s]="%s"  # %s\n' \
+          "${led}" "${led_calibration[${led}]}" "$(led-names "${led}")" >&2
+      done
+    fi
+  }
+
+  printf '\n\033[1mInteractive LED calibration\033[0m\n' >&2
+  show-help
+
+  printf "%s\n" 'brightness 10'
+
+  randomize
+  flood "${r}" "${g}" "${b}" "${cal_on}"
+  status
+
+  while IFS= read -r -p "> " line <&3; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "${line}" ]] && continue
+
+    read -r cmd a1 a2 a3 <<< "${line}"
+
+    case "${cmd}" in
+      r)
+        randomize
+        flood "${r}" "${g}" "${b}" "${cal_on}"
+        status
+        ;;
+      c)
+        cal_on=$(( 1 - cal_on ))
+        flood "${r}" "${g}" "${b}" "${cal_on}"
+        status
+        ;;
+      d)
+        local led
+        if [[ -n "${a1}" ]] && led=$(resolve-key "${a1}"); then
+          if [[ -v "led_calibration[${led}]" ]]; then
+            unset "led_calibration[${led}]"
+            printf 'Deleted calibration for %s (LED %d)\n' "${a1}" "${led}" >&2
+            flood "${r}" "${g}" "${b}" "${cal_on}"
+          else
+            printf 'No calibration entry for %s (LED %d)\n' "${a1}" "${led}" >&2
+          fi
+        else
+          printf 'Unknown key: %s\n' "${a1}" >&2
+        fi
+        ;;
+      p)
+        print-table
+        ;;
+      q)
+        printf '\nFinal calibration settings for led_calibration:\n' >&2
+        print-table
+        printf '\n' >&2
+        break
+        ;;
+      h|help|\?)
+        show-help
+        ;;
+      *)
+        # Try: KEY SR SG SB (calibration) or R G B (color)
+        local led
+        if [[ -n "${a3}" ]] && led=$(resolve-key "${cmd}"); then
+          led_calibration[${led}]="${a1} ${a2} ${a3}"
+          printf '%s (LED %d) calibration: %s%% %s%% %s%%\n' \
+            "${cmd}" "${led}" "${a1}" "${a2}" "${a3}" >&2
+          flood "${r}" "${g}" "${b}" "${cal_on}"
+        elif [[ -n "${a2}" && -z "${a3}" ]] && [[ "${cmd}" =~ ^[0-9]+$ ]]; then
+          r="${cmd}" g="${a1}" b="${a2}"
+          flood "${r}" "${g}" "${b}" "${cal_on}"
+          status
+        else
+          printf 'Unknown: %s (h for help)\n' "${cmd}" >&2
+        fi
+        ;;
+    esac
+  done
+} 3</dev/tty
 
 # ---------------------------------------------------------------------------
 # Commands
@@ -1367,11 +1513,12 @@ Schemes:  ${!schemes[*]}
 Commands:
   reset                 Reset keyboard LEDs
   colors                Apply the active color scheme
-  calibrate             Reapply only calibrated LEDs
+  calibrate             Interactive calibration mode
   off                   Turn LEDs off
   min|low|med|hi|max    Set brightness level
 
 Example: kb reset neon colors
+         kb calibrate | sudo ./ite-829x
 HELP
 }
 
@@ -1425,7 +1572,7 @@ commands() {
         shift
         ;;
       calibrate)
-        apply-calibration
+        interactive-calibration
         shift
         ;;
       *)
