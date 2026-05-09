@@ -523,12 +523,13 @@ declare -A keycodes=(
 # ---------------------------------------------------------------------------
 # Per-LED hardware calibration
 #
-# RGB offset applied to compensate for manufacturing variance.
-# Values are added to the base color and clamped to [0, 255].
+# Per-channel scale factors as percentages (100 = no change).
+# Models sub-pixel efficiency: a green at 80% strength needs
+# 125% scale (1/0.8) to compensate.
 # ---------------------------------------------------------------------------
 
 declare -A led_calibration=(
-  [5]="0 30 0"    # F5: weak green sub-pixel
+  [5]="82 125 100"  # F5: weak green, slightly hot red
 )
 
 clamp() {
@@ -540,13 +541,13 @@ clamp() {
 
 calibrate() {
   local led="${1}" r="${2}" g="${3}" b="${4}"
-  local offset="${led_calibration[${led}]:-}"
+  local scale="${led_calibration[${led}]:-}"
 
-  if [[ -n "${offset}" ]]; then
-    read -r dr dg db <<< "${offset}"
-    r=$(clamp $(( r + dr )))
-    g=$(clamp $(( g + dg )))
-    b=$(clamp $(( b + db )))
+  if [[ -n "${scale}" ]]; then
+    read -r sr sg sb <<< "${scale}"
+    r=$(clamp $(( r * sr / 100 )))
+    g=$(clamp $(( g * sg / 100 )))
+    b=$(clamp $(( b * sb / 100 )))
   fi
 
   printf 'led %d %d %d %d\n' "${led}" "${r}" "${g}" "${b}"
