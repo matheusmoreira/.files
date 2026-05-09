@@ -1324,7 +1324,8 @@ random-per-key() {
 }
 
 rain() {
-  trap 'printf "%s\n" "reset"; exit 0' INT
+  local running=1
+  trap 'running=0' INT
 
   local all_leds=($(unique-leds))
   local count=${#all_leds[@]}
@@ -1334,7 +1335,7 @@ rain() {
     printf 'led %d 5 5 15\n' "${led}"
   done
 
-  while true; do
+  while (( running )); do
     for led in "${!brightness[@]}"; do
       local b=$(( brightness[${led}] - 30 ))
       if (( b <= 15 )); then
@@ -1353,8 +1354,10 @@ rain() {
       calibrate "${led}" 100 200 255
     done
 
-    sleep 0.12
+    sleep 0.12 || true
   done
+
+  printf '%s\n' 'reset'
 }
 
 apply-colors() {
