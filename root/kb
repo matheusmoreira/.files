@@ -1336,7 +1336,7 @@ rain() {
 
   while true; do
     for led in "${!brightness[@]}"; do
-      local b=$(( brightness[${led}] - 18 ))
+      local b=$(( brightness[${led}] - 30 ))
       if (( b <= 15 )); then
         printf 'led %d 5 5 15\n' "${led}"
         unset "brightness[${led}]"
@@ -1353,7 +1353,7 @@ rain() {
       calibrate "${led}" 100 200 255
     done
 
-    sleep 0.25
+    sleep 0.12
   done
 }
 
