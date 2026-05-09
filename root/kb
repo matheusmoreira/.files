@@ -1479,6 +1479,13 @@ find-keyboard-input() {
   for dev in /dev/input/by-id/*-event-kbd; do
     [[ -e "${dev}" ]] && printf '%s' "${dev}" && return 0
   done
+  for sys in /sys/class/input/event*/device/name; do
+    if grep -qi 'keyboard' "${sys}" 2>/dev/null; then
+      local event="${sys%/device/name}"
+      event="/dev/input/${event##*/}"
+      [[ -e "${event}" ]] && printf '%s' "${event}" && return 0
+    fi
+  done
   return 1
 }
 
