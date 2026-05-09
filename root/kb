@@ -360,6 +360,27 @@ alien_dark='25 35 25'          # #192319  dark corridors
 
 # --- bioshock ---
 
+# --- pacific rim ---
+# Shatterdome LOCCENT console. Conn-Pod HUD.
+# Jaeger reactor core. Kaiju bioluminescence.
+# Breach dimensional rift. Neural Drift.
+#
+# The Jaeger cockpit is defined by layered blues:
+# holographic HUD projections over steel-dark consoles,
+# the reactor's bright blue-white bleeding through gaps.
+# Kaiju blood glows a sickly blue-teal — similar hue,
+# alien register. The Breach pulses deep amber.
+# Damage alerts flash red across the Conn-Pod.
+
+pr_hud='0 140 220'             # #008CDC  LOCCENT holographic display
+pr_drift='0 180 255'           # #00B4FF  neural Drift bridge
+pr_reactor='100 200 255'       # #64C8FF  Gipsy Danger chest reactor
+pr_kaiju='0 200 180'           # #00C8B4  Kaiju Blue bioluminescence
+pr_breach='255 140 0'          # #FF8C00  dimensional breach amber
+pr_alert='255 30 0'            # #FF1E00  Conn-Pod damage alert
+pr_shatterdome='70 80 95'      # #46505F  Shatterdome steel
+pr_console='40 50 65'          # #283241  dark console
+
 bio_gold='220 180 80'          # #DCB450  art deco
 bio_teal='0 150 140'           # #00968C  Rapture ocean
 bio_red='200 40 40'            # #C82828  plasmid / ADAM
@@ -879,6 +900,24 @@ declare -A bebop=(
   [meta_key]="${bebop_blue}"
 )
 
+declare -A pacificrim=(
+  [fkeys]="${pr_hud}"
+  [numbers]="${pr_drift}"
+  [alpha]="${pr_hud}"
+  [special]="${pr_kaiju}"
+  [nav]="${pr_drift}"
+  [arrows]="${pr_reactor}"
+  [modifiers]="${pr_console}"
+  [action]="${pr_reactor}"
+  [destructive]="${pr_alert}"
+  [keypad_numbers]="${pr_drift}"
+  [spacebar]="${pr_shatterdome}"
+  [status]="${pr_shatterdome}"
+  [misc_keys]="${pr_console}"
+  [sysrq_key]="${pr_breach}"
+  [meta_key]="${pr_breach}"
+)
+
 declare -A bladerunner=(
   [fkeys]="${blade_teal}"
   [numbers]="${blade_amber}"
@@ -1111,7 +1150,7 @@ declare -A schemes=(
   [persona5]=1 [halflife]=1 [megaman]=1
   [evangelion]=1 [gits]=1 [bebop]=1
   [bladerunner]=1 [alien]=1 [bioshock]=1
-  [dbz]=1 [mgs]=1 [nier]=1
+  [dbz]=1 [mgs]=1 [nier]=1 [pacificrim]=1
 )
 
 usage() {
