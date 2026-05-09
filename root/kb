@@ -556,6 +556,22 @@ calibrate() {
 # Color application
 # ---------------------------------------------------------------------------
 
+apply-calibration() {
+  local -n scheme="${color_scheme}"
+
+  for category in "${all_categories[@]}"; do
+    local -n keys="${category}"
+    local fallback="${category_fallback[${category}]:-}"
+    local color="${scheme[${category}]:-${scheme[${fallback}]:-}}"
+
+    for key in "${keys[@]}"; do
+      local led="${keycodes[${key}]}"
+      [[ -v "led_calibration[${led}]" ]] || continue
+      calibrate "${led}" ${color}
+    done
+  done
+}
+
 apply-colors() {
   local -n scheme="${color_scheme}"
 
@@ -589,6 +605,7 @@ Schemes:  ${!schemes[*]}
 Commands:
   reset                 Reset keyboard LEDs
   colors                Apply the active color scheme
+  calibrate             Reapply only calibrated LEDs
   off                   Turn LEDs off
   min|low|med|hi|max    Set brightness level
 
@@ -643,6 +660,10 @@ commands() {
         ;;
       color|colors)
         apply-colors
+        shift
+        ;;
+      calibrate)
+        apply-calibration
         shift
         ;;
       *)
