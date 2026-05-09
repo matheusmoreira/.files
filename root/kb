@@ -569,7 +569,8 @@ commands() {
         shift
         ;;
       *)
-	break
+	printf 'kb: unknown command: %s\n' "${1}" >&2
+	exit 1
 	;;
     esac
   done
