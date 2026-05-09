@@ -1,0 +1,312 @@
+#!/usr/bin/bash
+
+color_scheme=neon
+
+# --- neon palette, readability-fixed ---
+# https://xcolors.net/neon
+
+neon_blue='22 177 251'       # #16B1FB
+neon_cyan='15 220 182'       # #0FDCB6
+neon_green='151 208 26'      # #97D01A
+neon_amber='255 168 0'       # #FFA800
+neon_pink='237 46 123'       # #ED2E7B
+neon_hot='255 36 145'        # #FF2491
+neon_red='255 5 5'           # #FF0505
+neon_dim_blue='40 156 213'   # #289CD5
+neon_dim_green='118 182 57'  # #76B639
+neon_dim_cyan='10 155 129'   # #0A9B81
+neon_white='248 248 248'     # #F8F8F8
+neon_grey='136 136 136'      # #888888
+
+declare -A colors=(
+  [neon.esc]="${neon_red}"
+  [neon.f1]="${neon_blue}"
+  [neon.f2]="${neon_blue}"
+  [neon.f3]="${neon_blue}"
+  [neon.f4]="${neon_blue}"
+  [neon.f5]="${neon_blue}"
+  [neon.f6]="${neon_blue}"
+  [neon.f7]="${neon_blue}"
+  [neon.f8]="${neon_blue}"
+  [neon.f9]="${neon_blue}"
+  [neon.f10]="${neon_blue}"
+  [neon.f11]="${neon_blue}"
+  [neon.f12]="${neon_blue}"
+  [neon.sysrq]="${neon_green}"
+  [neon.ins]="${neon_cyan}"
+  [neon.del]="${neon_red}"
+  [neon.home]="${neon_cyan}"
+  [neon.end]="${neon_cyan}"
+  [neon.pgup]="${neon_cyan}"
+  [neon.pgdn]="${neon_cyan}"
+  [neon.tilde]="${neon_hot}"
+  [neon.1]="${neon_amber}"
+  [neon.2]="${neon_amber}"
+  [neon.3]="${neon_amber}"
+  [neon.4]="${neon_amber}"
+  [neon.5]="${neon_amber}"
+  [neon.6]="${neon_amber}"
+  [neon.7]="${neon_amber}"
+  [neon.8]="${neon_amber}"
+  [neon.9]="${neon_amber}"
+  [neon.0]="${neon_amber}"
+  [neon.-]="${neon_amber}"
+  [neon.=]="${neon_amber}"
+  [neon.q]="${neon_dim_cyan}"
+  [neon.w]="${neon_dim_cyan}"
+  [neon.e]="${neon_dim_cyan}"
+  [neon.r]="${neon_dim_cyan}"
+  [neon.t]="${neon_dim_cyan}"
+  [neon.y]="${neon_dim_cyan}"
+  [neon.u]="${neon_dim_cyan}"
+  [neon.i]="${neon_dim_cyan}"
+  [neon.o]="${neon_dim_cyan}"
+  [neon.p]="${neon_dim_cyan}"
+  [neon.a]="${neon_dim_cyan}"
+  [neon.s]="${neon_dim_cyan}"
+  [neon.d]="${neon_dim_cyan}"
+  [neon.f]="${neon_dim_cyan}"
+  [neon.g]="${neon_dim_cyan}"
+  [neon.h]="${neon_dim_cyan}"
+  [neon.j]="${neon_dim_cyan}"
+  [neon.k]="${neon_dim_cyan}"
+  [neon.l]="${neon_dim_cyan}"
+  [neon.z]="${neon_dim_cyan}"
+  [neon.x]="${neon_dim_cyan}"
+  [neon.c]="${neon_dim_cyan}"
+  [neon.v]="${neon_dim_cyan}"
+  [neon.b]="${neon_dim_cyan}"
+  [neon.n]="${neon_dim_cyan}"
+  [neon.m]="${neon_dim_cyan}"
+  [neon.space.1]="${neon_white}"
+  [neon.space.2]="${neon_white}"
+  [neon.semicolon]="${neon_hot}"
+  [neon.quote]="${neon_hot}"
+  [neon.comma]="${neon_hot}"
+  [neon.period]="${neon_hot}"
+  [neon.slash]="${neon_hot}"
+  [neon.brackets.opening]="${neon_hot}"
+  [neon.brackets.closing]="${neon_hot}"
+  [neon.pipe.1]="${neon_hot}"
+  [neon.pipe.2]="${neon_hot}"
+  [neon.keypad.1]="${neon_amber}"
+  [neon.keypad.2]="${neon_amber}"
+  [neon.keypad.3]="${neon_amber}"
+  [neon.keypad.4]="${neon_amber}"
+  [neon.keypad.5]="${neon_amber}"
+  [neon.keypad.6]="${neon_amber}"
+  [neon.keypad.7]="${neon_amber}"
+  [neon.keypad.8]="${neon_amber}"
+  [neon.keypad.9]="${neon_amber}"
+  [neon.keypad.0]="${neon_amber}"
+  [neon.keypad.period]="${neon_hot}"
+  [neon.keypad./]="${neon_amber}"
+  [neon.keypad.*]="${neon_amber}"
+  [neon.keypad.-]="${neon_amber}"
+  [neon.keypad.+.1]="${neon_amber}"
+  [neon.keypad.+.2]="${neon_amber}"
+  [neon.keypad.enter.1]="${neon_cyan}"
+  [neon.keypad.enter.2]="${neon_cyan}"
+  [neon.numlock]="${neon_white}"
+  [neon.capslock.1]="${neon_red}"
+  [neon.capslock.2]="${neon_red}"
+  [neon.backspace.1]="${neon_red}"
+  [neon.backspace.2]="${neon_red}"
+  [neon.enter.1]="${neon_cyan}"
+  [neon.enter.2]="${neon_cyan}"
+  [neon.ctrl.left.1]="${neon_pink}"
+  [neon.ctrl.left.2]="${neon_pink}"
+  [neon.ctrl.right.1]="${neon_pink}"
+  [neon.ctrl.right.2]="${neon_pink}"
+  [neon.alt.left]="${neon_pink}"
+  [neon.alt.right]="${neon_pink}"
+  [neon.shift.left.1]="${neon_pink}"
+  [neon.shift.left.2]="${neon_pink}"
+  [neon.shift.right.1]="${neon_pink}"
+  [neon.shift.right.2]="${neon_pink}"
+  [neon.fn]="${neon_grey}"
+  [neon.meta]="${neon_blue}"
+  [neon.menu]="${neon_grey}"
+  [neon.tab.1]="${neon_cyan}"
+  [neon.tab.2]="${neon_cyan}"
+  [neon.arrows.up]="${neon_dim_blue}"
+  [neon.arrows.down]="${neon_dim_blue}"
+  [neon.arrows.left]="${neon_dim_blue}"
+  [neon.arrows.right]="${neon_dim_blue}"
+)
+
+declare -A keycodes=(
+  [esc]=0
+  [f1]=1
+  [f2]=2
+  [f3]=3
+  [f4]=4
+  [f5]=5
+  [f6]=6
+  [f7]=7
+  [f8]=8
+  [f9]=9
+  [f10]=10
+  [f11]=11
+  [f12]=12
+  [prtsc]=13
+  [sysrq]=13
+  [ins]=14
+  [scrlk]=14
+  [del]=15
+  [home]=16
+  [end]=17
+  [pgup]=18
+  [pgdn]=19
+  [tilde]=32
+  [1]=33
+  [2]=34
+  [3]=35
+  [4]=36
+  [5]=37
+  [6]=38
+  [7]=39
+  [8]=40
+  [9]=41
+  [0]=42
+  [-]=43
+  [=]=45
+  [backspace.1]=46
+  [backspace.2]=47
+  [numlock]=48
+  [keypad./]=49
+  [keypad.*]=50
+  [keypad.-]=51
+  [tab.1]=64
+  [tab.2]=65
+  [q]=66
+  [w]=67
+  [e]=68
+  [r]=69
+  [t]=70
+  [y]=71
+  [u]=72
+  [i]=73
+  [o]=74
+  [p]=75
+  [brackets.opening]=76
+  [brackets.closing]=77
+  [backslash]=78
+  [pipe.1]=78
+  [pipe.2]=79
+  [keypad.7]=80
+  [keypad.8]=81
+  [keypad.9]=82
+  [keypad.+.1]=83
+  [capslock.1]=96
+  [capslock.2]=97
+  [a]=98
+  [s]=99
+  [d]=100
+  [f]=101
+  [g]=102
+  [h]=103
+  [j]=104
+  [k]=105
+  [l]=106
+  [semicolon]=107
+  [colon]=107
+  [quote]=108
+  [enter.1]=110
+  [enter.2]=111
+  [keypad.4]=112
+  [keypad.5]=113
+  [keypad.6]=114
+  [keypad.+.2]=115
+  [shift.left.1]=128
+  [shift.left.2]=130
+  [z]=131
+  [x]=132
+  [c]=133
+  [v]=134
+  [b]=135
+  [n]=136
+  [m]=137
+  [comma]=138
+  [period]=139
+  [slash]=140
+  [shift.right.1]=141
+  [shift.right.2]=142
+  [arrows.up]=143
+  [keypad.1]=144
+  [keypad.2]=145
+  [keypad.3]=146
+  [keypad.enter.1]=147
+  [ctrl.left.1]=160
+  [ctrl.left.2]=161
+  [fn]=162
+  [meta]=163
+  [alt.left]=164
+  [space.1]=165
+  [space.2]=169
+  [alt.right]=170
+  [menu]=171
+  [ctrl.right.1]=172
+  [ctrl.right.2]=173
+  [arrows.left]=174
+  [arrows.down]=175
+  [arrows.right]=176
+  [keypad.0]=177
+  [keypad.period]=178
+  [keypad.enter.2]=179
+)
+
+apply-colors() {
+  for key in "${!colors[@]}"; do
+    printf 'led %d %s\n' "${keycodes["${key#${color_scheme}.}"]}" "${colors["${key}"]}"
+  done
+}
+
+commands() {
+  while [[ $# -gt 0 ]]; do
+    case "${1}" in
+      reset)
+        printf "%s\n" 'reset'
+        sleep 0.2
+        shift
+        ;;
+      off)
+        printf "%s\n" 'brightness 0'
+        shift
+        ;;
+      min|minimum)
+        printf "%s\n" 'brightness 1'
+        shift
+        ;;
+      low|lo)
+        printf "%s\n" 'brightness 3'
+        shift
+        ;;
+      med|medium)
+        printf "%s\n" 'brightness 5'
+        shift
+        ;;
+      hi|high)
+        printf "%s\n" 'brightness 7'
+        shift
+        ;;
+      max|maximum)
+        printf "%s\n" 'brightness 10'
+        shift
+        ;;
+      color|colors)
+        apply-colors "${color_scheme}"
+        shift
+        ;;
+      neon)
+        color_scheme=neon
+        shift
+        ;;
+      *)
+	break
+	;;
+    esac
+  done
+}
+
+commands "${@}"
