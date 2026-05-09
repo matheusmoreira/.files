@@ -8,23 +8,10 @@ email="$(git config user.email)"
 # Support for user ID comments deliberately omitted
 # https://dkg.fifthhorseman.net/blog/openpgp-user-id-comments-considered-harmful.html
 
-# The master key is a certification key
-# using one of the following algorithms:
-#
-#   - Non-ECC
-#     - RSA
-#       - 4096 bits
-#   - ECC
-#     - EdDSA
-#       - Curve ed25519
-#
-ecc_cipher=EDDSA
+# EdDSA ed25519 certification key
+cipher=EDDSA
 curve=ed25519
-non_ecc_cipher=RSA
-bits=4096
 
-# Use elliptic curve cryptography by default
-mode=ecc
 usage=cert
 expire=0
 keyserver=hkps://keys.openpgp.org
@@ -34,22 +21,8 @@ digests='SHA512 SHA384 SHA256 SHA224'
 compressors='BZIP2 ZLIB ZIP Uncompressed'
 preferences="${digests} ${ciphers} ${compressors}"
 
-cipher=
-cipher_parameter=
-echoed_cipher_parameter=
-
-case "${mode}" in
-  ecc|ECC)
-    cipher="${ecc_cipher}"
-    echoed_cipher_parameter="Curve:  ${curve}"
-    cipher_parameter="Key-Curve: ${curve}"
-    ;;
-  *)
-    cipher="${non_ecc_cipher}"
-    echoed_cipher_parameter="Bits:   ${bits}"
-    cipher_parameter="Key-Length: ${bits}"
-    ;;
-esac
+cipher_parameter="Key-Curve: ${curve}"
+echoed_cipher_parameter="Curve:  ${curve}"
 
 gpg --batch --full-generate-key <<KEY_PARAMETERS
 
