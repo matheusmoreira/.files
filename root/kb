@@ -1323,6 +1323,38 @@ random-per-key() {
   done
 }
 
+rain() {
+  local all_leds=($(unique-leds))
+  local count=${#all_leds[@]}
+  local -A brightness=()
+
+  for led in "${all_leds[@]}"; do
+    printf 'led %d 5 5 15\n' "${led}"
+  done
+
+  while true; do
+    for led in "${!brightness[@]}"; do
+      local b=$(( brightness[${led}] - 30 ))
+      if (( b <= 15 )); then
+        printf 'led %d 5 5 15\n' "${led}"
+        unset "brightness[${led}]"
+      else
+        calibrate "${led}" "$(( b * 40 / 100 ))" "$(( b * 80 / 100 ))" "${b}"
+        brightness[${led}]=${b}
+      fi
+    done
+
+    local drops=$(( RANDOM % 3 + 1 ))
+    for (( i = 0; i < drops; i++ )); do
+      local led="${all_leds[$(( RANDOM % count ))]}"
+      brightness[${led}]=255
+      calibrate "${led}" 100 200 255
+    done
+
+    sleep 0.12
+  done
+}
+
 apply-colors() {
   local -n scheme="${color_scheme}"
 
@@ -1528,6 +1560,8 @@ Commands:
   colors                Apply the active color scheme
   random                Random color, whole keyboard
   party                 Random color per key
+  rain                  Animated rain drops (Ctrl+C to stop)
+  wave|breathe|scan|blink   Hardware effects
   calibrate             Interactive calibration mode
   off                   Turn LEDs off
   min|low|med|hi|max    Set brightness level
@@ -1592,6 +1626,26 @@ commands() {
         ;;
       party)
         random-per-key
+        shift
+        ;;
+      rain)
+        rain
+        shift
+        ;;
+      wave)
+        printf '%s\n' 'effects 0'
+        shift
+        ;;
+      breathe)
+        printf '%s\n' 'effects 1'
+        shift
+        ;;
+      scan)
+        printf '%s\n' 'effects 2'
+        shift
+        ;;
+      blink)
+        printf '%s\n' 'effects 3'
         shift
         ;;
       calibrate)
