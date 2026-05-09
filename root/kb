@@ -175,6 +175,57 @@ vim_orange='209 154 102'       # #D19A66
 vim_white='171 178 191'        # #ABB2BF
 vim_grey='92 99 112'           # #5C6370
 
+# --- sunset ---
+
+sun_gold='255 200 0'           # #FFC800
+sun_orange='255 140 0'         # #FF8C00
+sun_coral='255 100 80'         # #FF6450
+sun_red='255 50 50'            # #FF3232
+sun_magenta='200 50 150'       # #C83296
+sun_purple='150 80 200'        # #9650C8
+sun_warm_white='255 230 200'   # #FFE6C8
+sun_dim='180 100 30'           # #B4641E
+
+# --- ocean ---
+
+ocean_navy='40 90 170'         # #285AAA
+ocean_teal='0 160 160'         # #00A0A0
+ocean_seafoam='100 220 200'    # #64DCC8
+ocean_wave='50 150 220'        # #3296DC
+ocean_foam='200 240 255'       # #C8F0FF
+ocean_coral='255 120 100'      # #FF7864
+ocean_sand='220 200 160'       # #DCC8A0
+ocean_deep='30 60 120'         # #1E3C78
+
+# --- cyberpunk (2077) ---
+# Matches the in-game UI: the iconic yellow, scanner cyan,
+# threat red, and Kiroshi optics magenta.
+
+cyber_yellow='252 225 0'       # #FCE100  main UI / quest markers
+cyber_cyan='0 236 255'         # #00ECFF  scanner / netrunning
+cyber_red='255 24 48'          # #FF1830  threat / enemy
+cyber_magenta='213 0 125'      # #D5007D  Kiroshi / cyberware
+cyber_white='220 220 210'      # #DCDCD2  subtitle text
+cyber_dark='60 55 50'          # #3C3732  Arasaka dark
+
+# --- sakura ---
+
+sakura_petal='255 180 200'     # #FFB4C8
+sakura_blossom='255 130 170'   # #FF82AA
+sakura_branch='180 130 100'    # #B48264
+sakura_leaf='130 200 100'      # #82C864
+sakura_white='255 240 245'     # #FFF0F5
+sakura_sky='170 200 255'       # #AAC8FF
+
+# --- stealth ---
+
+stealth_steel='80 90 110'      # #505A6E
+stealth_slate='50 60 80'       # #323C50
+stealth_accent='100 140 200'   # #648CC8
+stealth_glow='130 170 230'     # #82AAE6
+stealth_warn='180 60 60'       # #B43C3C
+stealth_dim='40 50 70'         # #283246
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
@@ -305,6 +356,96 @@ declare -A matrix=(
   [meta_key]="${matrix_glow}"
 )
 
+declare -A sunset=(
+  [fkeys]="${sun_gold}"
+  [numbers]="${sun_orange}"
+  [alpha]="${sun_coral}"
+  [special]="${sun_red}"
+  [nav]="${sun_orange}"
+  [arrows]="${sun_magenta}"
+  [modifiers]="${sun_purple}"
+  [action]="${sun_gold}"
+  [destructive]="${sun_red}"
+  [keypad_numbers]="${sun_orange}"
+  [spacebar]="${sun_warm_white}"
+  [status]="${sun_warm_white}"
+  [misc_keys]="${sun_dim}"
+  [sysrq_key]="${sun_gold}"
+  [meta_key]="${sun_purple}"
+)
+
+declare -A ocean=(
+  [fkeys]="${ocean_navy}"
+  [numbers]="${ocean_wave}"
+  [alpha]="${ocean_teal}"
+  [special]="${ocean_coral}"
+  [nav]="${ocean_seafoam}"
+  [arrows]="${ocean_seafoam}"
+  [modifiers]="${ocean_deep}"
+  [action]="${ocean_seafoam}"
+  [destructive]="${ocean_coral}"
+  [keypad_numbers]="${ocean_wave}"
+  [spacebar]="${ocean_foam}"
+  [status]="${ocean_foam}"
+  [misc_keys]="${ocean_deep}"
+  [sysrq_key]="${ocean_seafoam}"
+  [meta_key]="${ocean_navy}"
+)
+
+declare -A cyberpunk=(
+  [fkeys]="${cyber_yellow}"
+  [numbers]="${cyber_yellow}"
+  [alpha]="${cyber_cyan}"
+  [special]="${cyber_magenta}"
+  [nav]="${cyber_cyan}"
+  [arrows]="${cyber_cyan}"
+  [modifiers]="${cyber_dark}"
+  [action]="${cyber_yellow}"
+  [destructive]="${cyber_red}"
+  [keypad_numbers]="${cyber_yellow}"
+  [spacebar]="${cyber_white}"
+  [status]="${cyber_white}"
+  [misc_keys]="${cyber_dark}"
+  [sysrq_key]="${cyber_yellow}"
+  [meta_key]="${cyber_magenta}"
+)
+
+declare -A sakura=(
+  [fkeys]="${sakura_sky}"
+  [numbers]="${sakura_blossom}"
+  [alpha]="${sakura_petal}"
+  [special]="${sakura_blossom}"
+  [nav]="${sakura_sky}"
+  [arrows]="${sakura_sky}"
+  [modifiers]="${sakura_branch}"
+  [action]="${sakura_leaf}"
+  [destructive]="${sakura_blossom}"
+  [keypad_numbers]="${sakura_blossom}"
+  [spacebar]="${sakura_white}"
+  [status]="${sakura_white}"
+  [misc_keys]="${sakura_branch}"
+  [sysrq_key]="${sakura_leaf}"
+  [meta_key]="${sakura_sky}"
+)
+
+declare -A stealth=(
+  [fkeys]="${stealth_accent}"
+  [numbers]="${stealth_steel}"
+  [alpha]="${stealth_slate}"
+  [special]="${stealth_dim}"
+  [nav]="${stealth_accent}"
+  [arrows]="${stealth_accent}"
+  [modifiers]="${stealth_dim}"
+  [action]="${stealth_glow}"
+  [destructive]="${stealth_warn}"
+  [keypad_numbers]="${stealth_steel}"
+  [spacebar]="${stealth_steel}"
+  [status]="${stealth_steel}"
+  [misc_keys]="${stealth_dim}"
+  [sysrq_key]="${stealth_glow}"
+  [meta_key]="${stealth_accent}"
+)
+
 declare -A vim=(
   [fkeys]="${vim_grey}"
   [numbers]="${vim_yellow}"
@@ -404,6 +545,7 @@ apply-colors() {
 declare -A schemes=(
   [neon]=1 [monokai]=1 [vaporwave]=1 [gruvbox]=1
   [nord]=1 [dracula]=1 [matrix]=1   [vim]=1
+  [sunset]=1 [ocean]=1 [cyberpunk]=1 [sakura]=1 [stealth]=1
 )
 
 usage() {
