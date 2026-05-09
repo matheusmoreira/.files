@@ -1310,6 +1310,19 @@ calibrate() {
 # Color application
 # ---------------------------------------------------------------------------
 
+random-flood() {
+  local r=$(( RANDOM % 256 ))
+  local g=$(( RANDOM % 256 ))
+  local b=$(( RANDOM % 256 ))
+  flood "${r}" "${g}" "${b}" 1
+}
+
+random-per-key() {
+  for led in $(unique-leds); do
+    calibrate "${led}" "$(( RANDOM % 256 ))" "$(( RANDOM % 256 ))" "$(( RANDOM % 256 ))"
+  done
+}
+
 apply-colors() {
   local -n scheme="${color_scheme}"
 
@@ -1513,6 +1526,8 @@ Schemes:  ${!schemes[*]}
 Commands:
   reset                 Reset keyboard LEDs
   colors                Apply the active color scheme
+  random                Random color, whole keyboard
+  party                 Random color per key
   calibrate             Interactive calibration mode
   off                   Turn LEDs off
   min|low|med|hi|max    Set brightness level
@@ -1569,6 +1584,14 @@ commands() {
         ;;
       color|colors)
         apply-colors
+        shift
+        ;;
+      random)
+        random-flood
+        shift
+        ;;
+      party)
+        random-per-key
         shift
         ;;
       calibrate)
