@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-color_scheme=neon
+color_scheme=vaporwave
 
 # --- neon palette, readability-fixed ---
 # https://xcolors.net/neon
@@ -29,6 +29,20 @@ mono_orange='253 151 31'     # #FD971F
 mono_light_cyan='161 239 228' # #A1EFE4
 mono_white='248 248 242'     # #F8F8F2
 mono_grey='144 141 126'      # #908D7E
+
+# --- vaporwave palette ---
+
+vapor_pink='255 113 206'     # #FF71CE  aesthetic pink
+vapor_blue='1 205 254'       # #01CDFE  electric cyan
+vapor_green='5 255 161'      # #05FFA1  neon green
+vapor_purple='185 103 255'   # #B967FF  lavender purple
+vapor_yellow='255 251 150'   # #FFFB96  pastel yellow
+vapor_magenta='255 0 128'    # #FF0080  hot magenta
+vapor_coral='255 100 146'    # #FF6492  sunset coral
+vapor_white='230 220 255'    # #E6DCFF  lavender white
+vapor_lavender='140 160 255'  # #8CA0FF  soft periwinkle for letters
+vapor_crimson='255 20 60'     # #FF143C  aggressive red
+vapor_gold='255 200 50'       # #FFC832  special meta key
 
 declare -A colors=(
   [monokai.esc]="${mono_pink}"
@@ -260,6 +274,121 @@ declare -A colors=(
   [neon.arrows.down]="${neon_dim_blue}"
   [neon.arrows.left]="${neon_dim_blue}"
   [neon.arrows.right]="${neon_dim_blue}"
+
+  [vaporwave.esc]="${vapor_magenta}"
+  [vaporwave.f1]="${vapor_blue}"
+  [vaporwave.f2]="${vapor_blue}"
+  [vaporwave.f3]="${vapor_blue}"
+  [vaporwave.f4]="${vapor_blue}"
+  [vaporwave.f5]="${vapor_blue}"
+  [vaporwave.f6]="${vapor_blue}"
+  [vaporwave.f7]="${vapor_blue}"
+  [vaporwave.f8]="${vapor_blue}"
+  [vaporwave.f9]="${vapor_blue}"
+  [vaporwave.f10]="${vapor_blue}"
+  [vaporwave.f11]="${vapor_blue}"
+  [vaporwave.f12]="${vapor_blue}"
+  [vaporwave.sysrq]="${vapor_green}"
+  [vaporwave.ins]="${vapor_blue}"
+  [vaporwave.del]="${vapor_crimson}"
+  [vaporwave.home]="${vapor_blue}"
+  [vaporwave.end]="${vapor_blue}"
+  [vaporwave.pgup]="${vapor_blue}"
+  [vaporwave.pgdn]="${vapor_blue}"
+  [vaporwave.tilde]="${vapor_magenta}"
+  [vaporwave.1]="${vapor_yellow}"
+  [vaporwave.2]="${vapor_yellow}"
+  [vaporwave.3]="${vapor_yellow}"
+  [vaporwave.4]="${vapor_yellow}"
+  [vaporwave.5]="${vapor_yellow}"
+  [vaporwave.6]="${vapor_yellow}"
+  [vaporwave.7]="${vapor_yellow}"
+  [vaporwave.8]="${vapor_yellow}"
+  [vaporwave.9]="${vapor_yellow}"
+  [vaporwave.0]="${vapor_yellow}"
+  [vaporwave.-]="${vapor_yellow}"
+  [vaporwave.=]="${vapor_yellow}"
+  [vaporwave.q]="${vapor_lavender}"
+  [vaporwave.w]="${vapor_lavender}"
+  [vaporwave.e]="${vapor_lavender}"
+  [vaporwave.r]="${vapor_lavender}"
+  [vaporwave.t]="${vapor_lavender}"
+  [vaporwave.y]="${vapor_lavender}"
+  [vaporwave.u]="${vapor_lavender}"
+  [vaporwave.i]="${vapor_lavender}"
+  [vaporwave.o]="${vapor_lavender}"
+  [vaporwave.p]="${vapor_lavender}"
+  [vaporwave.a]="${vapor_lavender}"
+  [vaporwave.s]="${vapor_lavender}"
+  [vaporwave.d]="${vapor_lavender}"
+  [vaporwave.f]="${vapor_lavender}"
+  [vaporwave.g]="${vapor_lavender}"
+  [vaporwave.h]="${vapor_lavender}"
+  [vaporwave.j]="${vapor_lavender}"
+  [vaporwave.k]="${vapor_lavender}"
+  [vaporwave.l]="${vapor_lavender}"
+  [vaporwave.z]="${vapor_lavender}"
+  [vaporwave.x]="${vapor_lavender}"
+  [vaporwave.c]="${vapor_lavender}"
+  [vaporwave.v]="${vapor_lavender}"
+  [vaporwave.b]="${vapor_lavender}"
+  [vaporwave.n]="${vapor_lavender}"
+  [vaporwave.m]="${vapor_lavender}"
+  [vaporwave.space.1]="${vapor_white}"
+  [vaporwave.space.2]="${vapor_white}"
+  [vaporwave.semicolon]="${vapor_magenta}"
+  [vaporwave.quote]="${vapor_magenta}"
+  [vaporwave.comma]="${vapor_magenta}"
+  [vaporwave.period]="${vapor_magenta}"
+  [vaporwave.slash]="${vapor_magenta}"
+  [vaporwave.brackets.opening]="${vapor_magenta}"
+  [vaporwave.brackets.closing]="${vapor_magenta}"
+  [vaporwave.pipe.1]="${vapor_magenta}"
+  [vaporwave.pipe.2]="${vapor_magenta}"
+  [vaporwave.keypad.1]="${vapor_yellow}"
+  [vaporwave.keypad.2]="${vapor_yellow}"
+  [vaporwave.keypad.3]="${vapor_yellow}"
+  [vaporwave.keypad.4]="${vapor_yellow}"
+  [vaporwave.keypad.5]="${vapor_yellow}"
+  [vaporwave.keypad.6]="${vapor_yellow}"
+  [vaporwave.keypad.7]="${vapor_yellow}"
+  [vaporwave.keypad.8]="${vapor_yellow}"
+  [vaporwave.keypad.9]="${vapor_yellow}"
+  [vaporwave.keypad.0]="${vapor_yellow}"
+  [vaporwave.keypad.period]="${vapor_magenta}"
+  [vaporwave.keypad./]="${vapor_yellow}"
+  [vaporwave.keypad.*]="${vapor_yellow}"
+  [vaporwave.keypad.-]="${vapor_yellow}"
+  [vaporwave.keypad.+.1]="${vapor_yellow}"
+  [vaporwave.keypad.+.2]="${vapor_yellow}"
+  [vaporwave.keypad.enter.1]="${vapor_green}"
+  [vaporwave.keypad.enter.2]="${vapor_green}"
+  [vaporwave.numlock]="${vapor_white}"
+  [vaporwave.capslock.1]="${vapor_magenta}"
+  [vaporwave.capslock.2]="${vapor_magenta}"
+  [vaporwave.backspace.1]="${vapor_crimson}"
+  [vaporwave.backspace.2]="${vapor_crimson}"
+  [vaporwave.enter.1]="${vapor_green}"
+  [vaporwave.enter.2]="${vapor_green}"
+  [vaporwave.ctrl.left.1]="${vapor_purple}"
+  [vaporwave.ctrl.left.2]="${vapor_purple}"
+  [vaporwave.ctrl.right.1]="${vapor_purple}"
+  [vaporwave.ctrl.right.2]="${vapor_purple}"
+  [vaporwave.alt.left]="${vapor_purple}"
+  [vaporwave.alt.right]="${vapor_purple}"
+  [vaporwave.shift.left.1]="${vapor_purple}"
+  [vaporwave.shift.left.2]="${vapor_purple}"
+  [vaporwave.shift.right.1]="${vapor_purple}"
+  [vaporwave.shift.right.2]="${vapor_purple}"
+  [vaporwave.fn]="${vapor_purple}"
+  [vaporwave.meta]="${vapor_gold}"
+  [vaporwave.menu]="${vapor_purple}"
+  [vaporwave.tab.1]="${vapor_green}"
+  [vaporwave.tab.2]="${vapor_green}"
+  [vaporwave.arrows.up]="${vapor_green}"
+  [vaporwave.arrows.down]="${vapor_green}"
+  [vaporwave.arrows.left]="${vapor_green}"
+  [vaporwave.arrows.right]="${vapor_green}"
 )
 
 declare -A keycodes=(
@@ -432,6 +561,10 @@ commands() {
         ;;
       monokai)
         color_scheme=monokai
+        shift
+        ;;
+      vaporwave)
+        color_scheme=vaporwave
         shift
         ;;
       *)
