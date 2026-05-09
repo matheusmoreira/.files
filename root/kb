@@ -1490,6 +1490,9 @@ find-keyboard-input() {
 }
 
 reactive() {
+  local running=1
+  trap 'running=0' INT
+
   local input_dev="${1:-}"
   if [[ -z "${input_dev}" ]]; then
     input_dev=$(find-keyboard-input) || true
@@ -1500,21 +1503,43 @@ reactive() {
     return 1
   fi
 
-  printf 'kb: reading from %s\n' "${input_dev}" >&2
+  printf 'kb: reading from %s (Ctrl+C to stop)\n' "${input_dev}" >&2
+
+  local -A key_brightness=()
 
   for led in $(unique-leds); do
     printf 'led %d 5 5 10\n' "${led}"
   done
 
-  evtest "${input_dev}" 2>/dev/null \
-  | stdbuf -oL grep --line-buffered -oP 'code \K[0-9]+(?=.*value [12])' \
-  | while read -r code; do
-    local leds="${evdev_to_leds[${code}]:-}"
-    [[ -n "${leds}" ]] || continue
-    for led in ${leds}; do
-      calibrate "${led}" 255 255 255
+  # discard startup noise from evtest
+  sleep 0.3
+
+  while (( running )); do
+    # drain all queued key events
+    while read -t 0.01 -r code; do
+      local leds="${evdev_to_leds[${code}]:-}"
+      [[ -n "${leds}" ]] || continue
+      for led in ${leds}; do
+        key_brightness[${led}]=255
+        calibrate "${led}" 100 200 255
+      done
     done
-  done
+
+    # fade active keys
+    for led in "${!key_brightness[@]}"; do
+      local b=$(( key_brightness[${led}] - 25 ))
+      if (( b <= 10 )); then
+        printf 'led %d 5 5 10\n' "${led}"
+        unset "key_brightness[${led}]"
+      else
+        calibrate "${led}" "$(( b * 40 / 100 ))" "$(( b * 80 / 100 ))" "${b}"
+        key_brightness[${led}]=${b}
+      fi
+    done
+
+    sleep 0.10 || true
+  done < <(evtest "${input_dev}" 2>/dev/null \
+    | stdbuf -oL grep --line-buffered -oP 'code \K[0-9]+(?=.*value [12])')
 
   printf '%s\n' 'reset'
 }
