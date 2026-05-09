@@ -385,6 +385,7 @@ declare -A keycodes=(
 
 apply-colors() {
   for key in "${!colors[@]}"; do
+    [[ "${key}" == "${color_scheme}."* ]] || continue
     printf 'led %d %s\n' "${keycodes["${key#${color_scheme}.}"]}" "${colors["${key}"]}"
   done
 }
