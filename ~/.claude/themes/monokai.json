@@ -1,0 +1,51 @@
+{
+  "name": "Monokai",
+  "base": "dark-ansi",
+  "overrides": {
+    "claude": "#66D9EF",
+    "claudeShimmer": "#A1EEF9",
+    "text": "#F8F8F2",
+    "inverseText": "#272822",
+    "inactive": "#75715E",
+    "inactiveShimmer": "#928B70",
+    "subtle": "#49483E",
+    "suggestion": "#E6DB74",
+    "permission": "#AE81FF",
+    "permissionShimmer": "#C9ABFF",
+    "remember": "#FD971F",
+
+    "success": "#A6E22E",
+    "error": "#FE4386",
+    "warning": "#E6DB74",
+    "warningShimmer": "#F0E9A0",
+    "merged": "#AE81FF",
+
+    "promptBorder": "#66D9EF",
+    "promptBorderShimmer": "#A1EEF9",
+    "planMode": "#AE81FF",
+    "autoAccept": "#A6E22E",
+    "bashBorder": "#FD971F",
+    "ide": "#66D9EF",
+    "fastMode": "#FE4386",
+    "fastModeShimmer": "#FE72A4",
+
+    "diffAdded": "#2B3A1E",
+    "diffRemoved": "#3A1A25",
+    "diffAddedDimmed": "#252E1F",
+    "diffRemovedDimmed": "#2E1820",
+    "diffAddedWord": "#3D5A22",
+    "diffRemovedWord": "#5A1A30",
+
+    "userMessageBackground": "#3E3D32",
+    "userMessageBackgroundHover": "#49483E",
+    "messageActionsBackground": "#49483E",
+    "bashMessageBackgroundColor": "#352F1F",
+    "memoryBackgroundColor": "#2F2A1A",
+    "selectionBg": "#49483E",
+
+    "rate_limit_fill": "#A6E22E",
+    "rate_limit_empty": "#49483E",
+    "briefLabelYou": "#A6E22E",
+    "briefLabelClaude": "#66D9EF"
+  }
+}

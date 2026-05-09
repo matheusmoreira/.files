@@ -13,7 +13,7 @@
     "commit": "",
     "pr": ""
   },
-  "model": "opus[1m]",
+  "model": "claude-opus-4-6[1m]",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/status-line"
@@ -25,6 +25,7 @@
   "effortLevel": "high",
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "custom:monokai",
   "preferredNotifChannel": "notifications_disabled",
   "autoCompactEnabled": false,
   "fileCheckpointingEnabled": false,

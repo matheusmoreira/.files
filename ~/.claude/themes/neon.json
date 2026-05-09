@@ -1,0 +1,51 @@
+{
+  "name": "Neon",
+  "base": "dark-ansi",
+  "overrides": {
+    "claude": "#16B1FB",
+    "claudeShimmer": "#5CC8FC",
+    "text": "#F8F8F8",
+    "inverseText": "#171717",
+    "inactive": "#888888",
+    "inactiveShimmer": "#A0A0A0",
+    "subtle": "#2D2D2D",
+    "suggestion": "#FFA800",
+    "permission": "#FF2491",
+    "permissionShimmer": "#FF6CB5",
+    "remember": "#E1A126",
+
+    "success": "#97D01A",
+    "error": "#ED2E7B",
+    "warning": "#FFA800",
+    "warningShimmer": "#FFC44D",
+    "merged": "#FF2491",
+
+    "promptBorder": "#16B1FB",
+    "promptBorderShimmer": "#5CC8FC",
+    "planMode": "#FF2491",
+    "autoAccept": "#97D01A",
+    "bashBorder": "#FFA800",
+    "ide": "#16B1FB",
+    "fastMode": "#FF0505",
+    "fastModeShimmer": "#FF4D4D",
+
+    "diffAdded": "#1A2E0A",
+    "diffRemoved": "#2E0A1A",
+    "diffAddedDimmed": "#16250A",
+    "diffRemovedDimmed": "#250A15",
+    "diffAddedWord": "#2A4A10",
+    "diffRemovedWord": "#4A1025",
+
+    "userMessageBackground": "#222222",
+    "userMessageBackgroundHover": "#2D2D2D",
+    "messageActionsBackground": "#2D2D2D",
+    "bashMessageBackgroundColor": "#1F1A10",
+    "memoryBackgroundColor": "#1A1510",
+    "selectionBg": "#2D2D2D",
+
+    "rate_limit_fill": "#97D01A",
+    "rate_limit_empty": "#2D2D2D",
+    "briefLabelYou": "#0FDCB6",
+    "briefLabelClaude": "#16B1FB"
+  }
+}
