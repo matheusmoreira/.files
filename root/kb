@@ -381,12 +381,12 @@ pr_alert='255 30 0'            # #FF1E00  Conn-Pod damage alert
 pr_shatterdome='70 80 95'      # #46505F  Shatterdome steel
 pr_console='40 50 65'          # #283241  dark console
 
-bio_gold='220 180 80'          # #DCB450  art deco
-bio_teal='0 150 140'           # #00968C  Rapture ocean
-bio_red='200 40 40'            # #C82828  plasmid / ADAM
-bio_white='220 210 190'        # #DCD2BE  marble
-bio_bronze='180 130 60'        # #B4823C  brass
-bio_dark='60 45 30'            # #3C2D1E  dark Rapture
+bioshock_gold='220 180 80'     # #DCB450  art deco
+bioshock_teal='0 150 140'      # #00968C  Rapture ocean
+bioshock_red='200 40 40'       # #C82828  plasmid / ADAM
+bioshock_white='220 210 190'   # #DCD2BE  marble
+bioshock_bronze='180 130 60'   # #B4823C  brass
+bioshock_dark='60 45 30'       # #3C2D1E  dark Rapture
 
 # --- dragon ball z ---
 
@@ -1033,21 +1033,21 @@ declare -A alien=(
 )
 
 declare -A bioshock=(
-  [fkeys]="${bio_gold}"
-  [numbers]="${bio_gold}"
-  [alpha]="${bio_teal}"
-  [special]="${bio_red}"
-  [nav]="${bio_teal}"
-  [arrows]="${bio_teal}"
-  [modifiers]="${bio_bronze}"
-  [action]="${bio_gold}"
-  [destructive]="${bio_red}"
-  [keypad_numbers]="${bio_gold}"
-  [spacebar]="${bio_white}"
-  [status]="${bio_white}"
-  [misc_keys]="${bio_dark}"
-  [sysrq_key]="${bio_gold}"
-  [meta_key]="${bio_bronze}"
+  [fkeys]="${bioshock_gold}"
+  [numbers]="${bioshock_gold}"
+  [alpha]="${bioshock_teal}"
+  [special]="${bioshock_red}"
+  [nav]="${bioshock_teal}"
+  [arrows]="${bioshock_teal}"
+  [modifiers]="${bioshock_bronze}"
+  [action]="${bioshock_gold}"
+  [destructive]="${bioshock_red}"
+  [keypad_numbers]="${bioshock_gold}"
+  [spacebar]="${bioshock_white}"
+  [status]="${bioshock_white}"
+  [misc_keys]="${bioshock_dark}"
+  [sysrq_key]="${bioshock_gold}"
+  [meta_key]="${bioshock_bronze}"
 )
 
 declare -A dbz=(
