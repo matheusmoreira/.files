@@ -1539,7 +1539,7 @@ reactive() {
 
     sleep 0.10 || true
   done < <(evtest "${input_dev}" 2>/dev/null \
-    | stdbuf -oL grep --line-buffered -oP 'code \K[0-9]+(?=.*value [12])')
+    | stdbuf -oL grep --line-buffered -oP 'EV_KEY\).*code \K[0-9]+(?=.*value [12])')
 
   printf '%s\n' 'reset'
 }
