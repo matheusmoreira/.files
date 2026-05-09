@@ -1282,7 +1282,7 @@ declare -A keycodes=(
 # ---------------------------------------------------------------------------
 
 declare -A led_calibration=(
-  [5]="82 125 100"  # F5: weak green, slightly hot red
+  [5]="90 125 100"  # F5: weak green, slightly hot red
 )
 
 clamp() {
