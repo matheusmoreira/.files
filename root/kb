@@ -521,6 +521,38 @@ declare -A keycodes=(
 )
 
 # ---------------------------------------------------------------------------
+# Per-LED hardware calibration
+#
+# RGB offset applied to compensate for manufacturing variance.
+# Values are added to the base color and clamped to [0, 255].
+# ---------------------------------------------------------------------------
+
+declare -A led_calibration=(
+  [5]="0 30 0"    # F5: weak green sub-pixel
+)
+
+clamp() {
+  local v=$(( $1 ))
+  (( v < 0 )) && v=0
+  (( v > 255 )) && v=255
+  printf '%d' "${v}"
+}
+
+calibrate() {
+  local led="${1}" r="${2}" g="${3}" b="${4}"
+  local offset="${led_calibration[${led}]:-}"
+
+  if [[ -n "${offset}" ]]; then
+    read -r dr dg db <<< "${offset}"
+    r=$(clamp $(( r + dr )))
+    g=$(clamp $(( g + dg )))
+    b=$(clamp $(( b + db )))
+  fi
+
+  printf 'led %d %d %d %d\n' "${led}" "${r}" "${g}" "${b}"
+}
+
+# ---------------------------------------------------------------------------
 # Color application
 # ---------------------------------------------------------------------------
 
@@ -533,7 +565,7 @@ apply-colors() {
     local color="${scheme[${category}]:-${scheme[${fallback}]:-}}"
 
     for key in "${keys[@]}"; do
-      printf 'led %d %s\n' "${keycodes[${key}]}" "${color}"
+      calibrate "${keycodes[${key}]}" ${color}
     done
   done
 }
