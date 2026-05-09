@@ -3,7 +3,44 @@ set -euo pipefail
 
 color_scheme=vaporwave
 
-# --- neon palette, readability-fixed ---
+# ---------------------------------------------------------------------------
+# Key categories — shared across all schemes
+# ---------------------------------------------------------------------------
+
+fkeys=(f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12)
+alpha=(q w e r t y u i o p a s d f g h j k l z x c v b n m)
+numbers=(1 2 3 4 5 6 7 8 9 0 - =)
+special=(tilde semicolon quote comma period slash
+         brackets.opening brackets.closing pipe.1 pipe.2)
+nav=(ins home end pgup pgdn)
+arrows=(arrows.up arrows.down arrows.left arrows.right)
+modifiers=(ctrl.left.1 ctrl.left.2 ctrl.right.1 ctrl.right.2
+           alt.left alt.right
+           shift.left.1 shift.left.2 shift.right.1 shift.right.2)
+action=(enter.1 enter.2 tab.1 tab.2
+        keypad.enter.1 keypad.enter.2)
+destructive=(esc del backspace.1 backspace.2 capslock.1 capslock.2)
+keypad_numbers=(keypad.0 keypad.1 keypad.2 keypad.3 keypad.4
+                keypad.5 keypad.6 keypad.7 keypad.8 keypad.9
+                keypad./ keypad.* keypad.- keypad.+.1 keypad.+.2
+                keypad.period)
+spacebar=(space.1 space.2)
+status=(numlock)
+misc_keys=(fn menu)
+sysrq_key=(sysrq)
+meta_key=(meta)
+
+all_categories=(
+  fkeys alpha numbers special nav arrows modifiers
+  action destructive keypad_numbers spacebar status
+  misc_keys sysrq_key meta_key
+)
+
+# ---------------------------------------------------------------------------
+# Palettes
+# ---------------------------------------------------------------------------
+
+# --- neon, readability-fixed ---
 # https://xcolors.net/neon
 
 neon_blue='22 177 251'       # #16B1FB
@@ -14,511 +51,155 @@ neon_pink='237 46 123'       # #ED2E7B
 neon_hot='255 36 145'        # #FF2491
 neon_red='255 5 5'           # #FF0505
 neon_dim_blue='40 156 213'   # #289CD5
-neon_dim_green='118 182 57'  # #76B639
 neon_dim_cyan='10 155 129'   # #0A9B81
 neon_white='248 248 248'     # #F8F8F8
 neon_grey='136 136 136'      # #888888
 
-# --- monokai palette, readability-fixed ---
+# --- monokai, readability-fixed ---
 
-mono_cyan='102 217 239'      # #66D9EF
-mono_green='166 226 46'      # #A6E22E
-mono_yellow='244 191 117'    # #F4BF75
-mono_purple='174 129 255'    # #AE81FF
-mono_pink='254 67 134'       # #FE4386
-mono_orange='253 151 31'     # #FD971F
+mono_cyan='102 217 239'       # #66D9EF
+mono_green='166 226 46'       # #A6E22E
+mono_yellow='244 191 117'     # #F4BF75
+mono_purple='174 129 255'     # #AE81FF
+mono_pink='254 67 134'        # #FE4386
+mono_orange='253 151 31'      # #FD971F
 mono_light_cyan='161 239 228' # #A1EFE4
-mono_white='248 248 242'     # #F8F8F2
-mono_grey='144 141 126'      # #908D7E
+mono_white='248 248 242'      # #F8F8F2
+mono_grey='144 141 126'       # #908D7E
 
-# --- vaporwave palette ---
+# --- vaporwave ---
 
-vapor_pink='255 113 206'     # #FF71CE  aesthetic pink
-vapor_blue='1 205 254'       # #01CDFE  electric cyan
-vapor_green='5 255 161'      # #05FFA1  neon green
-vapor_purple='185 103 255'   # #B967FF  lavender purple
-vapor_yellow='255 251 150'   # #FFFB96  pastel yellow
-vapor_magenta='255 0 128'    # #FF0080  hot magenta
-vapor_coral='255 100 146'    # #FF6492  sunset coral
-vapor_white='230 220 255'    # #E6DCFF  lavender white
-vapor_lavender='140 160 255'  # #8CA0FF  soft periwinkle for letters
+vapor_blue='1 205 254'        # #01CDFE  electric cyan
+vapor_green='5 255 161'       # #05FFA1  neon green
+vapor_purple='185 103 255'    # #B967FF  lavender purple
+vapor_yellow='255 251 150'    # #FFFB96  pastel yellow
+vapor_magenta='255 0 128'     # #FF0080  hot magenta
+vapor_white='230 220 255'     # #E6DCFF  lavender white
+vapor_lavender='140 160 255'  # #8CA0FF  soft periwinkle
 vapor_crimson='255 20 60'     # #FF143C  aggressive red
 vapor_gold='255 200 50'       # #FFC832  special meta key
 
-declare -A colors=(
-  [monokai.esc]="${mono_pink}"
-  [monokai.f1]="${mono_cyan}"
-  [monokai.f2]="${mono_cyan}"
-  [monokai.f3]="${mono_cyan}"
-  [monokai.f4]="${mono_cyan}"
-  [monokai.f5]="${mono_cyan}"
-  [monokai.f6]="${mono_cyan}"
-  [monokai.f7]="${mono_cyan}"
-  [monokai.f8]="${mono_cyan}"
-  [monokai.f9]="${mono_cyan}"
-  [monokai.f10]="${mono_cyan}"
-  [monokai.f11]="${mono_cyan}"
-  [monokai.f12]="${mono_cyan}"
-  [monokai.sysrq]="${mono_green}"
-  [monokai.ins]="${mono_orange}"
-  [monokai.del]="${mono_pink}"
-  [monokai.home]="${mono_orange}"
-  [monokai.end]="${mono_orange}"
-  [monokai.pgup]="${mono_orange}"
-  [monokai.pgdn]="${mono_orange}"
-  [monokai.tilde]="${mono_pink}"
-  [monokai.1]="${mono_yellow}"
-  [monokai.2]="${mono_yellow}"
-  [monokai.3]="${mono_yellow}"
-  [monokai.4]="${mono_yellow}"
-  [monokai.5]="${mono_yellow}"
-  [monokai.6]="${mono_yellow}"
-  [monokai.7]="${mono_yellow}"
-  [monokai.8]="${mono_yellow}"
-  [monokai.9]="${mono_yellow}"
-  [monokai.0]="${mono_yellow}"
-  [monokai.-]="${mono_yellow}"
-  [monokai.=]="${mono_yellow}"
-  [monokai.q]="${mono_green}"
-  [monokai.w]="${mono_green}"
-  [monokai.e]="${mono_green}"
-  [monokai.r]="${mono_green}"
-  [monokai.t]="${mono_green}"
-  [monokai.y]="${mono_green}"
-  [monokai.u]="${mono_green}"
-  [monokai.i]="${mono_green}"
-  [monokai.o]="${mono_green}"
-  [monokai.p]="${mono_green}"
-  [monokai.a]="${mono_green}"
-  [monokai.s]="${mono_green}"
-  [monokai.d]="${mono_green}"
-  [monokai.f]="${mono_green}"
-  [monokai.g]="${mono_green}"
-  [monokai.h]="${mono_green}"
-  [monokai.j]="${mono_green}"
-  [monokai.k]="${mono_green}"
-  [monokai.l]="${mono_green}"
-  [monokai.z]="${mono_green}"
-  [monokai.x]="${mono_green}"
-  [monokai.c]="${mono_green}"
-  [monokai.v]="${mono_green}"
-  [monokai.b]="${mono_green}"
-  [monokai.n]="${mono_green}"
-  [monokai.m]="${mono_green}"
-  [monokai.space.1]="${mono_white}"
-  [monokai.space.2]="${mono_white}"
-  [monokai.semicolon]="${mono_pink}"
-  [monokai.quote]="${mono_pink}"
-  [monokai.comma]="${mono_pink}"
-  [monokai.period]="${mono_pink}"
-  [monokai.slash]="${mono_pink}"
-  [monokai.brackets.opening]="${mono_pink}"
-  [monokai.brackets.closing]="${mono_pink}"
-  [monokai.pipe.1]="${mono_pink}"
-  [monokai.pipe.2]="${mono_pink}"
-  [monokai.keypad.1]="${mono_yellow}"
-  [monokai.keypad.2]="${mono_yellow}"
-  [monokai.keypad.3]="${mono_yellow}"
-  [monokai.keypad.4]="${mono_yellow}"
-  [monokai.keypad.5]="${mono_yellow}"
-  [monokai.keypad.6]="${mono_yellow}"
-  [monokai.keypad.7]="${mono_yellow}"
-  [monokai.keypad.8]="${mono_yellow}"
-  [monokai.keypad.9]="${mono_yellow}"
-  [monokai.keypad.0]="${mono_yellow}"
-  [monokai.keypad.period]="${mono_pink}"
-  [monokai.keypad./]="${mono_yellow}"
-  [monokai.keypad.*]="${mono_yellow}"
-  [monokai.keypad.-]="${mono_yellow}"
-  [monokai.keypad.+.1]="${mono_yellow}"
-  [monokai.keypad.+.2]="${mono_yellow}"
-  [monokai.keypad.enter.1]="${mono_light_cyan}"
-  [monokai.keypad.enter.2]="${mono_light_cyan}"
-  [monokai.numlock]="${mono_white}"
-  [monokai.capslock.1]="${mono_pink}"
-  [monokai.capslock.2]="${mono_pink}"
-  [monokai.backspace.1]="${mono_pink}"
-  [monokai.backspace.2]="${mono_pink}"
-  [monokai.enter.1]="${mono_light_cyan}"
-  [monokai.enter.2]="${mono_light_cyan}"
-  [monokai.ctrl.left.1]="${mono_purple}"
-  [monokai.ctrl.left.2]="${mono_purple}"
-  [monokai.ctrl.right.1]="${mono_purple}"
-  [monokai.ctrl.right.2]="${mono_purple}"
-  [monokai.alt.left]="${mono_purple}"
-  [monokai.alt.right]="${mono_purple}"
-  [monokai.shift.left.1]="${mono_purple}"
-  [monokai.shift.left.2]="${mono_purple}"
-  [monokai.shift.right.1]="${mono_purple}"
-  [monokai.shift.right.2]="${mono_purple}"
-  [monokai.fn]="${mono_grey}"
-  [monokai.meta]="${mono_cyan}"
-  [monokai.menu]="${mono_grey}"
-  [monokai.tab.1]="${mono_light_cyan}"
-  [monokai.tab.2]="${mono_light_cyan}"
-  [monokai.arrows.up]="${mono_purple}"
-  [monokai.arrows.down]="${mono_purple}"
-  [monokai.arrows.left]="${mono_purple}"
-  [monokai.arrows.right]="${mono_purple}"
+# ---------------------------------------------------------------------------
+# Scheme definitions — category → color
+# ---------------------------------------------------------------------------
 
-  [neon.esc]="${neon_red}"
-  [neon.f1]="${neon_blue}"
-  [neon.f2]="${neon_blue}"
-  [neon.f3]="${neon_blue}"
-  [neon.f4]="${neon_blue}"
-  [neon.f5]="${neon_blue}"
-  [neon.f6]="${neon_blue}"
-  [neon.f7]="${neon_blue}"
-  [neon.f8]="${neon_blue}"
-  [neon.f9]="${neon_blue}"
-  [neon.f10]="${neon_blue}"
-  [neon.f11]="${neon_blue}"
-  [neon.f12]="${neon_blue}"
-  [neon.sysrq]="${neon_green}"
-  [neon.ins]="${neon_cyan}"
-  [neon.del]="${neon_red}"
-  [neon.home]="${neon_cyan}"
-  [neon.end]="${neon_cyan}"
-  [neon.pgup]="${neon_cyan}"
-  [neon.pgdn]="${neon_cyan}"
-  [neon.tilde]="${neon_hot}"
-  [neon.1]="${neon_amber}"
-  [neon.2]="${neon_amber}"
-  [neon.3]="${neon_amber}"
-  [neon.4]="${neon_amber}"
-  [neon.5]="${neon_amber}"
-  [neon.6]="${neon_amber}"
-  [neon.7]="${neon_amber}"
-  [neon.8]="${neon_amber}"
-  [neon.9]="${neon_amber}"
-  [neon.0]="${neon_amber}"
-  [neon.-]="${neon_amber}"
-  [neon.=]="${neon_amber}"
-  [neon.q]="${neon_dim_cyan}"
-  [neon.w]="${neon_dim_cyan}"
-  [neon.e]="${neon_dim_cyan}"
-  [neon.r]="${neon_dim_cyan}"
-  [neon.t]="${neon_dim_cyan}"
-  [neon.y]="${neon_dim_cyan}"
-  [neon.u]="${neon_dim_cyan}"
-  [neon.i]="${neon_dim_cyan}"
-  [neon.o]="${neon_dim_cyan}"
-  [neon.p]="${neon_dim_cyan}"
-  [neon.a]="${neon_dim_cyan}"
-  [neon.s]="${neon_dim_cyan}"
-  [neon.d]="${neon_dim_cyan}"
-  [neon.f]="${neon_dim_cyan}"
-  [neon.g]="${neon_dim_cyan}"
-  [neon.h]="${neon_dim_cyan}"
-  [neon.j]="${neon_dim_cyan}"
-  [neon.k]="${neon_dim_cyan}"
-  [neon.l]="${neon_dim_cyan}"
-  [neon.z]="${neon_dim_cyan}"
-  [neon.x]="${neon_dim_cyan}"
-  [neon.c]="${neon_dim_cyan}"
-  [neon.v]="${neon_dim_cyan}"
-  [neon.b]="${neon_dim_cyan}"
-  [neon.n]="${neon_dim_cyan}"
-  [neon.m]="${neon_dim_cyan}"
-  [neon.space.1]="${neon_white}"
-  [neon.space.2]="${neon_white}"
-  [neon.semicolon]="${neon_hot}"
-  [neon.quote]="${neon_hot}"
-  [neon.comma]="${neon_hot}"
-  [neon.period]="${neon_hot}"
-  [neon.slash]="${neon_hot}"
-  [neon.brackets.opening]="${neon_hot}"
-  [neon.brackets.closing]="${neon_hot}"
-  [neon.pipe.1]="${neon_hot}"
-  [neon.pipe.2]="${neon_hot}"
-  [neon.keypad.1]="${neon_amber}"
-  [neon.keypad.2]="${neon_amber}"
-  [neon.keypad.3]="${neon_amber}"
-  [neon.keypad.4]="${neon_amber}"
-  [neon.keypad.5]="${neon_amber}"
-  [neon.keypad.6]="${neon_amber}"
-  [neon.keypad.7]="${neon_amber}"
-  [neon.keypad.8]="${neon_amber}"
-  [neon.keypad.9]="${neon_amber}"
-  [neon.keypad.0]="${neon_amber}"
-  [neon.keypad.period]="${neon_hot}"
-  [neon.keypad./]="${neon_amber}"
-  [neon.keypad.*]="${neon_amber}"
-  [neon.keypad.-]="${neon_amber}"
-  [neon.keypad.+.1]="${neon_amber}"
-  [neon.keypad.+.2]="${neon_amber}"
-  [neon.keypad.enter.1]="${neon_cyan}"
-  [neon.keypad.enter.2]="${neon_cyan}"
-  [neon.numlock]="${neon_white}"
-  [neon.capslock.1]="${neon_red}"
-  [neon.capslock.2]="${neon_red}"
-  [neon.backspace.1]="${neon_red}"
-  [neon.backspace.2]="${neon_red}"
-  [neon.enter.1]="${neon_cyan}"
-  [neon.enter.2]="${neon_cyan}"
-  [neon.ctrl.left.1]="${neon_pink}"
-  [neon.ctrl.left.2]="${neon_pink}"
-  [neon.ctrl.right.1]="${neon_pink}"
-  [neon.ctrl.right.2]="${neon_pink}"
-  [neon.alt.left]="${neon_pink}"
-  [neon.alt.right]="${neon_pink}"
-  [neon.shift.left.1]="${neon_pink}"
-  [neon.shift.left.2]="${neon_pink}"
-  [neon.shift.right.1]="${neon_pink}"
-  [neon.shift.right.2]="${neon_pink}"
-  [neon.fn]="${neon_grey}"
-  [neon.meta]="${neon_blue}"
-  [neon.menu]="${neon_grey}"
-  [neon.tab.1]="${neon_cyan}"
-  [neon.tab.2]="${neon_cyan}"
-  [neon.arrows.up]="${neon_dim_blue}"
-  [neon.arrows.down]="${neon_dim_blue}"
-  [neon.arrows.left]="${neon_dim_blue}"
-  [neon.arrows.right]="${neon_dim_blue}"
-
-  [vaporwave.esc]="${vapor_magenta}"
-  [vaporwave.f1]="${vapor_blue}"
-  [vaporwave.f2]="${vapor_blue}"
-  [vaporwave.f3]="${vapor_blue}"
-  [vaporwave.f4]="${vapor_blue}"
-  [vaporwave.f5]="${vapor_blue}"
-  [vaporwave.f6]="${vapor_blue}"
-  [vaporwave.f7]="${vapor_blue}"
-  [vaporwave.f8]="${vapor_blue}"
-  [vaporwave.f9]="${vapor_blue}"
-  [vaporwave.f10]="${vapor_blue}"
-  [vaporwave.f11]="${vapor_blue}"
-  [vaporwave.f12]="${vapor_blue}"
-  [vaporwave.sysrq]="${vapor_green}"
-  [vaporwave.ins]="${vapor_blue}"
-  [vaporwave.del]="${vapor_crimson}"
-  [vaporwave.home]="${vapor_blue}"
-  [vaporwave.end]="${vapor_blue}"
-  [vaporwave.pgup]="${vapor_blue}"
-  [vaporwave.pgdn]="${vapor_blue}"
-  [vaporwave.tilde]="${vapor_magenta}"
-  [vaporwave.1]="${vapor_yellow}"
-  [vaporwave.2]="${vapor_yellow}"
-  [vaporwave.3]="${vapor_yellow}"
-  [vaporwave.4]="${vapor_yellow}"
-  [vaporwave.5]="${vapor_yellow}"
-  [vaporwave.6]="${vapor_yellow}"
-  [vaporwave.7]="${vapor_yellow}"
-  [vaporwave.8]="${vapor_yellow}"
-  [vaporwave.9]="${vapor_yellow}"
-  [vaporwave.0]="${vapor_yellow}"
-  [vaporwave.-]="${vapor_yellow}"
-  [vaporwave.=]="${vapor_yellow}"
-  [vaporwave.q]="${vapor_lavender}"
-  [vaporwave.w]="${vapor_lavender}"
-  [vaporwave.e]="${vapor_lavender}"
-  [vaporwave.r]="${vapor_lavender}"
-  [vaporwave.t]="${vapor_lavender}"
-  [vaporwave.y]="${vapor_lavender}"
-  [vaporwave.u]="${vapor_lavender}"
-  [vaporwave.i]="${vapor_lavender}"
-  [vaporwave.o]="${vapor_lavender}"
-  [vaporwave.p]="${vapor_lavender}"
-  [vaporwave.a]="${vapor_lavender}"
-  [vaporwave.s]="${vapor_lavender}"
-  [vaporwave.d]="${vapor_lavender}"
-  [vaporwave.f]="${vapor_lavender}"
-  [vaporwave.g]="${vapor_lavender}"
-  [vaporwave.h]="${vapor_lavender}"
-  [vaporwave.j]="${vapor_lavender}"
-  [vaporwave.k]="${vapor_lavender}"
-  [vaporwave.l]="${vapor_lavender}"
-  [vaporwave.z]="${vapor_lavender}"
-  [vaporwave.x]="${vapor_lavender}"
-  [vaporwave.c]="${vapor_lavender}"
-  [vaporwave.v]="${vapor_lavender}"
-  [vaporwave.b]="${vapor_lavender}"
-  [vaporwave.n]="${vapor_lavender}"
-  [vaporwave.m]="${vapor_lavender}"
-  [vaporwave.space.1]="${vapor_white}"
-  [vaporwave.space.2]="${vapor_white}"
-  [vaporwave.semicolon]="${vapor_magenta}"
-  [vaporwave.quote]="${vapor_magenta}"
-  [vaporwave.comma]="${vapor_magenta}"
-  [vaporwave.period]="${vapor_magenta}"
-  [vaporwave.slash]="${vapor_magenta}"
-  [vaporwave.brackets.opening]="${vapor_magenta}"
-  [vaporwave.brackets.closing]="${vapor_magenta}"
-  [vaporwave.pipe.1]="${vapor_magenta}"
-  [vaporwave.pipe.2]="${vapor_magenta}"
-  [vaporwave.keypad.1]="${vapor_yellow}"
-  [vaporwave.keypad.2]="${vapor_yellow}"
-  [vaporwave.keypad.3]="${vapor_yellow}"
-  [vaporwave.keypad.4]="${vapor_yellow}"
-  [vaporwave.keypad.5]="${vapor_yellow}"
-  [vaporwave.keypad.6]="${vapor_yellow}"
-  [vaporwave.keypad.7]="${vapor_yellow}"
-  [vaporwave.keypad.8]="${vapor_yellow}"
-  [vaporwave.keypad.9]="${vapor_yellow}"
-  [vaporwave.keypad.0]="${vapor_yellow}"
-  [vaporwave.keypad.period]="${vapor_magenta}"
-  [vaporwave.keypad./]="${vapor_yellow}"
-  [vaporwave.keypad.*]="${vapor_yellow}"
-  [vaporwave.keypad.-]="${vapor_yellow}"
-  [vaporwave.keypad.+.1]="${vapor_yellow}"
-  [vaporwave.keypad.+.2]="${vapor_yellow}"
-  [vaporwave.keypad.enter.1]="${vapor_green}"
-  [vaporwave.keypad.enter.2]="${vapor_green}"
-  [vaporwave.numlock]="${vapor_white}"
-  [vaporwave.capslock.1]="${vapor_magenta}"
-  [vaporwave.capslock.2]="${vapor_magenta}"
-  [vaporwave.backspace.1]="${vapor_crimson}"
-  [vaporwave.backspace.2]="${vapor_crimson}"
-  [vaporwave.enter.1]="${vapor_green}"
-  [vaporwave.enter.2]="${vapor_green}"
-  [vaporwave.ctrl.left.1]="${vapor_purple}"
-  [vaporwave.ctrl.left.2]="${vapor_purple}"
-  [vaporwave.ctrl.right.1]="${vapor_purple}"
-  [vaporwave.ctrl.right.2]="${vapor_purple}"
-  [vaporwave.alt.left]="${vapor_purple}"
-  [vaporwave.alt.right]="${vapor_purple}"
-  [vaporwave.shift.left.1]="${vapor_purple}"
-  [vaporwave.shift.left.2]="${vapor_purple}"
-  [vaporwave.shift.right.1]="${vapor_purple}"
-  [vaporwave.shift.right.2]="${vapor_purple}"
-  [vaporwave.fn]="${vapor_purple}"
-  [vaporwave.meta]="${vapor_gold}"
-  [vaporwave.menu]="${vapor_purple}"
-  [vaporwave.tab.1]="${vapor_green}"
-  [vaporwave.tab.2]="${vapor_green}"
-  [vaporwave.arrows.up]="${vapor_green}"
-  [vaporwave.arrows.down]="${vapor_green}"
-  [vaporwave.arrows.left]="${vapor_green}"
-  [vaporwave.arrows.right]="${vapor_green}"
+declare -A neon=(
+  [fkeys]="${neon_blue}"
+  [alpha]="${neon_dim_cyan}"
+  [numbers]="${neon_amber}"
+  [special]="${neon_hot}"
+  [nav]="${neon_cyan}"
+  [arrows]="${neon_dim_blue}"
+  [modifiers]="${neon_pink}"
+  [action]="${neon_cyan}"
+  [destructive]="${neon_red}"
+  [keypad_numbers]="${neon_amber}"
+  [spacebar]="${neon_white}"
+  [status]="${neon_white}"
+  [misc_keys]="${neon_grey}"
+  [sysrq_key]="${neon_green}"
+  [meta_key]="${neon_blue}"
 )
+
+declare -A monokai=(
+  [fkeys]="${mono_cyan}"
+  [alpha]="${mono_green}"
+  [numbers]="${mono_yellow}"
+  [special]="${mono_pink}"
+  [nav]="${mono_orange}"
+  [arrows]="${mono_purple}"
+  [modifiers]="${mono_purple}"
+  [action]="${mono_light_cyan}"
+  [destructive]="${mono_pink}"
+  [keypad_numbers]="${mono_yellow}"
+  [spacebar]="${mono_white}"
+  [status]="${mono_white}"
+  [misc_keys]="${mono_grey}"
+  [sysrq_key]="${mono_green}"
+  [meta_key]="${mono_cyan}"
+)
+
+declare -A vaporwave=(
+  [fkeys]="${vapor_blue}"
+  [alpha]="${vapor_lavender}"
+  [numbers]="${vapor_yellow}"
+  [special]="${vapor_magenta}"
+  [nav]="${vapor_blue}"
+  [arrows]="${vapor_green}"
+  [modifiers]="${vapor_purple}"
+  [action]="${vapor_green}"
+  [destructive]="${vapor_crimson}"
+  [keypad_numbers]="${vapor_yellow}"
+  [spacebar]="${vapor_white}"
+  [status]="${vapor_white}"
+  [misc_keys]="${vapor_purple}"
+  [sysrq_key]="${vapor_green}"
+  [meta_key]="${vapor_gold}"
+)
+
+# ---------------------------------------------------------------------------
+# LED index mapping
+# ---------------------------------------------------------------------------
 
 declare -A keycodes=(
   [esc]=0
-  [f1]=1
-  [f2]=2
-  [f3]=3
-  [f4]=4
-  [f5]=5
-  [f6]=6
-  [f7]=7
-  [f8]=8
-  [f9]=9
-  [f10]=10
-  [f11]=11
-  [f12]=12
-  [prtsc]=13
-  [sysrq]=13
-  [ins]=14
-  [scrlk]=14
-  [del]=15
-  [home]=16
-  [end]=17
-  [pgup]=18
-  [pgdn]=19
+  [f1]=1   [f2]=2   [f3]=3   [f4]=4   [f5]=5   [f6]=6
+  [f7]=7   [f8]=8   [f9]=9   [f10]=10 [f11]=11 [f12]=12
+  [prtsc]=13 [sysrq]=13 [ins]=14 [scrlk]=14
+  [del]=15 [home]=16 [end]=17 [pgup]=18 [pgdn]=19
   [tilde]=32
-  [1]=33
-  [2]=34
-  [3]=35
-  [4]=36
-  [5]=37
-  [6]=38
-  [7]=39
-  [8]=40
-  [9]=41
-  [0]=42
-  [-]=43
-  [=]=45
-  [backspace.1]=46
-  [backspace.2]=47
-  [numlock]=48
-  [keypad./]=49
-  [keypad.*]=50
-  [keypad.-]=51
-  [tab.1]=64
-  [tab.2]=65
-  [q]=66
-  [w]=67
-  [e]=68
-  [r]=69
-  [t]=70
-  [y]=71
-  [u]=72
-  [i]=73
-  [o]=74
-  [p]=75
-  [brackets.opening]=76
-  [brackets.closing]=77
-  [backslash]=78
-  [pipe.1]=78
-  [pipe.2]=79
-  [keypad.7]=80
-  [keypad.8]=81
-  [keypad.9]=82
-  [keypad.+.1]=83
-  [capslock.1]=96
-  [capslock.2]=97
-  [a]=98
-  [s]=99
-  [d]=100
-  [f]=101
-  [g]=102
-  [h]=103
-  [j]=104
-  [k]=105
-  [l]=106
-  [semicolon]=107
-  [colon]=107
-  [quote]=108
-  [enter.1]=110
-  [enter.2]=111
-  [keypad.4]=112
-  [keypad.5]=113
-  [keypad.6]=114
-  [keypad.+.2]=115
-  [shift.left.1]=128
-  [shift.left.2]=130
-  [z]=131
-  [x]=132
-  [c]=133
-  [v]=134
-  [b]=135
-  [n]=136
-  [m]=137
-  [comma]=138
-  [period]=139
-  [slash]=140
-  [shift.right.1]=141
-  [shift.right.2]=142
+  [1]=33 [2]=34 [3]=35 [4]=36 [5]=37
+  [6]=38 [7]=39 [8]=40 [9]=41 [0]=42
+  [-]=43 [=]=45
+  [backspace.1]=46 [backspace.2]=47
+  [numlock]=48 [keypad./]=49 [keypad.*]=50 [keypad.-]=51
+  [tab.1]=64 [tab.2]=65
+  [q]=66  [w]=67  [e]=68  [r]=69  [t]=70
+  [y]=71  [u]=72  [i]=73  [o]=74  [p]=75
+  [brackets.opening]=76 [brackets.closing]=77
+  [backslash]=78 [pipe.1]=78 [pipe.2]=79
+  [keypad.7]=80 [keypad.8]=81 [keypad.9]=82 [keypad.+.1]=83
+  [capslock.1]=96 [capslock.2]=97
+  [a]=98  [s]=99  [d]=100 [f]=101 [g]=102
+  [h]=103 [j]=104 [k]=105 [l]=106
+  [semicolon]=107 [colon]=107 [quote]=108
+  [enter.1]=110 [enter.2]=111
+  [keypad.4]=112 [keypad.5]=113 [keypad.6]=114 [keypad.+.2]=115
+  [shift.left.1]=128 [shift.left.2]=130
+  [z]=131 [x]=132 [c]=133 [v]=134 [b]=135 [n]=136 [m]=137
+  [comma]=138 [period]=139 [slash]=140
+  [shift.right.1]=141 [shift.right.2]=142
   [arrows.up]=143
-  [keypad.1]=144
-  [keypad.2]=145
-  [keypad.3]=146
-  [keypad.enter.1]=147
-  [ctrl.left.1]=160
-  [ctrl.left.2]=161
-  [fn]=162
-  [meta]=163
-  [alt.left]=164
-  [space.1]=165
-  [space.2]=169
-  [alt.right]=170
-  [menu]=171
-  [ctrl.right.1]=172
-  [ctrl.right.2]=173
-  [arrows.left]=174
-  [arrows.down]=175
-  [arrows.right]=176
-  [keypad.0]=177
-  [keypad.period]=178
-  [keypad.enter.2]=179
+  [keypad.1]=144 [keypad.2]=145 [keypad.3]=146 [keypad.enter.1]=147
+  [ctrl.left.1]=160 [ctrl.left.2]=161
+  [fn]=162 [meta]=163 [alt.left]=164
+  [space.1]=165 [space.2]=169
+  [alt.right]=170 [menu]=171
+  [ctrl.right.1]=172 [ctrl.right.2]=173
+  [arrows.left]=174 [arrows.down]=175 [arrows.right]=176
+  [keypad.0]=177 [keypad.period]=178 [keypad.enter.2]=179
 )
 
+# ---------------------------------------------------------------------------
+# Color application
+# ---------------------------------------------------------------------------
+
 apply-colors() {
-  for key in "${!colors[@]}"; do
-    [[ "${key}" == "${color_scheme}."* ]] || continue
-    printf 'led %d %s\n' "${keycodes["${key#${color_scheme}.}"]}" "${colors["${key}"]}"
+  local -n scheme="${color_scheme}"
+
+  for category in "${all_categories[@]}"; do
+    local -n keys="${category}"
+    local color="${scheme[${category}]}"
+
+    for key in "${keys[@]}"; do
+      printf 'led %d %s\n' "${keycodes[${key}]}" "${color}"
+    done
   done
 }
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
 
 usage() {
   cat >&2 <<HELP
@@ -578,25 +259,17 @@ commands() {
         shift
         ;;
       color|colors)
-        apply-colors "${color_scheme}"
+        apply-colors
         shift
         ;;
-      neon)
-        color_scheme=neon
-        shift
-        ;;
-      monokai)
-        color_scheme=monokai
-        shift
-        ;;
-      vaporwave)
-        color_scheme=vaporwave
+      neon|monokai|vaporwave)
+        color_scheme="${1}"
         shift
         ;;
       *)
-	printf 'kb: unknown command: %s\n' "${1}" >&2
-	exit 1
-	;;
+        printf 'kb: unknown command: %s\n' "${1}" >&2
+        exit 1
+        ;;
     esac
   done
 }
