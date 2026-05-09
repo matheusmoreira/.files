@@ -25,7 +25,7 @@
   "effortLevel": "high",
   "showThinkingSummaries": true,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "custom:monokai",
+  "theme": "custom:cyberpunk",
   "preferredNotifChannel": "notifications_disabled",
   "autoCompactEnabled": false,
   "fileCheckpointingEnabled": false,
