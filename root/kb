@@ -401,13 +401,16 @@ apply-colors() {
 # Commands
 # ---------------------------------------------------------------------------
 
-schemes=(neon monokai vaporwave gruvbox nord dracula matrix vim)
+declare -A schemes=(
+  [neon]=1 [monokai]=1 [vaporwave]=1 [gruvbox]=1
+  [nord]=1 [dracula]=1 [matrix]=1   [vim]=1
+)
 
 usage() {
   cat >&2 <<HELP
 Usage: kb [scheme] <command>...
 
-Schemes:  ${schemes[*]}
+Schemes:  ${!schemes[*]}
 
 Commands:
   reset                 Reset keyboard LEDs
@@ -420,11 +423,7 @@ HELP
 }
 
 is-scheme() {
-  local name="${1}"
-  for s in "${schemes[@]}"; do
-    [[ "${name}" == "${s}" ]] && return 0
-  done
-  return 1
+  [[ -v "schemes[${1}]" ]]
 }
 
 commands() {
