@@ -335,6 +335,65 @@ bebop_gold='230 190 80'        # #E6BE50  brass
 bebop_brown='140 90 50'        # #8C5A32  leather
 bebop_cream='220 200 170'      # #DCC8AA  paper / smoke
 
+# --- blade runner ---
+
+blade_blue='0 150 255'         # #0096FF  rain / city
+blade_pink='255 50 150'        # #FF3296  neon signs
+blade_amber='255 170 50'      # #FFAA32  Tyrell warmth
+blade_teal='0 180 180'         # #00B4B4  city teal
+blade_white='200 210 220'     # #C8D2DC  replicant cold
+blade_dark='50 35 60'          # #32233C  noir
+
+# --- alien ---
+# Nostromo MU-TH-UR terminal, Sevastopol (Isolation).
+# P1 phosphor green CRT, amber emergency lighting,
+# Working Joe red, APOLLO blue, acid blood.
+
+alien_phosphor='60 210 60'     # #3CD23C  MU-TH-UR / P1 CRT phosphor
+alien_tracker='30 160 30'      # #1EA01E  motion tracker
+alien_acid='180 255 0'         # #B4FF00  xenomorph acid blood
+alien_amber='255 140 0'        # #FF8C00  emergency / self-destruct
+alien_red='200 0 0'            # #C80000  Working Joe / alert
+alien_blue='60 100 180'        # #3C64B4  APOLLO / hypersleep
+alien_cold='160 180 170'       # #A0B4AA  Nostromo cold light
+alien_dark='25 35 25'          # #192319  dark corridors
+
+# --- bioshock ---
+
+bio_gold='220 180 80'          # #DCB450  art deco
+bio_teal='0 150 140'           # #00968C  Rapture ocean
+bio_red='200 40 40'            # #C82828  plasmid / ADAM
+bio_white='220 210 190'        # #DCD2BE  marble
+bio_bronze='180 130 60'        # #B4823C  brass
+bio_dark='60 45 30'            # #3C2D1E  dark Rapture
+
+# --- dragon ball z ---
+
+dbz_orange='255 140 0'         # #FF8C00  gi
+dbz_blue='50 80 200'           # #3250C8  undersuit
+dbz_yellow='255 230 0'         # #FFE600  super saiyan
+dbz_purple='120 40 160'        # #7828A0  Frieza
+dbz_green='60 200 60'          # #3CC83C  Shenron
+dbz_white='240 240 240'        # #F0F0F0  energy blast
+
+# --- metal gear solid ---
+
+mgs_olive='80 100 50'          # #506432  military
+mgs_teal='0 180 180'           # #00B4B4  codec
+mgs_alert='255 50 0'           # #FF3200  alert
+mgs_grey='140 140 140'         # #8C8C8C  metal
+mgs_dark='50 55 45'            # #32372D  stealth
+mgs_cardboard='190 160 100'    # #BEA064  the box
+
+# --- nier automata ---
+
+nier_cream='230 225 215'       # #E6E1D7  YoRHa
+nier_charcoal='90 85 80'       # #5A5550  2B outfit
+nier_red='200 50 40'           # #C83228  pod program
+nier_gold='200 180 100'        # #C8B464  rusted gold
+nier_white='245 240 235'       # #F5F0EB  machine
+nier_dark='60 55 50'           # #3C3732  bunker
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
@@ -820,6 +879,115 @@ declare -A bebop=(
   [meta_key]="${bebop_blue}"
 )
 
+declare -A bladerunner=(
+  [fkeys]="${blade_teal}"
+  [numbers]="${blade_amber}"
+  [alpha]="${blade_blue}"
+  [special]="${blade_pink}"
+  [nav]="${blade_teal}"
+  [arrows]="${blade_teal}"
+  [modifiers]="${blade_dark}"
+  [action]="${blade_pink}"
+  [destructive]="${blade_pink}"
+  [keypad_numbers]="${blade_amber}"
+  [spacebar]="${blade_white}"
+  [status]="${blade_white}"
+  [misc_keys]="${blade_dark}"
+  [sysrq_key]="${blade_amber}"
+  [meta_key]="${blade_teal}"
+)
+
+declare -A alien=(
+  [fkeys]="${alien_phosphor}"
+  [numbers]="${alien_phosphor}"
+  [alpha]="${alien_tracker}"
+  [special]="${alien_acid}"
+  [nav]="${alien_blue}"
+  [arrows]="${alien_blue}"
+  [modifiers]="${alien_dark}"
+  [action]="${alien_phosphor}"
+  [destructive]="${alien_amber}"
+  [keypad_numbers]="${alien_phosphor}"
+  [spacebar]="${alien_cold}"
+  [status]="${alien_cold}"
+  [misc_keys]="${alien_dark}"
+  [sysrq_key]="${alien_red}"
+  [meta_key]="${alien_blue}"
+)
+
+declare -A bioshock=(
+  [fkeys]="${bio_gold}"
+  [numbers]="${bio_gold}"
+  [alpha]="${bio_teal}"
+  [special]="${bio_red}"
+  [nav]="${bio_teal}"
+  [arrows]="${bio_teal}"
+  [modifiers]="${bio_bronze}"
+  [action]="${bio_gold}"
+  [destructive]="${bio_red}"
+  [keypad_numbers]="${bio_gold}"
+  [spacebar]="${bio_white}"
+  [status]="${bio_white}"
+  [misc_keys]="${bio_dark}"
+  [sysrq_key]="${bio_gold}"
+  [meta_key]="${bio_bronze}"
+)
+
+declare -A dbz=(
+  [fkeys]="${dbz_yellow}"
+  [numbers]="${dbz_orange}"
+  [alpha]="${dbz_orange}"
+  [special]="${dbz_purple}"
+  [nav]="${dbz_blue}"
+  [arrows]="${dbz_blue}"
+  [modifiers]="${dbz_blue}"
+  [action]="${dbz_yellow}"
+  [destructive]="${dbz_purple}"
+  [keypad_numbers]="${dbz_orange}"
+  [spacebar]="${dbz_white}"
+  [status]="${dbz_white}"
+  [misc_keys]="${dbz_blue}"
+  [sysrq_key]="${dbz_green}"
+  [meta_key]="${dbz_yellow}"
+)
+
+declare -A mgs=(
+  [fkeys]="${mgs_teal}"
+  [numbers]="${mgs_grey}"
+  [alpha]="${mgs_olive}"
+  [special]="${mgs_cardboard}"
+  [nav]="${mgs_teal}"
+  [arrows]="${mgs_teal}"
+  [modifiers]="${mgs_dark}"
+  [action]="${mgs_teal}"
+  [destructive]="${mgs_alert}"
+  [keypad_numbers]="${mgs_grey}"
+  [spacebar]="${mgs_grey}"
+  [status]="${mgs_grey}"
+  [misc_keys]="${mgs_dark}"
+  [sysrq_key]="${mgs_teal}"
+  [meta_key]="${mgs_cardboard}"
+)
+
+declare -A nier=(
+  [fkeys]="${nier_charcoal}"
+  [numbers]="${nier_gold}"
+  [alpha]="${nier_cream}"
+  [special]="${nier_red}"
+  [nav]="${nier_charcoal}"
+  [arrows]="${nier_charcoal}"
+  [modifiers]="${nier_dark}"
+  [action]="${nier_red}"
+  [destructive]="${nier_red}"
+  [keypad_numbers]="${nier_gold}"
+  [spacebar]="${nier_white}"
+  [status]="${nier_white}"
+  [misc_keys]="${nier_dark}"
+  [sysrq_key]="${nier_gold}"
+  [meta_key]="${nier_charcoal}"
+)
+
+
 # ---------------------------------------------------------------------------
 # LED index mapping
 # ---------------------------------------------------------------------------
@@ -942,6 +1110,8 @@ declare -A schemes=(
   [ice]=1 [christmas]=1
   [persona5]=1 [halflife]=1 [megaman]=1
   [evangelion]=1 [gits]=1 [bebop]=1
+  [bladerunner]=1 [alien]=1 [bioshock]=1
+  [dbz]=1 [mgs]=1 [nier]=1
 )
 
 usage() {
