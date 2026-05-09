@@ -1517,6 +1517,7 @@ reactive() {
   while (( running )); do
     # drain all queued key events
     while read -t 0.01 -r code; do
+      [[ -n "${code}" && "${code}" =~ ^[0-9]+$ ]] || continue
       local leds="${evdev_to_leds[${code}]:-}"
       [[ -n "${leds}" ]] || continue
       for led in ${leds}; do
