@@ -1571,8 +1571,8 @@ Commands:
   off                   Turn LEDs off
   min|low|med|hi|max    Set brightness level
 
-Example: kb reset neon colors
-         kb calibrate | sudo ./ite-829x
+Example: kb reset neon colors | sudo ./ite-829x
+         kb rain | (trap '' INT; exec sudo ./ite-829x)
 HELP
 }
 
