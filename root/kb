@@ -520,9 +520,34 @@ apply-colors() {
   done
 }
 
+usage() {
+  cat >&2 <<HELP
+Usage: kb [scheme] <command>...
+
+Schemes:  neon  monokai  vaporwave
+
+Commands:
+  reset                 Reset keyboard LEDs
+  colors                Apply the active color scheme
+  off                   Turn LEDs off
+  min|low|med|hi|max    Set brightness level
+
+Example: kb reset neon colors
+HELP
+}
+
 commands() {
+  if [[ $# -eq 0 ]]; then
+    usage
+    exit 0
+  fi
+
   while [[ $# -gt 0 ]]; do
     case "${1}" in
+      -h|--help|help)
+        usage
+        exit 0
+        ;;
       reset)
         printf "%s\n" 'reset'
         sleep 0.2
