@@ -226,6 +226,115 @@ stealth_glow='130 170 230'     # #82AAE6
 stealth_warn='180 60 60'       # #B43C3C
 stealth_dim='40 50 70'         # #283246
 
+# --- tron legacy ---
+
+tron_blue='0 204 255'          # #00CCFF  identity disc
+tron_orange='255 106 0'        # #FF6A00  CLU / Rinzler
+tron_glow='120 200 255'        # #78C8FF  light cycle trail
+tron_white='200 220 240'       # #C8DCF0  ISO white
+tron_dark='20 40 70'           # #142846  the grid
+
+# --- portal ---
+
+portal_blue='0 120 255'        # #0078FF  portal blue
+portal_orange='255 150 0'      # #FF9600  portal orange
+portal_white='220 220 220'     # #DCDCDC  Aperture Science
+portal_grey='100 100 100'      # #646464  Companion Cube
+
+# --- aurora borealis ---
+
+aurora_green='0 230 120'       # #00E678  curtain green
+aurora_teal='0 200 180'        # #00C8B4  teal shimmer
+aurora_purple='130 80 200'     # #8250C8  purple fold
+aurora_pink='200 100 200'      # #C864C8  pink edge
+aurora_blue='60 130 220'       # #3C82DC  sky
+aurora_white='200 230 220'     # #C8E6DC  starlight
+
+# --- lava ---
+
+lava_bright='255 200 0'        # #FFC800  molten core
+lava_orange='255 100 0'        # #FF6400  flowing
+lava_red='220 30 0'            # #DC1E00  cooling crust
+lava_dark='150 20 0'           # #961400  solidifying
+lava_ember='255 150 50'        # #FF9632  embers
+
+# --- deep space ---
+
+space_purple='80 40 160'       # #5028A0  nebula
+space_blue='50 70 170'         # #3246AA  deep blue
+space_star='230 230 255'       # #E6E6FF  starlight
+space_nebula='180 70 150'      # #B44696  nebula pink
+space_galaxy='100 80 180'      # #6450B4  galaxy
+space_dark='40 30 80'          # #281E50  void
+
+# --- ice ---
+
+ice_frost='200 230 255'        # #C8E6FF  surface frost
+ice_glacier='150 200 240'      # #96C8F0  glacier
+ice_deep='100 170 220'         # #64AADC  deep ice
+ice_crystal='230 245 255'      # #E6F5FF  crystal
+ice_steel='160 180 200'        # #A0B4C8  steel cold
+ice_crack='80 140 190'         # #508CBE  crevasse
+
+# --- christmas ---
+
+xmas_red='200 30 30'           # #C81E1E  ornament
+xmas_green='30 180 30'         # #1EB41E  tree
+xmas_gold='255 200 50'        # #FFC832  star / tinsel
+xmas_white='255 250 240'      # #FFFAF0  snow
+xmas_dark_green='20 120 20'   # #147814  pine
+
+# --- persona 5 ---
+
+p5_red='255 0 0'               # #FF0000  all-out attack
+p5_dark_red='140 0 0'          # #8C0000  velvet
+p5_white='255 255 255'         # #FFFFFF  calling card
+p5_yellow='255 230 0'          # #FFE600  Morgana / star
+
+# --- half-life ---
+
+hl_orange='255 150 0'          # #FF9600  HEV suit
+hl_dark_orange='200 100 0'    # #C86400  HEV dark
+hl_green='0 200 50'            # #00C832  health
+hl_grey='130 130 130'          # #828282  Black Mesa
+hl_dark='60 60 60'             # #3C3C3C  dark corridors
+
+# --- mega man x / zero ---
+
+mmx_blue='0 120 255'           # #0078FF  X armor
+mmx_cyan='0 200 255'           # #00C8FF  X charge shot
+zero_red='255 30 30'           # #FF1E1E  Zero armor
+zero_blonde='255 220 100'      # #FFDC64  Zero hair
+mmx_green='0 220 80'           # #00DC50  sub tank
+mmx_purple='150 50 200'        # #9632C8  Sigma
+
+# --- evangelion ---
+
+eva_purple='100 40 170'        # #6428AA  Unit 01
+eva_green='0 230 70'           # #00E646  Unit 01 accents
+eva_orange='255 140 0'         # #FF8C00  AT field / LCL
+eva_red='200 0 0'              # #C80000  Unit 02 / berserk
+eva_white='230 230 230'        # #E6E6E6  NERV
+eva_dark='50 20 70'            # #321446  dark purple
+
+# --- ghost in the shell ---
+
+gits_teal='0 180 170'          # #00B4AA  terminal
+gits_dark_teal='0 120 115'    # #007873  deep terminal
+gits_violet='130 80 180'      # #8250B4  Motoko
+gits_green='0 200 100'         # #00C864  data stream
+gits_white='180 200 200'      # #B4C8C8  cold light
+gits_dark='30 40 50'           # #1E2832  cyber dark
+
+# --- cowboy bebop ---
+
+bebop_orange='220 130 50'      # #DC8232  sunset / jazz
+bebop_red='180 50 40'          # #B43228  Swordfish II
+bebop_blue='70 100 160'        # #4664A0  smoky blue
+bebop_gold='230 190 80'        # #E6BE50  brass
+bebop_brown='140 90 50'        # #8C5A32  leather
+bebop_cream='220 200 170'      # #DCC8AA  paper / smoke
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
@@ -477,6 +586,240 @@ declare -A vim=(
   [meta_key]="${vim_grey}"
 )
 
+declare -A tron=(
+  [fkeys]="${tron_blue}"
+  [numbers]="${tron_orange}"
+  [alpha]="${tron_blue}"
+  [special]="${tron_orange}"
+  [nav]="${tron_glow}"
+  [arrows]="${tron_glow}"
+  [modifiers]="${tron_dark}"
+  [action]="${tron_blue}"
+  [destructive]="${tron_orange}"
+  [keypad_numbers]="${tron_orange}"
+  [spacebar]="${tron_white}"
+  [status]="${tron_white}"
+  [misc_keys]="${tron_dark}"
+  [sysrq_key]="${tron_glow}"
+  [meta_key]="${tron_glow}"
+)
+
+declare -A portal=(
+  [fkeys]="${portal_orange}"
+  [numbers]="${portal_orange}"
+  [alpha]="${portal_white}"
+  [special]="${portal_blue}"
+  [nav]="${portal_blue}"
+  [arrows]="${portal_orange}"
+  [modifiers]="${portal_grey}"
+  [action]="${portal_blue}"
+  [destructive]="${portal_orange}"
+  [keypad_numbers]="${portal_orange}"
+  [spacebar]="${portal_white}"
+  [status]="${portal_white}"
+  [misc_keys]="${portal_grey}"
+  [sysrq_key]="${portal_blue}"
+  [meta_key]="${portal_blue}"
+)
+
+declare -A aurora=(
+  [fkeys]="${aurora_green}"
+  [numbers]="${aurora_teal}"
+  [alpha]="${aurora_green}"
+  [special]="${aurora_pink}"
+  [nav]="${aurora_blue}"
+  [arrows]="${aurora_blue}"
+  [modifiers]="${aurora_purple}"
+  [action]="${aurora_teal}"
+  [destructive]="${aurora_pink}"
+  [keypad_numbers]="${aurora_teal}"
+  [spacebar]="${aurora_white}"
+  [status]="${aurora_white}"
+  [misc_keys]="${aurora_purple}"
+  [sysrq_key]="${aurora_green}"
+  [meta_key]="${aurora_purple}"
+)
+
+declare -A lava=(
+  [fkeys]="${lava_bright}"
+  [numbers]="${lava_orange}"
+  [alpha]="${lava_red}"
+  [special]="${lava_dark}"
+  [nav]="${lava_orange}"
+  [arrows]="${lava_ember}"
+  [modifiers]="${lava_dark}"
+  [action]="${lava_bright}"
+  [destructive]="${lava_bright}"
+  [keypad_numbers]="${lava_orange}"
+  [spacebar]="${lava_ember}"
+  [status]="${lava_ember}"
+  [misc_keys]="${lava_dark}"
+  [sysrq_key]="${lava_bright}"
+  [meta_key]="${lava_ember}"
+)
+
+declare -A space=(
+  [fkeys]="${space_star}"
+  [numbers]="${space_galaxy}"
+  [alpha]="${space_purple}"
+  [special]="${space_nebula}"
+  [nav]="${space_blue}"
+  [arrows]="${space_blue}"
+  [modifiers]="${space_dark}"
+  [action]="${space_star}"
+  [destructive]="${space_nebula}"
+  [keypad_numbers]="${space_galaxy}"
+  [spacebar]="${space_star}"
+  [status]="${space_star}"
+  [misc_keys]="${space_dark}"
+  [sysrq_key]="${space_star}"
+  [meta_key]="${space_galaxy}"
+)
+
+declare -A ice=(
+  [fkeys]="${ice_glacier}"
+  [numbers]="${ice_deep}"
+  [alpha]="${ice_frost}"
+  [special]="${ice_steel}"
+  [nav]="${ice_glacier}"
+  [arrows]="${ice_glacier}"
+  [modifiers]="${ice_crack}"
+  [action]="${ice_crystal}"
+  [destructive]="${ice_deep}"
+  [keypad_numbers]="${ice_deep}"
+  [spacebar]="${ice_crystal}"
+  [status]="${ice_crystal}"
+  [misc_keys]="${ice_crack}"
+  [sysrq_key]="${ice_crystal}"
+  [meta_key]="${ice_glacier}"
+)
+
+declare -A christmas=(
+  [fkeys]="${xmas_gold}"
+  [numbers]="${xmas_gold}"
+  [alpha]="${xmas_green}"
+  [special]="${xmas_red}"
+  [nav]="${xmas_green}"
+  [arrows]="${xmas_green}"
+  [modifiers]="${xmas_red}"
+  [action]="${xmas_green}"
+  [destructive]="${xmas_red}"
+  [keypad_numbers]="${xmas_gold}"
+  [spacebar]="${xmas_white}"
+  [status]="${xmas_white}"
+  [misc_keys]="${xmas_dark_green}"
+  [sysrq_key]="${xmas_gold}"
+  [meta_key]="${xmas_gold}"
+)
+
+declare -A persona5=(
+  [fkeys]="${p5_red}"
+  [numbers]="${p5_yellow}"
+  [alpha]="${p5_white}"
+  [special]="${p5_red}"
+  [nav]="${p5_white}"
+  [arrows]="${p5_yellow}"
+  [modifiers]="${p5_dark_red}"
+  [action]="${p5_red}"
+  [destructive]="${p5_red}"
+  [keypad_numbers]="${p5_yellow}"
+  [spacebar]="${p5_white}"
+  [status]="${p5_white}"
+  [misc_keys]="${p5_dark_red}"
+  [sysrq_key]="${p5_yellow}"
+  [meta_key]="${p5_yellow}"
+)
+
+declare -A halflife=(
+  [fkeys]="${hl_orange}"
+  [numbers]="${hl_orange}"
+  [alpha]="${hl_grey}"
+  [special]="${hl_dark_orange}"
+  [nav]="${hl_green}"
+  [arrows]="${hl_green}"
+  [modifiers]="${hl_dark}"
+  [action]="${hl_orange}"
+  [destructive]="${hl_orange}"
+  [keypad_numbers]="${hl_orange}"
+  [spacebar]="${hl_grey}"
+  [status]="${hl_grey}"
+  [misc_keys]="${hl_dark}"
+  [sysrq_key]="${hl_green}"
+  [meta_key]="${hl_orange}"
+)
+
+declare -A megaman=(
+  [fkeys]="${mmx_cyan}"
+  [numbers]="${zero_blonde}"
+  [alpha]="${mmx_blue}"
+  [special]="${zero_red}"
+  [nav]="${mmx_cyan}"
+  [arrows]="${mmx_cyan}"
+  [modifiers]="${mmx_purple}"
+  [action]="${mmx_green}"
+  [destructive]="${zero_red}"
+  [keypad_numbers]="${zero_blonde}"
+  [spacebar]="${mmx_blue}"
+  [status]="${mmx_blue}"
+  [misc_keys]="${mmx_purple}"
+  [sysrq_key]="${mmx_green}"
+  [meta_key]="${mmx_green}"
+)
+
+declare -A evangelion=(
+  [fkeys]="${eva_green}"
+  [numbers]="${eva_orange}"
+  [alpha]="${eva_purple}"
+  [special]="${eva_green}"
+  [nav]="${eva_orange}"
+  [arrows]="${eva_green}"
+  [modifiers]="${eva_dark}"
+  [action]="${eva_green}"
+  [destructive]="${eva_red}"
+  [keypad_numbers]="${eva_orange}"
+  [spacebar]="${eva_white}"
+  [status]="${eva_white}"
+  [misc_keys]="${eva_dark}"
+  [sysrq_key]="${eva_green}"
+  [meta_key]="${eva_orange}"
+)
+
+declare -A gits=(
+  [fkeys]="${gits_teal}"
+  [numbers]="${gits_green}"
+  [alpha]="${gits_dark_teal}"
+  [special]="${gits_violet}"
+  [nav]="${gits_teal}"
+  [arrows]="${gits_teal}"
+  [modifiers]="${gits_dark}"
+  [action]="${gits_green}"
+  [destructive]="${gits_violet}"
+  [keypad_numbers]="${gits_green}"
+  [spacebar]="${gits_white}"
+  [status]="${gits_white}"
+  [misc_keys]="${gits_dark}"
+  [sysrq_key]="${gits_green}"
+  [meta_key]="${gits_teal}"
+)
+
+declare -A bebop=(
+  [fkeys]="${bebop_orange}"
+  [numbers]="${bebop_gold}"
+  [alpha]="${bebop_cream}"
+  [special]="${bebop_red}"
+  [nav]="${bebop_blue}"
+  [arrows]="${bebop_blue}"
+  [modifiers]="${bebop_brown}"
+  [action]="${bebop_orange}"
+  [destructive]="${bebop_red}"
+  [keypad_numbers]="${bebop_gold}"
+  [spacebar]="${bebop_cream}"
+  [status]="${bebop_cream}"
+  [misc_keys]="${bebop_brown}"
+  [sysrq_key]="${bebop_gold}"
+  [meta_key]="${bebop_blue}"
+)
+
 # ---------------------------------------------------------------------------
 # LED index mapping
 # ---------------------------------------------------------------------------
@@ -595,6 +938,10 @@ declare -A schemes=(
   [neon]=1 [monokai]=1 [vaporwave]=1 [gruvbox]=1
   [nord]=1 [dracula]=1 [matrix]=1   [vim]=1
   [sunset]=1 [ocean]=1 [cyberpunk]=1 [sakura]=1 [stealth]=1
+  [tron]=1 [portal]=1 [aurora]=1 [lava]=1 [space]=1
+  [ice]=1 [christmas]=1
+  [persona5]=1 [halflife]=1 [megaman]=1
+  [evangelion]=1 [gits]=1 [bebop]=1
 )
 
 usage() {
