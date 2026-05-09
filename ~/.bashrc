@@ -5,12 +5,14 @@
 # Functions
 
 function paths.list {
+  [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || return 1
   declare -n variable=$1
 
   echo "${variable}" | tr : '\n'
 }
 
 function paths.add {
+  [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || return 1
   declare -n variable=$1
 
   case ":${variable}:" in
