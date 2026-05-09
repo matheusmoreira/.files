@@ -60,6 +60,17 @@ all_categories=(
   misc_keys sysrq_key meta_key
 )
 
+declare -A category_fallback=(
+  [motion_alpha]=alpha    [insert_alpha]=alpha
+  [operator_alpha]=alpha  [search_alpha]=alpha
+  [visual_alpha]=alpha    [paste_alpha]=alpha
+  [undo_alpha]=alpha      [macro_alpha]=alpha
+  [delete_alpha]=alpha    [fold_alpha]=alpha
+  [repeat_special]=special   [register_special]=special
+  [case_special]=special     [bracket_special]=special
+  [search_special]=special
+)
+
 # ---------------------------------------------------------------------------
 # Palettes
 # ---------------------------------------------------------------------------
@@ -171,14 +182,8 @@ vim_grey='92 99 112'           # #5C6370
 declare -A neon=(
   [fkeys]="${neon_blue}"
   [numbers]="${neon_amber}"
-  [motion_alpha]="${neon_dim_cyan}"   [insert_alpha]="${neon_dim_cyan}"
-  [operator_alpha]="${neon_dim_cyan}" [search_alpha]="${neon_dim_cyan}"
-  [visual_alpha]="${neon_dim_cyan}"   [paste_alpha]="${neon_dim_cyan}"
-  [undo_alpha]="${neon_dim_cyan}"     [macro_alpha]="${neon_dim_cyan}"
-  [delete_alpha]="${neon_dim_cyan}"   [fold_alpha]="${neon_dim_cyan}"
-  [repeat_special]="${neon_hot}"      [register_special]="${neon_hot}"
-  [case_special]="${neon_hot}"        [bracket_special]="${neon_hot}"
-  [search_special]="${neon_hot}"
+  [alpha]="${neon_dim_cyan}"
+  [special]="${neon_hot}"
   [nav]="${neon_cyan}"
   [arrows]="${neon_dim_blue}"
   [modifiers]="${neon_pink}"
@@ -195,14 +200,8 @@ declare -A neon=(
 declare -A monokai=(
   [fkeys]="${mono_cyan}"
   [numbers]="${mono_yellow}"
-  [motion_alpha]="${mono_green}"   [insert_alpha]="${mono_green}"
-  [operator_alpha]="${mono_green}" [search_alpha]="${mono_green}"
-  [visual_alpha]="${mono_green}"   [paste_alpha]="${mono_green}"
-  [undo_alpha]="${mono_green}"     [macro_alpha]="${mono_green}"
-  [delete_alpha]="${mono_green}"   [fold_alpha]="${mono_green}"
-  [repeat_special]="${mono_pink}"      [register_special]="${mono_pink}"
-  [case_special]="${mono_pink}"        [bracket_special]="${mono_pink}"
-  [search_special]="${mono_pink}"
+  [alpha]="${mono_green}"
+  [special]="${mono_pink}"
   [nav]="${mono_orange}"
   [arrows]="${mono_purple}"
   [modifiers]="${mono_purple}"
@@ -219,14 +218,8 @@ declare -A monokai=(
 declare -A vaporwave=(
   [fkeys]="${vapor_blue}"
   [numbers]="${vapor_yellow}"
-  [motion_alpha]="${vapor_lavender}"   [insert_alpha]="${vapor_lavender}"
-  [operator_alpha]="${vapor_lavender}" [search_alpha]="${vapor_lavender}"
-  [visual_alpha]="${vapor_lavender}"   [paste_alpha]="${vapor_lavender}"
-  [undo_alpha]="${vapor_lavender}"     [macro_alpha]="${vapor_lavender}"
-  [delete_alpha]="${vapor_lavender}"   [fold_alpha]="${vapor_lavender}"
-  [repeat_special]="${vapor_magenta}"      [register_special]="${vapor_magenta}"
-  [case_special]="${vapor_magenta}"        [bracket_special]="${vapor_magenta}"
-  [search_special]="${vapor_magenta}"
+  [alpha]="${vapor_lavender}"
+  [special]="${vapor_magenta}"
   [nav]="${vapor_blue}"
   [arrows]="${vapor_green}"
   [modifiers]="${vapor_purple}"
@@ -243,14 +236,8 @@ declare -A vaporwave=(
 declare -A gruvbox=(
   [fkeys]="${gruv_aqua}"
   [numbers]="${gruv_orange}"
-  [motion_alpha]="${gruv_fg}"   [insert_alpha]="${gruv_fg}"
-  [operator_alpha]="${gruv_fg}" [search_alpha]="${gruv_fg}"
-  [visual_alpha]="${gruv_fg}"   [paste_alpha]="${gruv_fg}"
-  [undo_alpha]="${gruv_fg}"     [macro_alpha]="${gruv_fg}"
-  [delete_alpha]="${gruv_fg}"   [fold_alpha]="${gruv_fg}"
-  [repeat_special]="${gruv_red}"      [register_special]="${gruv_red}"
-  [case_special]="${gruv_red}"        [bracket_special]="${gruv_red}"
-  [search_special]="${gruv_red}"
+  [alpha]="${gruv_fg}"
+  [special]="${gruv_red}"
   [nav]="${gruv_blue}"
   [arrows]="${gruv_blue}"
   [modifiers]="${gruv_purple}"
@@ -267,14 +254,8 @@ declare -A gruvbox=(
 declare -A nord=(
   [fkeys]="${nord_blue}"
   [numbers]="${nord_yellow}"
-  [motion_alpha]="${nord_snow}"   [insert_alpha]="${nord_snow}"
-  [operator_alpha]="${nord_snow}" [search_alpha]="${nord_snow}"
-  [visual_alpha]="${nord_snow}"   [paste_alpha]="${nord_snow}"
-  [undo_alpha]="${nord_snow}"     [macro_alpha]="${nord_snow}"
-  [delete_alpha]="${nord_snow}"   [fold_alpha]="${nord_snow}"
-  [repeat_special]="${nord_purple}"      [register_special]="${nord_purple}"
-  [case_special]="${nord_purple}"        [bracket_special]="${nord_purple}"
-  [search_special]="${nord_purple}"
+  [alpha]="${nord_snow}"
+  [special]="${nord_purple}"
   [nav]="${nord_cyan}"
   [arrows]="${nord_teal}"
   [modifiers]="${nord_orange}"
@@ -291,14 +272,8 @@ declare -A nord=(
 declare -A dracula=(
   [fkeys]="${drac_purple}"
   [numbers]="${drac_yellow}"
-  [motion_alpha]="${drac_fg}"   [insert_alpha]="${drac_fg}"
-  [operator_alpha]="${drac_fg}" [search_alpha]="${drac_fg}"
-  [visual_alpha]="${drac_fg}"   [paste_alpha]="${drac_fg}"
-  [undo_alpha]="${drac_fg}"     [macro_alpha]="${drac_fg}"
-  [delete_alpha]="${drac_fg}"   [fold_alpha]="${drac_fg}"
-  [repeat_special]="${drac_pink}"      [register_special]="${drac_pink}"
-  [case_special]="${drac_pink}"        [bracket_special]="${drac_pink}"
-  [search_special]="${drac_pink}"
+  [alpha]="${drac_fg}"
+  [special]="${drac_pink}"
   [nav]="${drac_cyan}"
   [arrows]="${drac_cyan}"
   [modifiers]="${drac_orange}"
@@ -315,14 +290,8 @@ declare -A dracula=(
 declare -A matrix=(
   [fkeys]="${matrix_bright}"
   [numbers]="${matrix_bright}"
-  [motion_alpha]="${matrix_medium}"   [insert_alpha]="${matrix_medium}"
-  [operator_alpha]="${matrix_medium}" [search_alpha]="${matrix_medium}"
-  [visual_alpha]="${matrix_medium}"   [paste_alpha]="${matrix_medium}"
-  [undo_alpha]="${matrix_medium}"     [macro_alpha]="${matrix_medium}"
-  [delete_alpha]="${matrix_medium}"   [fold_alpha]="${matrix_medium}"
-  [repeat_special]="${matrix_dim}"      [register_special]="${matrix_dim}"
-  [case_special]="${matrix_dim}"        [bracket_special]="${matrix_dim}"
-  [search_special]="${matrix_dim}"
+  [alpha]="${matrix_medium}"
+  [special]="${matrix_dim}"
   [nav]="${matrix_bright}"
   [arrows]="${matrix_bright}"
   [modifiers]="${matrix_dim}"
@@ -419,7 +388,8 @@ apply-colors() {
 
   for category in "${all_categories[@]}"; do
     local -n keys="${category}"
-    local color="${scheme[${category}]}"
+    local fallback="${category_fallback[${category}]:-}"
+    local color="${scheme[${category}]:-${scheme[${fallback}]:-}}"
 
     for key in "${keys[@]}"; do
       printf 'led %d %s\n' "${keycodes[${key}]}" "${color}"
