@@ -415,6 +415,41 @@ nier_gold='200 180 100'        # #C8B464  rusted gold
 nier_white='245 240 235'       # #F5F0EB  machine
 nier_dark='60 55 50'           # #3C3732  bunker
 
+# --- bioluminescence ---
+# Deep ocean organisms pulsing in the abyss.
+# Jellyfish, dinoflagellates, anglerfish lures.
+
+bio_cyan='0 220 220'           # #00DCDC  jellyfish bell
+bio_teal2='0 180 160'          # #00B4A0  dinoflagellate bloom
+bio_pulse='80 200 255'         # #50C8FF  bright pulse
+bio_blue='40 100 220'          # #2864DC  deep organism
+bio_plankton='0 200 100'       # #00C864  bioluminescent plankton
+bio_deep='20 25 55'            # #141937  deep water
+bio_abyss='10 12 30'           # #0A0C1E  the void
+
+# --- need for speed underground ---
+# Midnight street racing. Neon underglow. NOS.
+
+nfs_blue='0 120 255'           # #0078FF  UI / underglow
+nfs_cyan='0 220 255'           # #00DCFF  neon underglow
+nfs_green='0 255 80'           # #00FF50  neon underglow
+nfs_orange='255 120 0'         # #FF7800  NOS flames
+nfs_pink='255 0 150'           # #FF0096  vinyl / neon
+nfs_chrome='190 200 215'       # #BEC8D7  chrome rims
+nfs_night='25 25 40'           # #191928  midnight asphalt
+
+# --- unreal tournament ---
+# UT99 / UT2004. Arena combat. Weapon pickups.
+
+ut_red='220 60 0'              # #DC3C00  HUD / logo
+ut_orange='255 150 0'          # #FF9600  flak cannon
+ut_shock='160 50 255'          # #A032FF  shock combo
+ut_link='0 220 50'             # #00DC32  link gun
+ut_bio='100 200 0'             # #64C800  bio rifle
+ut_lightning='180 200 255'     # #B4C8FF  lightning gun
+ut_white='200 200 210'         # #C8C8D2  arena light
+ut_dark='35 20 25'             # #231419  arena dark
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
@@ -1026,6 +1061,59 @@ declare -A nier=(
   [meta_key]="${nier_charcoal}"
 )
 
+declare -A bioluminescence=(
+  [fkeys]="${bio_pulse}"
+  [numbers]="${bio_teal2}"
+  [alpha]="${bio_deep}"
+  [special]="${bio_plankton}"
+  [nav]="${bio_blue}"
+  [arrows]="${bio_blue}"
+  [modifiers]="${bio_abyss}"
+  [action]="${bio_cyan}"
+  [destructive]="${bio_pulse}"
+  [keypad_numbers]="${bio_teal2}"
+  [spacebar]="${bio_deep}"
+  [status]="${bio_deep}"
+  [misc_keys]="${bio_abyss}"
+  [sysrq_key]="${bio_cyan}"
+  [meta_key]="${bio_plankton}"
+)
+
+declare -A nfsu=(
+  [fkeys]="${nfs_cyan}"
+  [numbers]="${nfs_blue}"
+  [alpha]="${nfs_blue}"
+  [special]="${nfs_pink}"
+  [nav]="${nfs_cyan}"
+  [arrows]="${nfs_cyan}"
+  [modifiers]="${nfs_night}"
+  [action]="${nfs_green}"
+  [destructive]="${nfs_orange}"
+  [keypad_numbers]="${nfs_blue}"
+  [spacebar]="${nfs_chrome}"
+  [status]="${nfs_chrome}"
+  [misc_keys]="${nfs_night}"
+  [sysrq_key]="${nfs_orange}"
+  [meta_key]="${nfs_green}"
+)
+
+declare -A unreal=(
+  [fkeys]="${ut_red}"
+  [numbers]="${ut_orange}"
+  [alpha]="${ut_red}"
+  [special]="${ut_shock}"
+  [nav]="${ut_lightning}"
+  [arrows]="${ut_lightning}"
+  [modifiers]="${ut_dark}"
+  [action]="${ut_link}"
+  [destructive]="${ut_red}"
+  [keypad_numbers]="${ut_orange}"
+  [spacebar]="${ut_white}"
+  [status]="${ut_white}"
+  [misc_keys]="${ut_dark}"
+  [sysrq_key]="${ut_bio}"
+  [meta_key]="${ut_shock}"
+)
 
 # ---------------------------------------------------------------------------
 # LED index mapping
@@ -1151,6 +1239,7 @@ declare -A schemes=(
   [evangelion]=1 [gits]=1 [bebop]=1
   [bladerunner]=1 [alien]=1 [bioshock]=1
   [dbz]=1 [mgs]=1 [nier]=1 [pacificrim]=1
+  [bioluminescence]=1 [nfsu]=1 [unreal]=1
 )
 
 usage() {
