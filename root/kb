@@ -450,6 +450,49 @@ ut_lightning='180 200 255'     # #B4C8FF  lightning gun
 ut_white='200 200 210'         # #C8C8D2  arena light
 ut_dark='35 20 25'             # #231419  arena dark
 
+# --- obsidian ---
+# Volcanic glass. Nearly black with iridescent sheen —
+# subtle purple, blue, green reflections shift across
+# the surface as light catches different angles.
+
+obsidian_glass='30 25 35'      # #1E1923  base glass
+obsidian_purple='80 50 120'    # #503278  purple iridescence
+obsidian_blue='50 60 110'      # #323C6E  blue iridescence
+obsidian_green='40 80 60'      # #28503C  green iridescence
+obsidian_sheen='100 80 140'    # #64508C  bright purple sheen
+obsidian_edge='60 55 75'       # #3C374B  cutting edge
+
+# --- amethyst ---
+# Crystal purple. Pale lilac facets catching light,
+# deepening to rich violet in the interior.
+
+amethyst_pale='200 180 230'    # #C8B4E6  surface facet
+amethyst_light='170 130 220'   # #AA82DC  light crystal
+amethyst_medium='140 80 200'   # #8C50C8  mid crystal
+amethyst_deep='100 40 160'     # #6428A0  deep violet
+amethyst_white='230 220 245'   # #E6DCF5  highlight
+amethyst_dark='60 30 90'       # #3C1E5A  interior
+
+# --- jade ---
+# Carved stone from pale celadon to deep imperial green.
+
+jade_celadon='180 220 190'     # #B4DCBE  pale celadon
+jade_light='120 200 140'       # #78C88C  light jade
+jade_medium='60 160 90'        # #3CA05A  medium jade
+jade_imperial='30 120 60'      # #1E783C  imperial jade
+jade_polish='220 240 225'      # #DCF0E1  polished highlight
+jade_deep='20 80 40'           # #145028  deep stone
+
+# --- noir ---
+# Near-monochrome silver. One red accent: the meta key.
+
+noir_bright='180 180 185'      # #B4B4B9  bright silver
+noir_medium='120 120 125'      # #78787D  medium grey
+noir_dim='70 70 75'            # #46464B  dim grey
+noir_dark='35 35 40'           # #232328  shadow
+noir_white='210 210 215'       # #D2D2D7  highlight
+noir_red='200 20 20'           # #C81414  the accent
+
 # ---------------------------------------------------------------------------
 # Scheme definitions — category → color
 # ---------------------------------------------------------------------------
@@ -1115,6 +1158,78 @@ declare -A unreal=(
   [meta_key]="${ut_shock}"
 )
 
+declare -A obsidian=(
+  [fkeys]="${obsidian_purple}"
+  [numbers]="${obsidian_blue}"
+  [alpha]="${obsidian_glass}"
+  [special]="${obsidian_green}"
+  [nav]="${obsidian_blue}"
+  [arrows]="${obsidian_blue}"
+  [modifiers]="${obsidian_edge}"
+  [action]="${obsidian_sheen}"
+  [destructive]="${obsidian_purple}"
+  [keypad_numbers]="${obsidian_blue}"
+  [spacebar]="${obsidian_edge}"
+  [status]="${obsidian_edge}"
+  [misc_keys]="${obsidian_glass}"
+  [sysrq_key]="${obsidian_sheen}"
+  [meta_key]="${obsidian_green}"
+)
+
+declare -A amethyst=(
+  [fkeys]="${amethyst_medium}"
+  [numbers]="${amethyst_light}"
+  [alpha]="${amethyst_pale}"
+  [special]="${amethyst_deep}"
+  [nav]="${amethyst_light}"
+  [arrows]="${amethyst_light}"
+  [modifiers]="${amethyst_dark}"
+  [action]="${amethyst_white}"
+  [destructive]="${amethyst_deep}"
+  [keypad_numbers]="${amethyst_light}"
+  [spacebar]="${amethyst_white}"
+  [status]="${amethyst_white}"
+  [misc_keys]="${amethyst_dark}"
+  [sysrq_key]="${amethyst_medium}"
+  [meta_key]="${amethyst_medium}"
+)
+
+declare -A jade=(
+  [fkeys]="${jade_medium}"
+  [numbers]="${jade_light}"
+  [alpha]="${jade_celadon}"
+  [special]="${jade_imperial}"
+  [nav]="${jade_light}"
+  [arrows]="${jade_light}"
+  [modifiers]="${jade_deep}"
+  [action]="${jade_polish}"
+  [destructive]="${jade_imperial}"
+  [keypad_numbers]="${jade_light}"
+  [spacebar]="${jade_polish}"
+  [status]="${jade_polish}"
+  [misc_keys]="${jade_deep}"
+  [sysrq_key]="${jade_medium}"
+  [meta_key]="${jade_medium}"
+)
+
+declare -A noir=(
+  [fkeys]="${noir_dim}"
+  [numbers]="${noir_dim}"
+  [alpha]="${noir_medium}"
+  [special]="${noir_dim}"
+  [nav]="${noir_dim}"
+  [arrows]="${noir_dim}"
+  [modifiers]="${noir_dark}"
+  [action]="${noir_bright}"
+  [destructive]="${noir_medium}"
+  [keypad_numbers]="${noir_dim}"
+  [spacebar]="${noir_medium}"
+  [status]="${noir_medium}"
+  [misc_keys]="${noir_dark}"
+  [sysrq_key]="${noir_dim}"
+  [meta_key]="${noir_red}"
+)
+
 # ---------------------------------------------------------------------------
 # LED index mapping
 # ---------------------------------------------------------------------------
@@ -1240,6 +1355,7 @@ declare -A schemes=(
   [bladerunner]=1 [alien]=1 [bioshock]=1
   [dbz]=1 [mgs]=1 [nier]=1 [pacificrim]=1
   [bioluminescence]=1 [nfsu]=1 [unreal]=1
+  [obsidian]=1 [amethyst]=1 [jade]=1 [noir]=1
 )
 
 usage() {
