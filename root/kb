@@ -18,7 +18,134 @@ neon_dim_cyan='10 155 129'   # #0A9B81
 neon_white='248 248 248'     # #F8F8F8
 neon_grey='136 136 136'      # #888888
 
+# --- monokai palette, readability-fixed ---
+
+mono_cyan='102 217 239'      # #66D9EF
+mono_green='166 226 46'      # #A6E22E
+mono_yellow='244 191 117'    # #F4BF75
+mono_purple='174 129 255'    # #AE81FF
+mono_pink='254 67 134'       # #FE4386
+mono_orange='253 151 31'     # #FD971F
+mono_light_cyan='161 239 228' # #A1EFE4
+mono_white='248 248 242'     # #F8F8F2
+mono_grey='144 141 126'      # #908D7E
+
 declare -A colors=(
+  [monokai.esc]="${mono_pink}"
+  [monokai.f1]="${mono_cyan}"
+  [monokai.f2]="${mono_cyan}"
+  [monokai.f3]="${mono_cyan}"
+  [monokai.f4]="${mono_cyan}"
+  [monokai.f5]="${mono_cyan}"
+  [monokai.f6]="${mono_cyan}"
+  [monokai.f7]="${mono_cyan}"
+  [monokai.f8]="${mono_cyan}"
+  [monokai.f9]="${mono_cyan}"
+  [monokai.f10]="${mono_cyan}"
+  [monokai.f11]="${mono_cyan}"
+  [monokai.f12]="${mono_cyan}"
+  [monokai.sysrq]="${mono_green}"
+  [monokai.ins]="${mono_orange}"
+  [monokai.del]="${mono_pink}"
+  [monokai.home]="${mono_orange}"
+  [monokai.end]="${mono_orange}"
+  [monokai.pgup]="${mono_orange}"
+  [monokai.pgdn]="${mono_orange}"
+  [monokai.tilde]="${mono_pink}"
+  [monokai.1]="${mono_yellow}"
+  [monokai.2]="${mono_yellow}"
+  [monokai.3]="${mono_yellow}"
+  [monokai.4]="${mono_yellow}"
+  [monokai.5]="${mono_yellow}"
+  [monokai.6]="${mono_yellow}"
+  [monokai.7]="${mono_yellow}"
+  [monokai.8]="${mono_yellow}"
+  [monokai.9]="${mono_yellow}"
+  [monokai.0]="${mono_yellow}"
+  [monokai.-]="${mono_yellow}"
+  [monokai.=]="${mono_yellow}"
+  [monokai.q]="${mono_green}"
+  [monokai.w]="${mono_green}"
+  [monokai.e]="${mono_green}"
+  [monokai.r]="${mono_green}"
+  [monokai.t]="${mono_green}"
+  [monokai.y]="${mono_green}"
+  [monokai.u]="${mono_green}"
+  [monokai.i]="${mono_green}"
+  [monokai.o]="${mono_green}"
+  [monokai.p]="${mono_green}"
+  [monokai.a]="${mono_green}"
+  [monokai.s]="${mono_green}"
+  [monokai.d]="${mono_green}"
+  [monokai.f]="${mono_green}"
+  [monokai.g]="${mono_green}"
+  [monokai.h]="${mono_green}"
+  [monokai.j]="${mono_green}"
+  [monokai.k]="${mono_green}"
+  [monokai.l]="${mono_green}"
+  [monokai.z]="${mono_green}"
+  [monokai.x]="${mono_green}"
+  [monokai.c]="${mono_green}"
+  [monokai.v]="${mono_green}"
+  [monokai.b]="${mono_green}"
+  [monokai.n]="${mono_green}"
+  [monokai.m]="${mono_green}"
+  [monokai.space.1]="${mono_white}"
+  [monokai.space.2]="${mono_white}"
+  [monokai.semicolon]="${mono_pink}"
+  [monokai.quote]="${mono_pink}"
+  [monokai.comma]="${mono_pink}"
+  [monokai.period]="${mono_pink}"
+  [monokai.slash]="${mono_pink}"
+  [monokai.brackets.opening]="${mono_pink}"
+  [monokai.brackets.closing]="${mono_pink}"
+  [monokai.pipe.1]="${mono_pink}"
+  [monokai.pipe.2]="${mono_pink}"
+  [monokai.keypad.1]="${mono_yellow}"
+  [monokai.keypad.2]="${mono_yellow}"
+  [monokai.keypad.3]="${mono_yellow}"
+  [monokai.keypad.4]="${mono_yellow}"
+  [monokai.keypad.5]="${mono_yellow}"
+  [monokai.keypad.6]="${mono_yellow}"
+  [monokai.keypad.7]="${mono_yellow}"
+  [monokai.keypad.8]="${mono_yellow}"
+  [monokai.keypad.9]="${mono_yellow}"
+  [monokai.keypad.0]="${mono_yellow}"
+  [monokai.keypad.period]="${mono_pink}"
+  [monokai.keypad./]="${mono_yellow}"
+  [monokai.keypad.*]="${mono_yellow}"
+  [monokai.keypad.-]="${mono_yellow}"
+  [monokai.keypad.+.1]="${mono_yellow}"
+  [monokai.keypad.+.2]="${mono_yellow}"
+  [monokai.keypad.enter.1]="${mono_light_cyan}"
+  [monokai.keypad.enter.2]="${mono_light_cyan}"
+  [monokai.numlock]="${mono_white}"
+  [monokai.capslock.1]="${mono_pink}"
+  [monokai.capslock.2]="${mono_pink}"
+  [monokai.backspace.1]="${mono_pink}"
+  [monokai.backspace.2]="${mono_pink}"
+  [monokai.enter.1]="${mono_light_cyan}"
+  [monokai.enter.2]="${mono_light_cyan}"
+  [monokai.ctrl.left.1]="${mono_purple}"
+  [monokai.ctrl.left.2]="${mono_purple}"
+  [monokai.ctrl.right.1]="${mono_purple}"
+  [monokai.ctrl.right.2]="${mono_purple}"
+  [monokai.alt.left]="${mono_purple}"
+  [monokai.alt.right]="${mono_purple}"
+  [monokai.shift.left.1]="${mono_purple}"
+  [monokai.shift.left.2]="${mono_purple}"
+  [monokai.shift.right.1]="${mono_purple}"
+  [monokai.shift.right.2]="${mono_purple}"
+  [monokai.fn]="${mono_grey}"
+  [monokai.meta]="${mono_cyan}"
+  [monokai.menu]="${mono_grey}"
+  [monokai.tab.1]="${mono_light_cyan}"
+  [monokai.tab.2]="${mono_light_cyan}"
+  [monokai.arrows.up]="${mono_purple}"
+  [monokai.arrows.down]="${mono_purple}"
+  [monokai.arrows.left]="${mono_purple}"
+  [monokai.arrows.right]="${mono_purple}"
+
   [neon.esc]="${neon_red}"
   [neon.f1]="${neon_blue}"
   [neon.f2]="${neon_blue}"
@@ -300,6 +427,10 @@ commands() {
         ;;
       neon)
         color_scheme=neon
+        shift
+        ;;
+      monokai)
+        color_scheme=monokai
         shift
         ;;
       *)
