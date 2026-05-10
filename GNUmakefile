@@ -221,6 +221,9 @@ git : $(call BIN.dotfiles_to_user,git-next git-peek git-review git-ship)
 phony += ssh
 ssh : ~/.ssh/config
 
+phony += tmux
+tmux : $(call CONFIG.dotfiles_to_user,tmux/tmux.conf)
+
 phony += vim
 vim : ~/.vimrc
 
