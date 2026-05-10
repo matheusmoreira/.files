@@ -86,6 +86,34 @@ terminal-init() {
 terminal-init
 unset -f terminal-init
 
+declare -A tmux_format=(
+  [ansi.foreground.black]='#[fg=black]'
+  [ansi.foreground.red]='#[fg=red]'
+  [ansi.foreground.green]='#[fg=green]'
+  [ansi.foreground.yellow]='#[fg=yellow]'
+  [ansi.foreground.blue]='#[fg=blue]'
+  [ansi.foreground.magenta]='#[fg=magenta]'
+  [ansi.foreground.cyan]='#[fg=cyan]'
+  [ansi.foreground.white]='#[fg=white]'
+  [ansi.background.black]='#[bg=black]'
+  [ansi.background.red]='#[bg=red]'
+  [ansi.background.green]='#[bg=green]'
+  [ansi.background.yellow]='#[bg=yellow]'
+  [ansi.background.blue]='#[bg=blue]'
+  [ansi.background.magenta]='#[bg=magenta]'
+  [ansi.background.cyan]='#[bg=cyan]'
+  [ansi.background.white]='#[bg=white]'
+  [attributes.bold]='#[bold]'
+  [attributes.dim]='#[dim]'
+  [attributes.italics]='#[italics]'
+  [attributes.underline]='#[underscore]'
+  [attributes.reverse]='#[reverse]'
+  [attributes.standout]='#[reverse]'
+  [attributes.invisible]='#[hidden]'
+  [attributes.blink]='#[blink]'
+  [attributes.reset]='#[default]'
+)
+
 # Bash and readline need these codes to be escaped by surrounding them
 # with \[ \] and \x01 and \x02 respectively to indicate they are
 # non-printing characters, lest they interfere with their own codes.
@@ -100,16 +128,17 @@ terminal-write() {
 
   # Current escaping mode for non-printable characters.
   # If escape=mode is passed as argument, turn on the specified
-  # escaping mode. Currently supported modes are bash and readline.
-  #
-  # Bash and readline need this for line editing and cursor positions.
-  # If non-printable characters aren't escaped, these programs can get
-  # confused and overwrite part of the screen. Really aggravating.
+  # escaping mode. Currently supported modes are bash, readline,
+  # and tmux. Bash and readline need this for line editing and
+  # cursor positions. If non-printable characters aren't escaped,
+  # these programs can get confused and overwrite part of the screen.
+  # Really aggravating. Tmux #[...] codes are inherently
+  # non-printing-safe within tmux's own parser.
   local escaping_mode=''
 
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
-      escape=bash | escape=readline | escape='')
+      escape=bash | escape=readline | escape=tmux | escape='')
         escaping_mode="${1#*=}"; shift; continue; ;;
       foreground=* | fg=*)
         selector="ansi.foreground.${1#*=}"; ;;
@@ -137,10 +166,14 @@ terminal-write() {
         output+="${1}"; shift; continue; ;;
     esac
 
-    if [[ -n "${escaping_mode}" ]]; then
-      selector+=".escaped.${escaping_mode}"
+    if [[ "${escaping_mode}" == "tmux" ]]; then
+      output+="${tmux_format[${selector}]}"
+    else
+      if [[ -n "${escaping_mode}" ]]; then
+        selector+=".escaped.${escaping_mode}"
+      fi
+      output+="${terminal[${selector}]}"
     fi
-    output+="${terminal[${selector}]}"
 
     shift
   done
@@ -162,20 +195,35 @@ alias tty-write=terminal-write tty-fmt=terminal-format
 # Prompt
 
 prompt-write() {
-  terminal-write escape=bash "$@"
+  if [[ -n "${TMUX}" ]]; then
+    terminal-write escape=tmux "$@"
+  else
+    terminal-write escape=bash "$@"
+  fi
 }
 
 prompt-format() {
   if [[ -n "$1" ]]; then
     local input="$1"
     shift
-    terminal-write escape=bash ' '
-    terminal-format "${input}" escape=bash "$@"
+    if [[ -n "${TMUX}" ]]; then
+      terminal-write escape=tmux ' '
+      terminal-format "${input}" escape=tmux "$@"
+    else
+      terminal-write escape=bash ' '
+      terminal-format "${input}" escape=bash "$@"
+    fi
   fi
 }
 
 prompt-working-directory() {
-  prompt-write '[ ' foreground=green '\w' reset ' ]'
+  local directory
+  if [[ -n "${TMUX}" ]]; then
+    directory="${PWD/#${HOME}/~}"
+  else
+    directory='\w'
+  fi
+  prompt-write '[ ' foreground=green "${directory}" reset ' ]'
 }
 
 prompt-error-code() {
@@ -278,12 +326,26 @@ prompt-git() {
 prompt-command() {
   local status="$?"
 
-  PS1=''
-  PS1+="$(prompt-working-directory)"
-  PS1+="$(prompt-git)"
-  PS1+='\n'
-  PS1+="$(prompt-error-code "${status}")"
-  PS1+='\$ '
+  if [[ -n "${TMUX}" ]]; then
+    local shell_status=''
+    shell_status+="$(prompt-working-directory)"
+    shell_status+="$(prompt-git)"
+    shell_status+=" $(prompt-error-code "${status}")"
+    if [[ "${shell_status}" != "${_shell_status_prev:-}" ]]; then
+      tmux set-option -pq @shell_status "${shell_status}"
+      _shell_status_prev="${shell_status}"
+    fi
+    PS1='\$ '
+  else
+    PS1=''
+    PS1+="$(prompt-working-directory)"
+    PS1+="$(prompt-git)"
+    PS1+='\n'
+    PS1+="$(prompt-error-code "${status}")"
+    PS1+='\$ '
+  fi
+
+  return "${status}"
 }
 
 PROMPT_COMMAND=prompt-command
