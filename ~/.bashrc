@@ -219,7 +219,11 @@ prompt-format() {
 prompt-working-directory() {
   local directory
   if [[ -n "${TMUX}" ]]; then
-    directory="${PWD/#${HOME}/~}"
+    case "${PWD}" in
+      "${HOME}"/*)  directory="~${PWD:${#HOME}}" ;;
+      "${HOME}")    directory='~' ;;
+      *)            directory="${PWD}" ;;
+    esac
   else
     directory='\w'
   fi
