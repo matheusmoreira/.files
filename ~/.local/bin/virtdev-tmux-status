@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# virtdev-tmux-status <pane-id>
+#
+# Persistent connection handler for the virtdev tmux status channel.
+# Reads line-delimited JSON from stdin (one object per guest prompt
+# update), renders tmux format codes, and sets @shell_status on the
+# target pane.
+#
+# Invoked by socat via the virtdev-tmux-status@.service template unit.
+# The pane ID (numeric, % prefix already stripped) is passed as $1.
+#
+
+set -euo pipefail
+
+# shellcheck disable=SC1090
+source ~/.local/lib/bash/import
+import terminal
+
+pane="${1}"
+
+while IFS= read -r line; do
+  parsed="$(printf '%s' "${line}" | jq -r '[.version, .exit, .directory, .host, .git.branch // empty, .git.commit // empty, .git.operation // empty, (.git.conflicted | tostring), (.git.staged | tostring), (.git.unstaged | tostring), (.git.untracked | tostring), (.git.stashed // 0 | tostring), (.git.ahead // 0 | tostring), (.git.behind // 0 | tostring), (.git // empty | type)] | @tsv')" || continue
+
+  IFS=$'\t' read -r version exit_code directory host branch commit operation conflicted staged unstaged untracked stashed ahead behind git_type <<< "${parsed}"
+
+  [[ "${version}" == "1" ]] || continue
+
+  # Defense in depth: strip # from guest-supplied strings
+  # to prevent tmux format injection regardless of future tmux changes.
+  directory="${directory//#/}"
+  host="${host//#/}"
+  branch="${branch//#/}"
+  commit="${commit//#/}"
+  operation="${operation//#/}"
+
+  local_status=''
+
+  # Exit code
+  printf -v padded_exit '%3d' "${exit_code}"
+  if [[ "${exit_code}" -ne 0 ]]; then
+    local_status+="$(terminal-write escape=tmux foreground=red "${padded_exit}" reset ' ')"
+  else
+    local_status+="$(terminal-write escape=tmux dim "${padded_exit}" reset ' ')"
+  fi
+
+  # Working directory with hostname
+  local_status+="$(terminal-write escape=tmux '[ ' foreground=yellow "${host}" reset ' ' foreground=green "${directory}" reset ' ]')"
+
+  # Git
+  if [[ "${git_type}" == "object" ]]; then
+    local_status+="$(terminal-write escape=tmux ' ')"
+    local_status+="$(terminal-format ± escape=tmux foreground=yellow)"
+
+    if [[ -n "${operation}" ]]; then
+      local_status+="$(terminal-format "${operation}" escape=tmux foreground=magenta)"
+    fi
+
+    indicators=''
+    [[ "${conflicted}" == "true" ]] && indicators+="$(terminal-write escape=tmux foreground=red '!' reset)"
+    [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write escape=tmux foreground=green '•' reset)"
+    [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write escape=tmux foreground=magenta '*' reset)"
+    [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write escape=tmux foreground=blue '?' reset)"
+    [[ "${stashed}" != "0" ]]       && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
+
+    if [[ -n "${indicators}" ]]; then
+      local_status+="$(terminal-write escape=tmux ' ')${indicators}"
+    fi
+
+    if [[ -n "${commit}" ]]; then
+      local_status+="$(terminal-format "${commit}" escape=tmux dim foreground=cyan)"
+    fi
+
+    if [[ -n "${branch}" ]]; then
+      local_status+="$(terminal-format "${branch}" escape=tmux bright)"
+    fi
+
+    if [[ -n "${ahead}" && "${ahead}" -gt 0 ]]; then
+      local_status+="$(terminal-format + escape=tmux foreground=green)"
+      local_status+="$(terminal-write escape=tmux "${ahead}")"
+    fi
+    if [[ -n "${behind}" && "${behind}" -gt 0 ]]; then
+      local_status+="$(terminal-format - escape=tmux foreground=red)"
+      local_status+="$(terminal-write escape=tmux "${behind}")"
+    fi
+  fi
+
+  tmux set-option -t "%${pane}" -pq @shell_status "${local_status}" 2>/dev/null || true
+done
