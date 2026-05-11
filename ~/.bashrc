@@ -227,7 +227,11 @@ prompt-working-directory() {
   else
     directory='\w'
   fi
-  prompt-write '[ ' foreground=green "${directory}" reset ' ]'
+  if [[ -n "${SSH_CONNECTION}" ]]; then
+    prompt-write '[ ' foreground=yellow "${HOSTNAME%%.*}" reset ' ' foreground=green "${directory}" reset ' ]'
+  else
+    prompt-write '[ ' foreground=green "${directory}" reset ' ]'
+  fi
 }
 
 prompt-error-code() {
