@@ -213,6 +213,7 @@ bin : $(user_binaries)
 
 phony += bash
 bash : ~/.bash_profile ~/.bashrc
+bash : ~/.local/lib/bash/import ~/.local/lib/bash/terminal
 
 phony += git
 git : $(call CONFIG.dotfiles_to_user,git/config)
@@ -303,6 +304,10 @@ claude : $(call BIN.dotfiles_to_user,claudo-codo)
 
 phony += virtdev
 virtdev : $(call CONFIG.dotfiles_to_user,virtdev/projects/*/manifest)
+virtdev : $(call CONFIG.dotfiles_to_user,virtdev/triggers/pre-ssh virtdev/triggers/post-ssh)
+virtdev : $(call CONFIG.dotfiles_to_user,systemd/user/virtdev-tmux-status@.service)
+virtdev : $(call CONFIG.dotfiles_to_user,tmpfiles.d/virtdev-tmux-status.conf)
+virtdev : $(call BIN.dotfiles_to_user,virtdev-tmux-status)
 
 phony += basic
 basic : bash git ssh vim nano
