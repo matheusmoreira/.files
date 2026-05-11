@@ -307,13 +307,13 @@ prompt-git() {
   then
     prompt-write ' '
     if [[ -n "${conflicted}" ]]; then
-      prompt-write foreground=magenta "${conflicted}" reset
+      prompt-write foreground=red "${conflicted}" reset
     fi
     if [[ -n "${staged}" ]]; then
       prompt-write foreground=green "${staged}" reset
     fi
     if [[ -n "${unstaged}" ]]; then
-      prompt-write foreground=red  "${unstaged}" reset
+      prompt-write foreground=magenta "${unstaged}" reset
     fi
     if [[ -n "${untracked}" ]]; then
       prompt-write foreground=blue "${untracked}" reset
@@ -363,9 +363,9 @@ prompt-command() {
 
   if [[ -n "${TMUX}" ]]; then
     local shell_status=''
+    shell_status+="$(prompt-error-code "${status}")"
     shell_status+="$(prompt-working-directory)"
     shell_status+="$(prompt-git)"
-    shell_status+=" $(prompt-error-code "${status}")"
     if [[ "${shell_status}" != "${_shell_status_prev:-}" ]]; then
       tmux set-option -pq @shell_status "${shell_status}"
       _shell_status_prev="${shell_status}"
