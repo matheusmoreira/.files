@@ -300,11 +300,14 @@ prompt-status-json() {
     local escaped_branch="${_git_branch//\\/\\\\}"
     escaped_branch="${escaped_branch//\"/\\\"}"
 
+    local escaped_upstream="${_git_upstream//\\/\\\\}"
+    escaped_upstream="${escaped_upstream//\"/\\\"}"
+
     local op_json='null'
     [[ -n "${_git_operation}" ]] && op_json="\"${_git_operation}\""
 
-    git_json=$(printf '{"branch":"%s","commit":"%s","operation":%s,"conflicted":%s,"staged":%s,"unstaged":%s,"untracked":%s,"stashed":%d,"ahead":%d,"behind":%d}' \
-      "${escaped_branch}" "${_git_commit}" "${op_json}" \
+    git_json=$(printf '{"branch":"%s","commit":"%s","operation":%s,"upstream":"%s","conflicted":%s,"staged":%s,"unstaged":%s,"untracked":%s,"stashed":%d,"ahead":%d,"behind":%d}' \
+      "${escaped_branch}" "${_git_commit}" "${op_json}" "${escaped_upstream}" \
       "${_git_conflicted}" "${_git_staged}" "${_git_unstaged}" "${_git_untracked}" \
       "${_git_stashed}" "${_git_ahead}" "${_git_behind}")
   fi
