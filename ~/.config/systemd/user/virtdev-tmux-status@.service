@@ -3,4 +3,4 @@ Description=virtdev tmux status listener for pane %i
 
 [Service]
 Type=simple
-ExecStart=socat UNIX-LISTEN:%t/virtdev/socket/status-%i.sock,fork,unlink-early "EXEC:virtdev-tmux-status %i"
+ExecStart=socat UNIX-LISTEN:%t/virtdev/socket/status-%i.sock,fork,max-children=2,unlink-early "EXEC:virtdev-tmux-status %i"

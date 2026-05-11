@@ -10,6 +10,12 @@
 # Invoked by socat via the virtdev-tmux-status@.service template unit.
 # The pane ID (numeric, % prefix already stripped) is passed as $1.
 #
+# SECURITY: the guest is untrusted. Every field extracted from the JSON
+# is validated or sanitized before use. Numeric fields are regex-checked
+# against ^[0-9]+$ before any arithmetic context — bash's [[ -ne ]] and
+# [[ -gt ]] perform arithmetic evaluation which executes command
+# substitutions embedded in the operand.
+#
 
 set -euo pipefail
 
@@ -18,16 +24,26 @@ source ~/.local/lib/bash/import
 import terminal
 
 pane="${1}"
+integer='^[0-9]+$'
 
-while IFS= read -r line; do
-  parsed="$(printf '%s' "${line}" | jq -r '[.version, .exit, .directory, .host, .git.branch // empty, .git.commit // empty, .git.operation // empty, (.git.conflicted | tostring), (.git.staged | tostring), (.git.unstaged | tostring), (.git.untracked | tostring), (.git.stashed // 0 | tostring), (.git.ahead // 0 | tostring), (.git.behind // 0 | tostring), (.git // empty | type)] | @tsv')" || continue
+while IFS= read -r -n 16384 line; do
+  parsed="$(printf '%s' "${line}" | jq -r '[.version, .exit, .directory, .host, .git.branch // "", .git.commit // "", .git.operation // "", (.git.conflicted | tostring), (.git.staged | tostring), (.git.unstaged | tostring), (.git.untracked | tostring), (.git.stashed // 0 | tostring), (.git.ahead // 0 | tostring), (.git.behind // 0 | tostring), (.git // null | type)] | @tsv')" || continue
 
   IFS=$'\t' read -r version exit_code directory host branch commit operation conflicted staged unstaged untracked stashed ahead behind git_type <<< "${parsed}"
 
-  [[ "${version}" == "1" ]] || continue
+  # Validate version and all numeric fields before any arithmetic context.
+  # Bash's [[ -ne ]] and [[ -gt ]] evaluate arithmetic expressions which
+  # would execute command substitutions embedded by a malicious guest.
+  [[ "${version}" =~ $integer && "${version}" == "1" ]] || continue
+  [[ "${exit_code}" =~ $integer ]] || continue
+  [[ "${stashed}" =~ $integer ]] || continue
+  [[ "${ahead}" =~ $integer ]] || continue
+  [[ "${behind}" =~ $integer ]] || continue
 
-  # Defense in depth: strip # from guest-supplied strings
-  # to prevent tmux format injection regardless of future tmux changes.
+  # Strip # from guest-supplied strings to prevent tmux format injection.
+  # #{@shell_status} without the E: prefix does not re-evaluate embedded
+  # format sequences, but this eliminates the vector entirely regardless
+  # of future tmux behavior changes.
   directory="${directory//#/}"
   host="${host//#/}"
   branch="${branch//#/}"
@@ -61,7 +77,7 @@ while IFS= read -r line; do
     [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write escape=tmux foreground=green '•' reset)"
     [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write escape=tmux foreground=magenta '*' reset)"
     [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write escape=tmux foreground=blue '?' reset)"
-    [[ "${stashed}" != "0" ]]       && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
+    [[ "${stashed}" -ne 0 ]]       && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
 
     if [[ -n "${indicators}" ]]; then
       local_status+="$(terminal-write escape=tmux ' ')${indicators}"
@@ -75,11 +91,11 @@ while IFS= read -r line; do
       local_status+="$(terminal-format "${branch}" escape=tmux bright)"
     fi
 
-    if [[ -n "${ahead}" && "${ahead}" -gt 0 ]]; then
+    if [[ "${ahead}" -gt 0 ]]; then
       local_status+="$(terminal-format + escape=tmux foreground=green)"
       local_status+="$(terminal-write escape=tmux "${ahead}")"
     fi
-    if [[ -n "${behind}" && "${behind}" -gt 0 ]]; then
+    if [[ "${behind}" -gt 0 ]]; then
       local_status+="$(terminal-format - escape=tmux foreground=red)"
       local_status+="$(terminal-write escape=tmux "${behind}")"
     fi
