@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+#
+# terminal — rendering library for terminal escape sequences.
+#
+# Provides terminal capability lookup via tput, tmux format code
+# mapping, and a unified terminal-write function that handles
+# ANSI, bash prompt, readline, and tmux escape modes.
+#
+# Public:
+#   terminal-write [escape=<mode>] <args...>
+#   terminal-format <text> <args...>
+#   terminal[]          associative array of ANSI escape sequences
+#   tmux_format[]       associative array of tmux #[...] format codes
+#
+# Aliases:
+#   tty-write   -> terminal-write
+#   tty-fmt     -> terminal-format
+#
+
+set -euo pipefail
+
+# Must use declare -gA because this library is sourced from inside
+# the import() function. A plain declare -A would create a variable
+# local to import() that disappears when import() returns.
+
+declare -gA terminal=()
+
+terminal-init() {
+  local -a keys=(
+    ansi.foreground.black ansi.foreground.red
+    ansi.foreground.green ansi.foreground.yellow
+    ansi.foreground.blue  ansi.foreground.magenta
+    ansi.foreground.cyan  ansi.foreground.white
+    ansi.background.black ansi.background.red
+    ansi.background.green ansi.background.yellow
+    ansi.background.blue  ansi.background.magenta
+    ansi.background.cyan  ansi.background.white
+    attributes.bold       attributes.dim
+    attributes.italics    attributes.underline
+    attributes.reverse    attributes.standout
+    attributes.invisible  attributes.blink
+    attributes.reset
+  )
+  local -a capabilities=(
+    'setaf 0' 'setaf 1' 'setaf 2' 'setaf 3'
+    'setaf 4' 'setaf 5' 'setaf 6' 'setaf 7'
+    'setab 0' 'setab 1' 'setab 2' 'setab 3'
+    'setab 4' 'setab 5' 'setab 6' 'setab 7'
+    bold dim sitm smul rev smso invis blink sgr0
+  )
+  local raw
+  raw=$(printf '%s\nbel\n' "${capabilities[@]}" | tput -S 2>/dev/null)
+  local -a values=()
+  local value
+  while IFS= read -rd $'\a' value; do
+    values+=("${value}")
+  done <<< "${raw}"
+  local i
+  for (( i = 0; i < ${#keys[@]}; i++ )); do
+    terminal["${keys[i]}"]="${values[i]:-}"
+  done
+}
+terminal-init
+unset -f terminal-init
+
+declare -gA tmux_format=(
+  [ansi.foreground.black]='#[fg=black]'
+  [ansi.foreground.red]='#[fg=red]'
+  [ansi.foreground.green]='#[fg=green]'
+  [ansi.foreground.yellow]='#[fg=yellow]'
+  [ansi.foreground.blue]='#[fg=blue]'
+  [ansi.foreground.magenta]='#[fg=magenta]'
+  [ansi.foreground.cyan]='#[fg=cyan]'
+  [ansi.foreground.white]='#[fg=white]'
+  [ansi.background.black]='#[bg=black]'
+  [ansi.background.red]='#[bg=red]'
+  [ansi.background.green]='#[bg=green]'
+  [ansi.background.yellow]='#[bg=yellow]'
+  [ansi.background.blue]='#[bg=blue]'
+  [ansi.background.magenta]='#[bg=magenta]'
+  [ansi.background.cyan]='#[bg=cyan]'
+  [ansi.background.white]='#[bg=white]'
+  [attributes.bold]='#[bold]'
+  [attributes.dim]='#[dim]'
+  [attributes.italics]='#[italics]'
+  [attributes.underline]='#[underscore]'
+  [attributes.reverse]='#[reverse]'
+  [attributes.standout]='#[reverse]'
+  [attributes.invisible]='#[hidden]'
+  [attributes.blink]='#[blink]'
+  [attributes.reset]='#[default]'
+)
+
+for key in "${!terminal[@]}"; do
+  terminal[${key}.escaped.bash]="\[${terminal[${key}]}\]"
+  terminal[${key}.escaped.readline]=$'\x01'"${terminal[${key}]}"$'\x02'
+done
+
+terminal-write() {
+  local output=''
+  local selector=''
+
+  local escaping_mode=''
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      escape=bash | escape=readline | escape=tmux | escape='')
+        escaping_mode="${1#*=}"; shift; continue; ;;
+      foreground=* | fg=*)
+        selector="ansi.foreground.${1#*=}"; ;;
+      background=* | bg=*)
+        selector="ansi.background.${1#*=}"; ;;
+      reset)
+        selector='attributes.reset'; ;;
+      bold | bright)
+        selector='attributes.bold'; ;;
+      dim)
+        selector='attributes.dim'; ;;
+      italics)
+        selector='attributes.italics'; ;;
+      underline | underlined)
+        selector='attributes.underline'; ;;
+      reverse | reversed | reverse-video | reversed-video)
+        selector='attributes.reverse'; ;;
+      standout | highlight | highlighted)
+        selector='attributes.standout'; ;;
+      invis | invisible)
+        selector='attributes.invisible'; ;;
+      blink | blinking)
+        selector='attributes.blink'; ;;
+      *)
+        output+="${1}"; shift; continue; ;;
+    esac
+
+    if [[ "${escaping_mode}" == "tmux" ]]; then
+      output+="${tmux_format[${selector}]}"
+    else
+      if [[ -n "${escaping_mode}" ]]; then
+        selector+=".escaped.${escaping_mode}"
+      fi
+      output+="${terminal[${selector}]}"
+    fi
+
+    shift
+  done
+
+  printf '%s' "${output}"
+}
+
+terminal-format() {
+  if [[ -n "$1" ]]; then
+    local input
+    input="$1"
+    shift
+    terminal-write "$@" "${input}" reset
+  fi
+}
+
+# shellcheck disable=SC2262  # aliases in library
+alias tty-write=terminal-write tty-fmt=terminal-format

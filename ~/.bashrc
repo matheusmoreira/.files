@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.bashrc
 # Sourced by all bash shells
 # Everything past the PATH adjustment is interactive-only
@@ -41,156 +42,11 @@ alias ls='ls -lahp --group-directories-first --color=auto'
 alias tree='tree -lh --du --dirsfirst --sort size'
 alias g=git
 
-# Terminal escape sequences
+# Terminal rendering library
 
-# Single tput -S call for all capabilities.
-# The bel (0x07) character is interleaved
-# as a record separator, since it cannot
-# appear in SGR sequences.
-declare -A terminal=()
-terminal-init() {
-  local -a keys=(
-    ansi.foreground.black ansi.foreground.red
-    ansi.foreground.green ansi.foreground.yellow
-    ansi.foreground.blue  ansi.foreground.magenta
-    ansi.foreground.cyan  ansi.foreground.white
-    ansi.background.black ansi.background.red
-    ansi.background.green ansi.background.yellow
-    ansi.background.blue  ansi.background.magenta
-    ansi.background.cyan  ansi.background.white
-    attributes.bold       attributes.dim
-    attributes.italics    attributes.underline
-    attributes.reverse    attributes.standout
-    attributes.invisible  attributes.blink
-    attributes.reset
-  )
-  local -a capabilities=(
-    'setaf 0' 'setaf 1' 'setaf 2' 'setaf 3'
-    'setaf 4' 'setaf 5' 'setaf 6' 'setaf 7'
-    'setab 0' 'setab 1' 'setab 2' 'setab 3'
-    'setab 4' 'setab 5' 'setab 6' 'setab 7'
-    bold dim sitm smul rev smso invis blink sgr0
-  )
-  local raw
-  raw=$(printf '%s\nbel\n' "${capabilities[@]}" | tput -S 2>/dev/null)
-  local -a values=()
-  local value
-  while IFS= read -rd $'\a' value; do
-    values+=("${value}")
-  done <<< "${raw}"
-  local i
-  for (( i = 0; i < ${#keys[@]}; i++ )); do
-    terminal["${keys[i]}"]="${values[i]:-}"
-  done
-}
-terminal-init
-unset -f terminal-init
-
-declare -A tmux_format=(
-  [ansi.foreground.black]='#[fg=black]'
-  [ansi.foreground.red]='#[fg=red]'
-  [ansi.foreground.green]='#[fg=green]'
-  [ansi.foreground.yellow]='#[fg=yellow]'
-  [ansi.foreground.blue]='#[fg=blue]'
-  [ansi.foreground.magenta]='#[fg=magenta]'
-  [ansi.foreground.cyan]='#[fg=cyan]'
-  [ansi.foreground.white]='#[fg=white]'
-  [ansi.background.black]='#[bg=black]'
-  [ansi.background.red]='#[bg=red]'
-  [ansi.background.green]='#[bg=green]'
-  [ansi.background.yellow]='#[bg=yellow]'
-  [ansi.background.blue]='#[bg=blue]'
-  [ansi.background.magenta]='#[bg=magenta]'
-  [ansi.background.cyan]='#[bg=cyan]'
-  [ansi.background.white]='#[bg=white]'
-  [attributes.bold]='#[bold]'
-  [attributes.dim]='#[dim]'
-  [attributes.italics]='#[italics]'
-  [attributes.underline]='#[underscore]'
-  [attributes.reverse]='#[reverse]'
-  [attributes.standout]='#[reverse]'
-  [attributes.invisible]='#[hidden]'
-  [attributes.blink]='#[blink]'
-  [attributes.reset]='#[default]'
-)
-
-# Bash and readline need these codes to be escaped by surrounding them
-# with \[ \] and \x01 and \x02 respectively to indicate they are
-# non-printing characters, lest they interfere with their own codes.
-for key in "${!terminal[@]}"; do
-  terminal[${key}.escaped.bash]="\[${terminal[${key}]}\]"
-  terminal[${key}.escaped.readline]=$'\x01'"${terminal[${key}]}"$'\x02'
-done
-
-terminal-write() {
-  local output=''
-  local selector=''
-
-  # Current escaping mode for non-printable characters.
-  # If escape=mode is passed as argument, turn on the specified
-  # escaping mode. Currently supported modes are bash, readline,
-  # and tmux. Bash and readline need this for line editing and
-  # cursor positions. If non-printable characters aren't escaped,
-  # these programs can get confused and overwrite part of the screen.
-  # Really aggravating. Tmux #[...] codes are inherently
-  # non-printing-safe within tmux's own parser.
-  local escaping_mode=''
-
-  while [[ "$#" -gt 0 ]]; do
-    case "$1" in
-      escape=bash | escape=readline | escape=tmux | escape='')
-        escaping_mode="${1#*=}"; shift; continue; ;;
-      foreground=* | fg=*)
-        selector="ansi.foreground.${1#*=}"; ;;
-      background=* | bg=*)
-        selector="ansi.background.${1#*=}"; ;;
-      reset)
-        selector='attributes.reset'; ;;
-      bold | bright)
-        selector='attributes.bold'; ;;
-      dim)
-        selector='attributes.dim'; ;;
-      italics)
-        selector='attributes.italics'; ;;
-      underline | underlined)
-        selector='attributes.underline'; ;;
-      reverse | reversed | reverse-video | reversed-video)
-        selector='attributes.reverse'; ;;
-      standout | highlight | highlighted)
-        selector='attributes.standout'; ;;
-      invis | invisible)
-        selector='attributes.invisible'; ;;
-      blink | blinking)
-        selector='attributes.blink'; ;;
-      *)
-        output+="${1}"; shift; continue; ;;
-    esac
-
-    if [[ "${escaping_mode}" == "tmux" ]]; then
-      output+="${tmux_format[${selector}]}"
-    else
-      if [[ -n "${escaping_mode}" ]]; then
-        selector+=".escaped.${escaping_mode}"
-      fi
-      output+="${terminal[${selector}]}"
-    fi
-
-    shift
-  done
-
-  printf '%s' "${output}"
-}
-
-terminal-format() {
-  if [[ -n "$1" ]]; then
-    local input
-    input="$1"
-    shift
-    terminal-write "$@" "${input}" reset
-  fi
-}
-
-alias tty-write=terminal-write tty-fmt=terminal-format
+# shellcheck disable=SC1090
+source ~/.local/lib/bash/import
+import terminal
 
 # Prompt
 
@@ -362,6 +218,125 @@ prompt-git() {
   fi
 }
 
+# Git status data collection for both local and remote prompt paths.
+# Populates _git_* variables; returns 1 if not in a git repository.
+prompt-git-data() {
+  local git_directory
+  if git_directory="$(git rev-parse --git-dir 2>/dev/null)" && [[ -n "${git_directory}" ]]
+  then
+    :
+  else
+    return 1
+  fi
+
+  _git_operation=''
+  if [[ -d "${git_directory}/rebase-merge" || -d "${git_directory}/rebase-apply" ]]; then
+    _git_operation='rebase'
+  elif [[ -f "${git_directory}/MERGE_HEAD" ]]; then
+    _git_operation='merge'
+  elif [[ -f "${git_directory}/CHERRY_PICK_HEAD" ]]; then
+    _git_operation='pick'
+  elif [[ -f "${git_directory}/REVERT_HEAD" ]]; then
+    _git_operation='revert'
+  elif [[ -f "${git_directory}/BISECT_LOG" ]]; then
+    _git_operation='bisect'
+  fi
+
+  _git_commit='' _git_branch='' _git_upstream='' _git_ab=''
+  _git_stashed=0 _git_staged=false _git_unstaged=false
+  _git_untracked=false _git_conflicted=false
+
+  local status
+  if status="$(git status --porcelain=v2 --branch --show-stash)"; then
+    local line
+    while read -r line; do
+      case "${line}" in
+        '# branch.oid '*)     _git_commit="${line#'# branch.oid '}" ;;
+        '# branch.head '*)    _git_branch="${line#'# branch.head '}" ;;
+        '# branch.upstream '*)_git_upstream="${line#'# branch.upstream '}" ;;
+        '# branch.ab '*)      _git_ab="${line#'# branch.ab '}" ;;
+        '# stash '*)          _git_stashed="${line#'# stash '}" ;;
+        '1 '* | '2 '*)
+          [[ "${line:2:1}" != '.' ]] && _git_staged=true
+          [[ "${line:3:1}" != '.' ]] && _git_unstaged=true
+          ;;
+        'u '*)                _git_conflicted=true ;;
+        '? '*)                _git_untracked=true ;;
+      esac
+    done <<< "${status}"
+  fi
+
+  if [[ "${_git_commit}" != "(initial)" ]]; then
+    _git_commit="$(git rev-parse --short "${_git_commit}" 2>/dev/null)" || _git_commit=''
+  else
+    _git_commit=''
+  fi
+
+  _git_ahead=0 _git_behind=0
+  if [[ -n "${_git_ab}" ]]; then
+    local ahead behind
+    read -r ahead behind <<< "${_git_ab}"
+    _git_ahead="${ahead#+}"
+    _git_behind="${behind#-}"
+  fi
+}
+
+# Generate JSON for the remote status channel.
+prompt-status-json() {
+  local exit_code="$1"
+
+  local directory
+  case "${PWD}" in
+    "${HOME}"/*)  directory="~${PWD:${#HOME}}" ;;
+    "${HOME}")    directory='~' ;;
+    *)            directory="${PWD}" ;;
+  esac
+
+  local escaped_directory="${directory//\\/\\\\}"
+  escaped_directory="${escaped_directory//\"/\\\"}"
+
+  local git_json='null'
+  if prompt-git-data; then
+    local escaped_branch="${_git_branch//\\/\\\\}"
+    escaped_branch="${escaped_branch//\"/\\\"}"
+
+    local op_json='null'
+    [[ -n "${_git_operation}" ]] && op_json="\"${_git_operation}\""
+
+    git_json=$(printf '{"branch":"%s","commit":"%s","operation":%s,"conflicted":%s,"staged":%s,"unstaged":%s,"untracked":%s,"stashed":%d,"ahead":%d,"behind":%d}' \
+      "${escaped_branch}" "${_git_commit}" "${op_json}" \
+      "${_git_conflicted}" "${_git_staged}" "${_git_unstaged}" "${_git_untracked}" \
+      "${_git_stashed}" "${_git_ahead}" "${_git_behind}")
+  fi
+
+  printf '{"version":1,"exit":%d,"directory":"%s","host":"%s","git":%s}\n' \
+    "${exit_code}" "${escaped_directory}" "${HOSTNAME%%.*}" "${git_json}"
+}
+
+# Persistent status socket connection management.
+_virtdev_status_fd=''
+
+_virtdev_status_open() {
+  trap '' PIPE
+  exec 7> >(socat - UNIX-CONNECT:"${VIRTDEV_STATUS_SOCKET}" 2>/dev/null)
+  _virtdev_status_fd=7
+}
+
+_virtdev_status_write() {
+  if [[ -z "${_virtdev_status_fd}" ]]; then
+    _virtdev_status_open
+  fi
+  if ! printf '%s\n' "$1" >&"${_virtdev_status_fd}"; then
+    exec 7>&- 2>/dev/null
+    _virtdev_status_fd=''
+    _virtdev_status_open
+    if ! printf '%s\n' "$1" >&"${_virtdev_status_fd}"; then
+      exec 7>&- 2>/dev/null
+      _virtdev_status_fd=''
+    fi
+  fi
+} 2>/dev/null
+
 prompt-command() {
   local status="$?"
 
@@ -374,6 +349,10 @@ prompt-command() {
       fi
     fi
     PS1='\$ '
+  elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
+    _virtdev_status_write "$(prompt-status-json "${status}")"
+    PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
+    PS1+='\$ '
   else
     PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
     PS1+='\$ '
