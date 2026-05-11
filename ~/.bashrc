@@ -318,6 +318,7 @@ _virtdev_status_fd=''
 
 _virtdev_status_open() {
   trap '' PIPE
+  mkdir -p "$(dirname "${VIRTDEV_STATUS_SOCKET}")" 2>/dev/null
   exec 7> >(socat - UNIX-CONNECT:"${VIRTDEV_STATUS_SOCKET}" 2>/dev/null)
   _virtdev_status_fd=7
 }
