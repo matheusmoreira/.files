@@ -119,7 +119,7 @@ declare -A tmux_format=(
 # non-printing characters, lest they interfere with their own codes.
 for key in "${!terminal[@]}"; do
   terminal[${key}.escaped.bash]="\[${terminal[${key}]}\]"
-  terminal[${key}.escaped.readline]="\x01${terminal[${key}]}\x02"
+  terminal[${key}.escaped.readline]=$'\x01'"${terminal[${key}]}"$'\x02'
 done
 
 terminal-write() {
@@ -178,7 +178,7 @@ terminal-write() {
     shift
   done
 
-  printf '%b' "${output}"
+  printf '%s' "${output}"
 }
 
 terminal-format() {
@@ -240,7 +240,7 @@ prompt-error-code() {
     format='dim'
   fi
 
-  code="$(printf '%3d' "${code}")"
+  printf -v code '%3d' "${code}"
   prompt-write "${format}" "${code}" reset ' '
 }
 
@@ -319,7 +319,7 @@ prompt-git() {
       prompt-write foreground=blue "${untracked}" reset
     fi
     if [[ -n "${stashed}" ]]; then
-      prompt-write foreground=green "${stashed}" reset
+      prompt-write foreground=cyan "${stashed}" reset
     fi
   fi
 
@@ -362,28 +362,23 @@ prompt-command() {
   local status="$?"
 
   if [[ -n "${TMUX}" ]]; then
-    local shell_status=''
-    shell_status+="$(prompt-error-code "${status}")"
-    shell_status+="$(prompt-working-directory)"
-    shell_status+="$(prompt-git)"
+    local shell_status
+    shell_status="$(prompt-error-code "${status}"; prompt-working-directory; prompt-git)"
     if [[ "${shell_status}" != "${_shell_status_prev:-}" ]]; then
-      tmux set-option -pq @shell_status "${shell_status}"
-      _shell_status_prev="${shell_status}"
+      if tmux set-option -pq @shell_status "${shell_status}"; then
+        _shell_status_prev="${shell_status}"
+      fi
     fi
     PS1='\$ '
   else
-    PS1=''
-    PS1+="$(prompt-working-directory)"
-    PS1+="$(prompt-git)"
-    PS1+='\n'
-    PS1+="$(prompt-error-code "${status}")"
+    PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
     PS1+='\$ '
   fi
 
   return "${status}"
 }
 
-PROMPT_COMMAND=prompt-command
+PROMPT_COMMAND=(prompt-command)
 
 # Exported environment variables
 
