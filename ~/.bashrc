@@ -253,7 +253,24 @@ prompt-git() {
     return 1
   fi
 
-  local status commit branch upstream ab stashed modified untracked
+  local operation=''
+  if [[ -d "${git_directory}/rebase-merge" || -d "${git_directory}/rebase-apply" ]]; then
+    operation='rebase'
+  elif [[ -f "${git_directory}/MERGE_HEAD" ]]; then
+    operation='merge'
+  elif [[ -f "${git_directory}/CHERRY_PICK_HEAD" ]]; then
+    operation='pick'
+  elif [[ -f "${git_directory}/REVERT_HEAD" ]]; then
+    operation='revert'
+  elif [[ -f "${git_directory}/BISECT_LOG" ]]; then
+    operation='bisect'
+  fi
+
+  if [[ -n "${operation}" ]]; then
+    prompt-format "${operation}" foreground=magenta
+  fi
+
+  local status commit branch upstream ab stashed staged unstaged untracked conflicted
   if status="$(git status --porcelain=v2 --branch --show-stash)"; then
     local line
     while read -r line; do
@@ -269,7 +286,15 @@ prompt-git() {
         '# stash '*)
           stashed="${line#'# stash '}" ; ;;
         '1 '* | '2 '*)
-          modified='*' ; ;;
+          if [[ "${line:2:1}" != '.' ]]; then
+            staged='•'
+          fi
+          if [[ "${line:3:1}" != '.' ]]; then
+            unstaged='*'
+          fi
+          ;;
+        'u '*)
+          conflicted='!' ; ;;
         '? '*)
           untracked='?' ; ;;
         *)
@@ -278,14 +303,20 @@ prompt-git() {
     done <<< "${status}"
   fi
 
-  if [[ -n "${untracked}" || -n "${modified}" || -n "${stashed}" ]]
+  if [[ -n "${conflicted}" || -n "${staged}" || -n "${unstaged}" || -n "${untracked}" || -n "${stashed}" ]]
   then
     prompt-write ' '
+    if [[ -n "${conflicted}" ]]; then
+      prompt-write foreground=magenta "${conflicted}" reset
+    fi
+    if [[ -n "${staged}" ]]; then
+      prompt-write foreground=green "${staged}" reset
+    fi
+    if [[ -n "${unstaged}" ]]; then
+      prompt-write foreground=red  "${unstaged}" reset
+    fi
     if [[ -n "${untracked}" ]]; then
       prompt-write foreground=blue "${untracked}" reset
-    fi
-    if [[ -n "${modified}" ]]; then
-      prompt-write foreground=red  "${modified}" reset
     fi
     if [[ -n "${stashed}" ]]; then
       prompt-write foreground=green "${stashed}" reset
