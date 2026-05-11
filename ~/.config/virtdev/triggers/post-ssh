@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ -n "${TMUX:-}" ]] || exit 0
+
+# shellcheck disable=SC2154  # TMUX_PANE from environment
+pane="${TMUX_PANE#%}"
+
+systemctl --user stop "virtdev-tmux-status@${pane}.service" 2>/dev/null || true
+tmux set-option -pu @shell_status 2>/dev/null || true

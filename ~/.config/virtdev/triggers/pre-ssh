@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ -n "${TMUX:-}" ]] || exit 0
+command -v socat >/dev/null 2>&1 || exit 0
+
+# shellcheck disable=SC2154  # TMUX_PANE from environment
+pane="${TMUX_PANE#%}"
+guest_socket="/tmp/virtdev/socket/status-${pane}.sock"
+# shellcheck disable=SC2154  # XDG_RUNTIME_DIR from environment
+host_socket="${XDG_RUNTIME_DIR}/virtdev/socket/status-${pane}.sock"
+
+mkdir -p "$(dirname "${host_socket}")"
+systemctl --user start "virtdev-tmux-status@${pane}.service"
+
+cat <<EOF
+RemoteForward ${guest_socket} ${host_socket}
+SetEnv VIRTDEV_STATUS_SOCKET=${guest_socket}
+StreamLocalBindUnlink yes
+EOF
