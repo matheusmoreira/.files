@@ -11,10 +11,18 @@
 # The pane ID (numeric, % prefix already stripped) is passed as $1.
 #
 # SECURITY: the guest is untrusted. Every field extracted from the JSON
-# is validated or sanitized before use. Numeric fields are regex-checked
-# against ^[0-9]+$ before any arithmetic context — bash's [[ -ne ]] and
-# [[ -gt ]] perform arithmetic evaluation which executes command
-# substitutions embedded in the operand.
+# is validated or sanitized before use:
+#
+#   - Numeric fields are regex-checked against ^[0-9]{1,18}$ before any
+#     arithmetic context. Bash's [[ -ne ]] and [[ -gt ]] perform
+#     arithmetic evaluation which executes command substitutions.
+#
+#   - String fields have # stripped (tmux format injection) and control
+#     characters removed (terminal escape injection via jq's \uXXXX
+#     decoding). Attacker-controlled strings are concatenated directly
+#     into the output, never passed through terminal-write's keyword
+#     matcher (which would interpret values like "reset" or "bold" as
+#     formatting directives rather than literal text).
 #
 
 set -euo pipefail
@@ -24,7 +32,13 @@ source ~/.local/lib/bash/import
 import terminal
 
 pane="${1}"
-integer='^[0-9]+$'
+integer='^[0-9]{1,18}$'
+
+sanitize() {
+  local value="$1"
+  value="${value//#/}"
+  printf '%s' "${value}" | LC_ALL=C tr -dc '[:print:]'
+}
 
 while IFS= read -r -n 16384 line; do
   parsed="$(printf '%s' "${line}" | jq -r '[.version, .exit, .directory, .host, .git.branch // "", .git.commit // "", .git.operation // "", (.git.conflicted | tostring), (.git.staged | tostring), (.git.unstaged | tostring), (.git.untracked | tostring), (.git.stashed // 0 | tostring), (.git.ahead // 0 | tostring), (.git.behind // 0 | tostring), (.git // null | type)] | @tsv')" || continue
@@ -32,44 +46,54 @@ while IFS= read -r -n 16384 line; do
   IFS=$'\t' read -r version exit_code directory host branch commit operation conflicted staged unstaged untracked stashed ahead behind git_type <<< "${parsed}"
 
   # Validate version and all numeric fields before any arithmetic context.
-  # Bash's [[ -ne ]] and [[ -gt ]] evaluate arithmetic expressions which
-  # would execute command substitutions embedded by a malicious guest.
   [[ "${version}" =~ $integer && "${version}" == "1" ]] || continue
   [[ "${exit_code}" =~ $integer ]] || continue
   [[ "${stashed}" =~ $integer ]] || continue
   [[ "${ahead}" =~ $integer ]] || continue
   [[ "${behind}" =~ $integer ]] || continue
 
-  # Strip # from guest-supplied strings to prevent tmux format injection.
-  # #{@shell_status} without the E: prefix does not re-evaluate embedded
-  # format sequences, but this eliminates the vector entirely regardless
-  # of future tmux behavior changes.
-  directory="${directory//#/}"
-  host="${host//#/}"
-  branch="${branch//#/}"
-  commit="${commit//#/}"
-  operation="${operation//#/}"
+  # Sanitize guest-supplied strings: strip # (tmux format injection)
+  # and control characters (terminal escape injection via \uXXXX).
+  directory="$(sanitize "${directory}")"
+  host="$(sanitize "${host}")"
+  branch="$(sanitize "${branch}")"
+  commit="$(sanitize "${commit}")"
+  operation="$(sanitize "${operation}")"
+
+  # Build the tmux format string. Attacker-controlled values are
+  # concatenated directly, never passed through terminal-write's
+  # case-based keyword matcher which would interpret strings like
+  # "reset", "bold", or "escape=bash" as formatting directives.
 
   local_status=''
 
   # Exit code
   printf -v padded_exit '%3d' "${exit_code}"
   if [[ "${exit_code}" -ne 0 ]]; then
-    local_status+="$(terminal-write escape=tmux foreground=red "${padded_exit}" reset ' ')"
+    local_status+="$(terminal-write escape=tmux foreground=red)"
+    local_status+="${padded_exit}"
+    local_status+="$(terminal-write escape=tmux reset ' ')"
   else
-    local_status+="$(terminal-write escape=tmux dim "${padded_exit}" reset ' ')"
+    local_status+="$(terminal-write escape=tmux dim)"
+    local_status+="${padded_exit}"
+    local_status+="$(terminal-write escape=tmux reset ' ')"
   fi
 
   # Working directory with hostname
-  local_status+="$(terminal-write escape=tmux '[ ' foreground=yellow "${host}" reset ' ' foreground=green "${directory}" reset ' ]')"
+  local_status+="$(terminal-write escape=tmux '[ ' foreground=yellow)"
+  local_status+="${host}"
+  local_status+="$(terminal-write escape=tmux reset ' ' foreground=green)"
+  local_status+="${directory}"
+  local_status+="$(terminal-write escape=tmux reset ' ]')"
 
   # Git
   if [[ "${git_type}" == "object" ]]; then
-    local_status+="$(terminal-write escape=tmux ' ')"
-    local_status+="$(terminal-format ± escape=tmux foreground=yellow)"
+    local_status+=" $(terminal-format ± escape=tmux foreground=yellow)"
 
     if [[ -n "${operation}" ]]; then
-      local_status+="$(terminal-format "${operation}" escape=tmux foreground=magenta)"
+      local_status+=" $(terminal-write escape=tmux foreground=magenta)"
+      local_status+="${operation}"
+      local_status+="$(terminal-write escape=tmux reset)"
     fi
 
     indicators=''
@@ -77,27 +101,33 @@ while IFS= read -r -n 16384 line; do
     [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write escape=tmux foreground=green '•' reset)"
     [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write escape=tmux foreground=magenta '*' reset)"
     [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write escape=tmux foreground=blue '?' reset)"
-    [[ "${stashed}" -ne 0 ]]       && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
+    [[ "${stashed}" -ne 0 ]]        && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
 
     if [[ -n "${indicators}" ]]; then
-      local_status+="$(terminal-write escape=tmux ' ')${indicators}"
+      local_status+=" ${indicators}"
     fi
 
     if [[ -n "${commit}" ]]; then
-      local_status+="$(terminal-format "${commit}" escape=tmux dim foreground=cyan)"
+      local_status+=" $(terminal-write escape=tmux dim foreground=cyan)"
+      local_status+="${commit}"
+      local_status+="$(terminal-write escape=tmux reset)"
     fi
 
     if [[ -n "${branch}" ]]; then
-      local_status+="$(terminal-format "${branch}" escape=tmux bright)"
+      local_status+=" $(terminal-write escape=tmux bright)"
+      local_status+="${branch}"
+      local_status+="$(terminal-write escape=tmux reset)"
     fi
 
     if [[ "${ahead}" -gt 0 ]]; then
-      local_status+="$(terminal-format + escape=tmux foreground=green)"
-      local_status+="$(terminal-write escape=tmux "${ahead}")"
+      local_status+=" $(terminal-write escape=tmux foreground=green)"
+      local_status+="+${ahead}"
+      local_status+="$(terminal-write escape=tmux reset)"
     fi
     if [[ "${behind}" -gt 0 ]]; then
-      local_status+="$(terminal-format - escape=tmux foreground=red)"
-      local_status+="$(terminal-write escape=tmux "${behind}")"
+      local_status+=" $(terminal-write escape=tmux foreground=red)"
+      local_status+="-${behind}"
+      local_status+="$(terminal-write escape=tmux reset)"
     fi
   fi
 
