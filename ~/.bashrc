@@ -51,7 +51,7 @@ import terminal
 # Prompt
 
 prompt-write() {
-  if [[ -n "${TMUX}" ]]; then
+  if [[ -n "${TMUX:-}" ]]; then
     terminal-write escape=tmux "$@"
   else
     terminal-write escape=bash "$@"
@@ -83,7 +83,7 @@ prompt-working-directory() {
   else
     directory='\w'
   fi
-  if [[ -n "${SSH_CONNECTION}" ]]; then
+  if [[ -n "${SSH_CONNECTION:-}" ]]; then
     prompt-write '[ ' foreground=yellow "${HOSTNAME%%.*}" reset ' ' foreground=green "${directory}" reset ' ]'
   else
     prompt-write '[ ' foreground=green "${directory}" reset ' ]'

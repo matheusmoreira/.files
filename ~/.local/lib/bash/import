@@ -15,13 +15,13 @@
 #   import()                      source libraries by name, idempotent
 #
 
-set -euo pipefail
-
 dotfiles_library_directory="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 declare -gA dotfiles_loaded_libraries=([import]=1)
 
 import() {
+  local -
+  set -euo pipefail
   local f
   for f in "$@"; do
     [[ -v dotfiles_loaded_libraries[${f}] ]] && continue

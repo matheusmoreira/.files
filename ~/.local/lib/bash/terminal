@@ -17,8 +17,6 @@
 #   tty-fmt     -> terminal-format
 #
 
-set -euo pipefail
-
 # Must use declare -gA because this library is sourced from inside
 # the import() function. A plain declare -A would create a variable
 # local to import() that disappears when import() returns.
@@ -26,6 +24,9 @@ set -euo pipefail
 declare -gA terminal=()
 
 terminal-init() {
+  local -
+  set -euo pipefail
+
   local -a keys=(
     ansi.foreground.black ansi.foreground.red
     ansi.foreground.green ansi.foreground.yellow
@@ -97,6 +98,9 @@ for key in "${!terminal[@]}"; do
 done
 
 terminal-write() {
+  local -
+  set -euo pipefail
+
   local output=''
   local selector=''
 
@@ -148,6 +152,9 @@ terminal-write() {
 }
 
 terminal-format() {
+  local -
+  set -euo pipefail
+
   if [[ -n "$1" ]]; then
     local input
     input="$1"
