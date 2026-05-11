@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#
+# import — bootstrap module for the dotfiles library system.
+#
+# Source this file from any script or .bashrc to get the library
+# infrastructure. Then import libraries by name:
+#
+#     source ~/.local/lib/bash/import
+#     import terminal
+#
+# Provides:
+#
+#   dotfiles_library_directory    resolved path to this directory
+#   dotfiles_loaded_libraries     associative array tracking loaded libraries
+#   import()                      source libraries by name, idempotent
+#
+
+set -euo pipefail
+
+dotfiles_library_directory="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
+declare -gA dotfiles_loaded_libraries=([import]=1)
+
+import() {
+  local f
+  for f in "$@"; do
+    [[ -v dotfiles_loaded_libraries[${f}] ]] && continue
+    dotfiles_loaded_libraries[${f}]=1
+    # shellcheck disable=SC1090
+    source -p "${dotfiles_library_directory}" "${f}"
+  done
+}
