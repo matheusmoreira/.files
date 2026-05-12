@@ -349,8 +349,7 @@ prompt-command() {
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
     _virtdev_status_write "$(prompt-status-json "${status}")"
-    PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
-    PS1+='\$ '
+    PS1='\$ '
   else
     PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
     PS1+='\$ '
