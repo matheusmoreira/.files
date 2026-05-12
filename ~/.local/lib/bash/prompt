@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 #
-# prompt — shared prompt rendering for tmux status bar.
+# prompt — shared prompt rendering for tmux and terminal.
 #
 # Public:
-#   prompt-render <exit> <directory> <host> [<branch> <commit>
-#                 <operation> <upstream> <conflicted> <staged>
-#                 <unstaged> <untracked> <stashed> <ahead> <behind>]
+#   prompt-render <mode> <exit> <directory> <host>
+#                 [<branch> <commit> <operation> <upstream>
+#                  <conflicted> <staged> <unstaged> <untracked>
+#                  <stashed> <ahead> <behind>]
 #
-# Outputs a tmux #[fg=...] format string. Called by both the local
-# tmux prompt-command path and the remote virtdev-tmux-status listener.
+# Mode controls both escape sequences and layout:
+#   tmux      #[fg=...] codes, single line: exit dir git
+#   bash      \[...\] PS1 escapes, two lines: dir git \n exit
+#   readline  \x01...\x02 escapes, two lines: dir git \n exit
 #
-# 4 required arguments. 11 optional git arguments — their presence
-# indicates the shell is inside a git repository.
+# 5 required arguments (mode + 3 fields). 11 optional git arguments —
+# their presence indicates the shell is inside a git repository.
+# Pass empty host to hide the hostname from the output.
 #
 
 import terminal
@@ -20,94 +24,102 @@ prompt-render() {
   local -
   set -euo pipefail
 
-  local exit_code="${1}"
-  local directory="${2}"
-  local host="${3}"
+  local mode="${1}"
+  local exit_code="${2}"
+  local directory="${3}"
+  local host="${4}"
+  shift 4
 
-  local result=''
+  local e="escape=${mode}"
+
+  local exit_part=''
+  local dir_part=''
+  local git_part=''
 
   # Exit code
   local padded_exit
   printf -v padded_exit '%3d' "${exit_code}"
   if [[ "${exit_code}" -ne 0 ]]; then
-    result+="$(terminal-write escape=tmux foreground=red)"
-    result+="${padded_exit}"
-    result+="$(terminal-write escape=tmux reset ' ')"
+    exit_part+="$(terminal-write "${e}" foreground=red)"
+    exit_part+="${padded_exit}"
+    exit_part+="$(terminal-write "${e}" reset ' ')"
   else
-    result+="$(terminal-write escape=tmux dim)"
-    result+="${padded_exit}"
-    result+="$(terminal-write escape=tmux reset ' ')"
+    exit_part+="$(terminal-write "${e}" dim)"
+    exit_part+="${padded_exit}"
+    exit_part+="$(terminal-write "${e}" reset ' ')"
   fi
 
-  # Working directory with hostname
-  result+="$(terminal-write escape=tmux '[ ' foreground=yellow)"
-  result+="${host}"
-  result+="$(terminal-write escape=tmux reset ' ' foreground=green)"
-  result+="${directory}"
-  result+="$(terminal-write escape=tmux reset ' ]')"
+  # Working directory with optional hostname
+  dir_part+="$(terminal-write "${e}" '[ ')"
+  if [[ -n "${host}" ]]; then
+    dir_part+="$(terminal-write "${e}" foreground=yellow)"
+    dir_part+="${host}"
+    dir_part+="$(terminal-write "${e}" reset ' ')"
+  fi
+  dir_part+="$(terminal-write "${e}" foreground=green)"
+  dir_part+="${directory}"
+  dir_part+="$(terminal-write "${e}" reset ' ]')"
 
-  # Git (present when more than 4 arguments)
-  if [[ $# -gt 4 ]]; then
-    local branch="${4:-}"
-    local commit="${5:-}"
-    local operation="${6:-}"
-    local upstream="${7:-}"
-    local conflicted="${8:-}"
-    local staged="${9:-}"
-    local unstaged="${10:-}"
-    local untracked="${11:-}"
-    local stashed="${12:-0}"
-    local ahead="${13:-0}"
-    local behind="${14:-0}"
+  # Git (present when there are remaining arguments)
+  if [[ $# -gt 0 ]]; then
+    local branch="${1:-}"
+    local commit="${2:-}"
+    local operation="${3:-}"
+    local upstream="${4:-}"
+    local conflicted="${5:-}"
+    local staged="${6:-}"
+    local unstaged="${7:-}"
+    local untracked="${8:-}"
+    local stashed="${9:-0}"
+    local ahead="${10:-0}"
+    local behind="${11:-0}"
 
-    result+=" $(terminal-format ± escape=tmux foreground=yellow)"
+    git_part+="$(terminal-format ± "${e}" foreground=yellow)"
 
     if [[ -n "${operation}" ]]; then
-      result+=" $(terminal-write escape=tmux foreground=magenta)"
-      result+="${operation}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format "${operation}" "${e}" foreground=magenta)"
     fi
 
     local indicators=''
-    [[ "${conflicted}" == "true" ]] && indicators+="$(terminal-write escape=tmux foreground=red '!' reset)"
-    [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write escape=tmux foreground=green '•' reset)"
-    [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write escape=tmux foreground=magenta '*' reset)"
-    [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write escape=tmux foreground=blue '?' reset)"
-    [[ "${stashed}" -ne 0 ]] 2>/dev/null && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
+    [[ "${conflicted}" == "true" ]] && indicators+="$(terminal-write "${e}" foreground=red '!' reset)"
+    [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write "${e}" foreground=green '•' reset)"
+    [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write "${e}" foreground=magenta '*' reset)"
+    [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write "${e}" foreground=blue '?' reset)"
+    [[ "${stashed}" -ne 0 ]] 2>/dev/null && indicators+="$(terminal-write "${e}" foreground=cyan '⊙' reset)"
 
     if [[ -n "${indicators}" ]]; then
-      result+=" ${indicators}"
+      git_part+=" ${indicators}"
     fi
 
     if [[ -n "${commit}" ]]; then
-      result+=" $(terminal-write escape=tmux dim foreground=cyan)"
-      result+="${commit}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format "${commit}" "${e}" dim foreground=cyan)"
     fi
 
     if [[ -n "${branch}" ]]; then
-      result+=" $(terminal-write escape=tmux bright)"
-      result+="${branch}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format "${branch}" "${e}" bright)"
     fi
 
     if [[ -n "${upstream}" ]]; then
-      result+=" $(terminal-write escape=tmux dim)"
-      result+="${upstream}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format "${upstream}" "${e}" dim)"
     fi
 
     if [[ "${ahead}" -gt 0 ]] 2>/dev/null; then
-      result+=" $(terminal-write escape=tmux foreground=green)"
-      result+="+${ahead}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format + "${e}" foreground=green)"
+      git_part+="${ahead}"
     fi
     if [[ "${behind}" -gt 0 ]] 2>/dev/null; then
-      result+=" $(terminal-write escape=tmux foreground=red)"
-      result+="-${behind}"
-      result+="$(terminal-write escape=tmux reset)"
+      git_part+="$(terminal-format - "${e}" foreground=red)"
+      git_part+="${behind}"
     fi
   fi
 
-  printf '%s' "${result}"
+  # Layout depends on mode
+  case "${mode}" in
+    tmux)
+      printf '%s%s%s' "${exit_part}" "${dir_part}" "${git_part}"
+      ;;
+    bash | readline)
+      printf '%s%s\n%s' "${dir_part}" "${git_part}" "${exit_part}"
+      ;;
+  esac
 }

@@ -50,175 +50,7 @@ import terminal prompt
 
 # Prompt
 
-prompt-write() {
-  if [[ -n "${TMUX:-}" ]]; then
-    terminal-write escape=tmux "$@"
-  else
-    terminal-write escape=bash "$@"
-  fi
-}
-
-prompt-format() {
-  if [[ -n "$1" ]]; then
-    local input="$1"
-    shift
-    if [[ -n "${TMUX}" ]]; then
-      terminal-write escape=tmux ' '
-      terminal-format "${input}" escape=tmux "$@"
-    else
-      terminal-write escape=bash ' '
-      terminal-format "${input}" escape=bash "$@"
-    fi
-  fi
-}
-
-prompt-working-directory() {
-  local directory
-  if [[ -n "${TMUX}" ]]; then
-    case "${PWD}" in
-      "${HOME}"/*)  directory="~${PWD:${#HOME}}" ;;
-      "${HOME}")    directory='~' ;;
-      *)            directory="${PWD}" ;;
-    esac
-  else
-    directory='\w'
-  fi
-  if [[ -n "${SSH_CONNECTION:-}" ]]; then
-    prompt-write '[ ' foreground=yellow "${HOSTNAME%%.*}" reset ' ' foreground=green "${directory}" reset ' ]'
-  else
-    prompt-write '[ ' foreground=green "${directory}" reset ' ]'
-  fi
-}
-
-prompt-error-code() {
-  local code="$1"
-  local format
-
-  if [[ "${code}" -ne 0 ]]; then
-    format='foreground=red'
-  else
-    format='dim'
-  fi
-
-  printf -v code '%3d' "${code}"
-  prompt-write "${format}" "${code}" reset ' '
-}
-
-prompt-git() {
-  local git_directory
-  if git_directory="$(git rev-parse --git-dir 2>/dev/null)" && [[ -n "${git_directory}" ]]
-  then
-    prompt-format ± foreground=yellow
-  else
-    return 1
-  fi
-
-  local operation=''
-  if [[ -d "${git_directory}/rebase-merge" || -d "${git_directory}/rebase-apply" ]]; then
-    operation='rebase'
-  elif [[ -f "${git_directory}/MERGE_HEAD" ]]; then
-    operation='merge'
-  elif [[ -f "${git_directory}/CHERRY_PICK_HEAD" ]]; then
-    operation='pick'
-  elif [[ -f "${git_directory}/REVERT_HEAD" ]]; then
-    operation='revert'
-  elif [[ -f "${git_directory}/BISECT_LOG" ]]; then
-    operation='bisect'
-  fi
-
-  if [[ -n "${operation}" ]]; then
-    prompt-format "${operation}" foreground=magenta
-  fi
-
-  local status commit branch upstream ab stashed staged unstaged untracked conflicted
-  if status="$(git status --porcelain=v2 --branch --show-stash)"; then
-    local line
-    while read -r line; do
-      case "${line}" in
-        '# branch.oid '*)
-          commit="${line#'# branch.oid '}" ; ;;
-        '# branch.head '*)
-          branch="${line#'# branch.head '}" ; ;;
-        '# branch.upstream '*)
-          upstream="${line#'# branch.upstream '}" ; ;;
-        '# branch.ab '*)
-          ab="${line#'# branch.ab '}" ; ;;
-        '# stash '*)
-          stashed="${line#'# stash '}" ; ;;
-        '1 '* | '2 '*)
-          if [[ "${line:2:1}" != '.' ]]; then
-            staged='•'
-          fi
-          if [[ "${line:3:1}" != '.' ]]; then
-            unstaged='*'
-          fi
-          ;;
-        'u '*)
-          conflicted='!' ; ;;
-        '? '*)
-          untracked='?' ; ;;
-        *)
-          :
-      esac
-    done <<< "${status}"
-  fi
-
-  if [[ -n "${conflicted}" || -n "${staged}" || -n "${unstaged}" || -n "${untracked}" || -n "${stashed}" ]]
-  then
-    prompt-write ' '
-    if [[ -n "${conflicted}" ]]; then
-      prompt-write foreground=red "${conflicted}" reset
-    fi
-    if [[ -n "${staged}" ]]; then
-      prompt-write foreground=green "${staged}" reset
-    fi
-    if [[ -n "${unstaged}" ]]; then
-      prompt-write foreground=magenta "${unstaged}" reset
-    fi
-    if [[ -n "${untracked}" ]]; then
-      prompt-write foreground=blue "${untracked}" reset
-    fi
-    if [[ -n "${stashed}" ]]; then
-      prompt-write foreground=cyan "${stashed}" reset
-    fi
-  fi
-
-  if [[ "${commit}" != "(initial)"  ]]; then
-    if commit="$(git rev-parse --short "${commit}" 2>/dev/null)"; then
-      prompt-format "${commit}" dim foreground=cyan
-    fi
-  else
-    prompt-format ∅ dim
-    return
-  fi
-
-  if [[ "${branch}" != "(detached)" ]]; then
-    prompt-format "${branch}" bright
-  else
-    return
-  fi
-
-  if [[ -n "${upstream}" ]]; then
-    prompt-format "${upstream}" dim
-  else
-    return
-  fi
-
-  local ahead behind
-  read -r ahead behind <<< "${ab}"
-  ahead="${ahead#+}"
-  behind="${behind#-}"
-  if [[ "${ahead}" -gt 0 ]]; then
-    prompt-format + foreground=green
-    prompt-write "${ahead}"
-  fi
-  if [[ "${behind}" -gt 0 ]]; then
-    prompt-format - foreground=red
-    prompt-write "${behind}"
-  fi
-}
-
-# Git status data collection for both local and remote prompt paths.
+# Git status data collection for prompt-build-args.
 # Populates _git_* variables; returns 1 if not in a git repository.
 prompt-git-data() {
   local git_directory
@@ -295,7 +127,12 @@ prompt-build-args() {
     *)            directory="${PWD}" ;;
   esac
 
-  _build_args_ref=("${exit_code}" "${directory}" "${HOSTNAME%%.*}")
+  local host="${HOSTNAME%%.*}"
+  if [[ -z "${TMUX:-}" && -z "${VIRTDEV_STATUS_SOCKET:-}" && -z "${SSH_CONNECTION:-}" ]]; then
+    host=''
+  fi
+
+  _build_args_ref=("${exit_code}" "${directory}" "${host}")
 
   if prompt-git-data; then
     _build_args_ref+=("${_git_branch}" "${_git_commit}" "${_git_operation}"
@@ -341,18 +178,17 @@ _virtdev_status_write() {
 prompt-command() {
   local status="$?"
 
+  local -a prompt_args=()
+  prompt-build-args prompt_args "${status}"
+
   if [[ -n "${TMUX}" ]]; then
-    local -a prompt_args=()
-    prompt-build-args prompt_args "${status}"
-    tmux set-option -pq @shell_status "$(prompt-render "${prompt_args[@]}")" 2>/dev/null || true
+    tmux set-option -pq @shell_status "$(prompt-render tmux "${prompt_args[@]}")" 2>/dev/null || true
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
-    local -a prompt_args=()
-    prompt-build-args prompt_args "${status}"
     _virtdev_status_write "$(prompt-status-record prompt_args)"
     PS1='\$ '
   else
-    PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
+    PS1="$(prompt-render bash "${prompt_args[@]}")"
     PS1+='\$ '
   fi
 
