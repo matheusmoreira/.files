@@ -77,7 +77,9 @@ prompt-render() {
     git_part+="$(terminal-format ± "${e}" foreground=yellow)"
 
     if [[ -n "${operation}" ]]; then
-      git_part+="$(terminal-format "${operation}" "${e}" foreground=magenta)"
+      git_part+=" $(terminal-write "${e}" foreground=magenta)"
+      git_part+="${operation}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
 
     local indicators=''
@@ -92,15 +94,21 @@ prompt-render() {
     fi
 
     if [[ -n "${commit}" ]]; then
-      git_part+="$(terminal-format "${commit}" "${e}" dim foreground=cyan)"
+      git_part+=" $(terminal-write "${e}" dim foreground=cyan)"
+      git_part+="${commit}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
 
     if [[ -n "${branch}" ]]; then
-      git_part+="$(terminal-format "${branch}" "${e}" bright)"
+      git_part+=" $(terminal-write "${e}" bright)"
+      git_part+="${branch}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
 
     if [[ -n "${upstream}" ]]; then
-      git_part+="$(terminal-format "${upstream}" "${e}" dim)"
+      git_part+=" $(terminal-write "${e}" dim)"
+      git_part+="${upstream}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
 
     if [[ "${ahead}" -gt 0 ]] 2>/dev/null; then

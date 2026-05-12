@@ -10,8 +10,8 @@
 # Invoked by socat via the virtdev-tmux-status@.service template unit.
 # The pane ID (numeric, % prefix already stripped) is passed as $1.
 #
-# SECURITY: the guest is untrusted. The entire parsing path uses bash
-# builtins only — no external programs process untrusted data.
+# SECURITY: the guest is untrusted. Parsing uses bash builtins (read).
+# Sanitization uses tr and sed to strip control characters.
 #
 #   - Numeric fields are regex-checked against ^[0-9]{1,18}$ before
 #     any arithmetic context (bash arithmetic eval RCE prevention).
@@ -65,5 +65,5 @@ while IFS= read -r -n 16384 line; do
                  "${stashed}" "${ahead}" "${behind}")
   fi
 
-  tmux set-option -t "%${pane}" -pq @shell_status "$(prompt-render "${local_args[@]}")" 2>/dev/null || true
+  tmux set-option -t "%${pane}" -pq @shell_status "$(prompt-render tmux "${local_args[@]}")" 2>/dev/null || true
 done
