@@ -50,7 +50,7 @@ terminal-init() {
     bold dim sitm smul rev smso invis blink sgr0
   )
   local raw
-  raw=$(printf '%s\nbel\n' "${capabilities[@]}" | tput -S 2>/dev/null)
+  raw=$(printf '%s\nbel\n' "${capabilities[@]}" | tput -S 2>/dev/null) || true
   local -a values=()
   local value
   while IFS= read -rd $'\a' value; do
