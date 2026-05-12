@@ -345,13 +345,7 @@ prompt-command() {
   local status="$?"
 
   if [[ -n "${TMUX}" ]]; then
-    local shell_status
-    shell_status="$(prompt-error-code "${status}"; prompt-working-directory; prompt-git)"
-    if [[ "${shell_status}" != "${_shell_status_prev:-}" ]]; then
-      if tmux set-option -pq @shell_status "${shell_status}"; then
-        _shell_status_prev="${shell_status}"
-      fi
-    fi
+    tmux set-option -pq @shell_status "$(prompt-error-code "${status}"; prompt-working-directory; prompt-git)" 2>/dev/null || true
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
     _virtdev_status_write "$(prompt-status-json "${status}")"
