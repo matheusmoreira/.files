@@ -40,6 +40,41 @@ systemctl --user status swayidle
 journalctl --user -u swayidle -f
 ```
 
+## virtdev tmux status forwarding
+
+Forwards shell status (directory, git info, exit codes) from virtdev
+guest VMs to the host's tmux status bar via a reverse-forwarded Unix
+socket.
+
+```sh
+make bash     # symlinks .bashrc + libraries (import, terminal, prompt)
+make virtdev  # symlinks triggers, listener, systemd unit, tmpfiles, manifests
+systemctl --user daemon-reload
+```
+
+### Guest provisioning
+
+Guests need `/tmp/virtdev/socket/` to exist before SSH connects
+(the `RemoteForward` socket binding happens at connection time,
+before the shell starts). Add to each project's provision script:
+
+```sh
+# /etc/tmpfiles.d/virtdev-tmux-status.conf — survives reboots
+sudo tee /etc/tmpfiles.d/virtdev-tmux-status.conf <<< 'd /tmp/virtdev/socket 0700 dev dev -'
+sudo systemd-tmpfiles --create
+
+# also install socat if not already present
+sudo pacman -S --noconfirm --needed socat
+```
+
+### Known limitation: systemd ignores symlinked tmpfiles.d
+
+`systemd-tmpfiles --user` does not discover configs that are symlinks
+in `~/.config/tmpfiles.d/`. The `make virtdev` target still deploys
+the symlink (it works when the path is given explicitly), but the
+host does not rely on it — the pre-ssh trigger creates the host
+socket directory via `mkdir -p` directly.
+
 ## Git workflow scripts
 
 In `~/.local/bin/`:
