@@ -282,8 +282,13 @@ prompt-git-data() {
 }
 
 # Generate JSON for the remote status channel.
-prompt-status-json() {
+# Generate a Unit Separator (0x1F) delimited status record.
+# Fixed field order, one line per prompt update. No JSON, no escaping
+# needed — fields cannot contain 0x1F or newline in practice, and the
+# host listener strips control characters as defense in depth.
+prompt-status-record() {
   local exit_code="$1"
+  local sep=$'\x1f'
 
   local directory
   case "${PWD}" in
@@ -292,28 +297,16 @@ prompt-status-json() {
     *)            directory="${PWD}" ;;
   esac
 
-  local escaped_directory="${directory//\\/\\\\}"
-  escaped_directory="${escaped_directory//\"/\\\"}"
+  local record="1${sep}${exit_code}${sep}${directory}${sep}${HOSTNAME%%.*}"
 
-  local git_json='null'
   if prompt-git-data; then
-    local escaped_branch="${_git_branch//\\/\\\\}"
-    escaped_branch="${escaped_branch//\"/\\\"}"
-
-    local escaped_upstream="${_git_upstream//\\/\\\\}"
-    escaped_upstream="${escaped_upstream//\"/\\\"}"
-
-    local op_json='null'
-    [[ -n "${_git_operation}" ]] && op_json="\"${_git_operation}\""
-
-    git_json=$(printf '{"branch":"%s","commit":"%s","operation":%s,"upstream":"%s","conflicted":%s,"staged":%s,"unstaged":%s,"untracked":%s,"stashed":%d,"ahead":%d,"behind":%d}' \
-      "${escaped_branch}" "${_git_commit}" "${op_json}" "${escaped_upstream}" \
-      "${_git_conflicted}" "${_git_staged}" "${_git_unstaged}" "${_git_untracked}" \
-      "${_git_stashed}" "${_git_ahead}" "${_git_behind}")
+    record+="${sep}${_git_branch}${sep}${_git_commit}${sep}${_git_operation}"
+    record+="${sep}${_git_upstream}${sep}${_git_conflicted}${sep}${_git_staged}"
+    record+="${sep}${_git_unstaged}${sep}${_git_untracked}${sep}${_git_stashed}"
+    record+="${sep}${_git_ahead}${sep}${_git_behind}"
   fi
 
-  printf '{"version":1,"exit":%d,"directory":"%s","host":"%s","git":%s}\n' \
-    "${exit_code}" "${escaped_directory}" "${HOSTNAME%%.*}" "${git_json}"
+  printf '%s\n' "${record}"
 }
 
 # Persistent status socket connection management.
@@ -348,7 +341,7 @@ prompt-command() {
     tmux set-option -pq @shell_status "$(prompt-error-code "${status}"; prompt-working-directory; prompt-git)" 2>/dev/null || true
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
-    _virtdev_status_write "$(prompt-status-json "${status}")"
+    _virtdev_status_write "$(prompt-status-record "${status}")"
     PS1='\$ '
   else
     PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"

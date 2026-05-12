@@ -3,32 +3,24 @@
 # virtdev-tmux-status <pane-id>
 #
 # Persistent connection handler for the virtdev tmux status channel.
-# Reads line-delimited JSON from stdin (one object per guest prompt
-# update), renders tmux format codes, and sets @shell_status on the
-# target pane.
+# Reads Unit Separator (0x1F) delimited records from stdin (one line
+# per guest prompt update), renders tmux format codes, and sets
+# @shell_status on the target pane.
 #
 # Invoked by socat via the virtdev-tmux-status@.service template unit.
 # The pane ID (numeric, % prefix already stripped) is passed as $1.
 #
-# SECURITY: the guest is untrusted. Every field extracted from the JSON
-# is validated or sanitized before use:
+# SECURITY: the guest is untrusted. The entire parsing path uses bash
+# builtins only — no external programs process untrusted data. This
+# eliminates the C parser attack surface that jq presented.
 #
-#   - Numeric fields are regex-checked against ^[0-9]{1,18}$ before any
-#     arithmetic context. Bash's [[ -ne ]] and [[ -gt ]] perform
-#     arithmetic evaluation which executes command substitutions.
+#   - Numeric fields are regex-checked against ^[0-9]{1,18}$ before
+#     any arithmetic context (bash arithmetic eval RCE prevention).
 #
-#   - String fields have C0/C1 control characters stripped to prevent
-#     terminal escape injection (ESC, BEL, etc.) via jq's \uXXXX
-#     decoding. Valid UTF-8 text is preserved. Attacker-controlled
-#     strings are concatenated directly into the output, never passed
-#     through terminal-write's keyword matcher.
-#
-#   - tmux format codes (#[...] style changes) in guest-supplied strings
-#     are cosmetic only — #{@shell_status} without the E: prefix does
-#     not recursively expand #(command) or #{variable} sequences, so
-#     there is no injection path to code execution or information
-#     leakage. The guest already controls the displayed content, so
-#     controlling colors is not a meaningful escalation.
+#   - String fields have control characters stripped (0x00-0x1F, 0x7F,
+#     and C1 controls 0x80-0x9F). Attacker-controlled strings are
+#     concatenated directly, never passed through terminal-write's
+#     keyword matcher.
 #
 
 set -euo pipefail
@@ -44,27 +36,25 @@ sanitize() {
   local value="$1"
   # Strip C0 control characters (0x00-0x1F), DEL (0x7F), and C1
   # control characters (0x80-0x9F, encoded as 0xC2 0x80-0x9F in UTF-8).
-  # Preserves valid UTF-8 text, #, and all printable characters.
+  # Preserves valid UTF-8 text and all printable characters.
   printf '%s' "${value}" | tr -d '\000-\037\177' | LC_ALL=C sed 's/\xc2[\x80-\x9f]//g'
 }
 
 while IFS= read -r -n 16384 line; do
-  parsed="$(printf '%s' "${line}" | jq -rj '[.version, .exit, .directory, .host, .git.branch // "", .git.commit // "", .git.operation // "", .git.upstream // "", (.git.conflicted | tostring), (.git.staged | tostring), (.git.unstaged | tostring), (.git.untracked | tostring), (.git.stashed // 0 | tostring), (.git.ahead // 0 | tostring), (.git.behind // 0 | tostring), (.git // null | type)] | join("")')" || continue
+  # Parse Unit Separator delimited fields. Fixed order:
+  # version, exit, directory, host [, branch, commit, operation,
+  # upstream, conflicted, staged, unstaged, untracked, stashed,
+  # ahead, behind]
+  # Git fields are absent when not in a repository (4 fields only).
+  IFS=$'\x1f' read -r version exit_code directory host branch commit operation upstream conflicted staged unstaged untracked stashed ahead behind <<< "${line}"
 
-  IFS=$'\x1f' read -r version exit_code directory host branch commit operation upstream conflicted staged unstaged untracked stashed ahead behind git_type <<< "${parsed}"
-
+  # Validate protocol version and numeric fields.
   [[ "${version}" =~ $integer && "${version}" == "1" ]] || continue
   [[ "${exit_code}" =~ $integer ]] || continue
-  [[ "${stashed}" =~ $integer ]] || continue
-  [[ "${ahead}" =~ $integer ]] || continue
-  [[ "${behind}" =~ $integer ]] || continue
 
+  # Sanitize guest-supplied strings.
   directory="$(sanitize "${directory}")"
   host="$(sanitize "${host}")"
-  branch="$(sanitize "${branch}")"
-  commit="$(sanitize "${commit}")"
-  operation="$(sanitize "${operation}")"
-  upstream="$(sanitize "${upstream}")"
 
   local_status=''
 
@@ -87,8 +77,19 @@ while IFS= read -r -n 16384 line; do
   local_status+="${directory}"
   local_status+="$(terminal-write escape=tmux reset ' ]')"
 
-  # Git
-  if [[ "${git_type}" == "object" ]]; then
+  # Git (present when more than 4 fields)
+  if [[ -n "${branch}${commit}${conflicted}${staged}${unstaged}${untracked}" ]]; then
+    # Validate git numeric fields
+    [[ "${stashed}" =~ $integer ]] || stashed=0
+    [[ "${ahead}" =~ $integer ]] || ahead=0
+    [[ "${behind}" =~ $integer ]] || behind=0
+
+    # Sanitize git strings
+    branch="$(sanitize "${branch}")"
+    commit="$(sanitize "${commit}")"
+    operation="$(sanitize "${operation}")"
+    upstream="$(sanitize "${upstream}")"
+
     local_status+=" $(terminal-format ± escape=tmux foreground=yellow)"
 
     if [[ -n "${operation}" ]]; then
