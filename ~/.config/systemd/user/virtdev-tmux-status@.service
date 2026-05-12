@@ -3,7 +3,7 @@ Description=virtdev tmux status listener for pane %i
 
 [Service]
 Type=simple
-ExecStart=socat UNIX-LISTEN:%t/virtdev/socket/status-%i.sock,fork,max-children=2,unlink-early "EXEC:%h/.local/bin/virtdev-tmux-status %i"
+ExecStart=socat UNIX-LISTEN:%t/virtdev/socket/status-%i.sock,fork,max-children=2,unlink-early,unlink-close "EXEC:%h/.local/bin/virtdev-tmux-status %i"
 
 # Sandbox: the listener processes untrusted data from guest VMs.
 # jq (C parser) is the primary attack surface — a crafted JSON
