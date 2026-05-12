@@ -213,7 +213,7 @@ bin : $(user_binaries)
 
 phony += bash
 bash : ~/.bash_profile ~/.bashrc
-bash : ~/.local/lib/bash/import ~/.local/lib/bash/terminal
+bash : ~/.local/lib/bash/import ~/.local/lib/bash/terminal ~/.local/lib/bash/prompt
 
 phony += git
 git : $(call CONFIG.dotfiles_to_user,git/config)

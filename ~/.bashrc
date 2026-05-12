@@ -46,7 +46,7 @@ alias g=git
 
 # shellcheck disable=SC1090
 source ~/.local/lib/bash/import
-import terminal
+import terminal prompt
 
 # Prompt
 
@@ -281,14 +281,10 @@ prompt-git-data() {
   fi
 }
 
-# Generate JSON for the remote status channel.
-# Generate a Unit Separator (0x1F) delimited status record.
-# Fixed field order, one line per prompt update. No JSON, no escaping
-# needed — fields cannot contain 0x1F or newline in practice, and the
-# host listener strips control characters as defense in depth.
-prompt-status-record() {
+# Build the prompt arguments array for prompt-render.
+# Both the local tmux path and the remote status path use this.
+prompt-build-args() {
   local exit_code="$1"
-  local sep=$'\x1f'
 
   local directory
   case "${PWD}" in
@@ -297,16 +293,21 @@ prompt-status-record() {
     *)            directory="${PWD}" ;;
   esac
 
-  local record="1${sep}${exit_code}${sep}${directory}${sep}${HOSTNAME%%.*}"
+  _prompt_args=("${exit_code}" "${directory}" "${HOSTNAME%%.*}")
 
   if prompt-git-data; then
-    record+="${sep}${_git_branch}${sep}${_git_commit}${sep}${_git_operation}"
-    record+="${sep}${_git_upstream}${sep}${_git_conflicted}${sep}${_git_staged}"
-    record+="${sep}${_git_unstaged}${sep}${_git_untracked}${sep}${_git_stashed}"
-    record+="${sep}${_git_ahead}${sep}${_git_behind}"
+    _prompt_args+=("${_git_branch}" "${_git_commit}" "${_git_operation}"
+                   "${_git_upstream}" "${_git_conflicted}" "${_git_staged}"
+                   "${_git_unstaged}" "${_git_untracked}" "${_git_stashed}"
+                   "${_git_ahead}" "${_git_behind}")
   fi
+}
 
-  printf '%s\n' "${record}"
+# Serialize prompt args as a Unit Separator (0x1F) delimited record.
+prompt-status-record() {
+  local sep=$'\x1f'
+  local IFS="${sep}"
+  printf '1%s%s\n' "${sep}" "${_prompt_args[*]}"
 }
 
 # Persistent status socket connection management.
@@ -338,10 +339,12 @@ prompt-command() {
   local status="$?"
 
   if [[ -n "${TMUX}" ]]; then
-    tmux set-option -pq @shell_status "$(prompt-error-code "${status}"; prompt-working-directory; prompt-git)" 2>/dev/null || true
+    prompt-build-args "${status}"
+    tmux set-option -pq @shell_status "$(prompt-render "${_prompt_args[@]}")" 2>/dev/null || true
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
-    _virtdev_status_write "$(prompt-status-record "${status}")"
+    prompt-build-args "${status}"
+    _virtdev_status_write "$(prompt-status-record)"
     PS1='\$ '
   else
     PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"

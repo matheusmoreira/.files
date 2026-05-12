@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+#
+# prompt — shared prompt rendering for tmux status bar.
+#
+# Public:
+#   prompt-render <exit> <directory> <host> [<branch> <commit>
+#                 <operation> <upstream> <conflicted> <staged>
+#                 <unstaged> <untracked> <stashed> <ahead> <behind>]
+#
+# Outputs a tmux #[fg=...] format string. Called by both the local
+# tmux prompt-command path and the remote virtdev-tmux-status listener.
+#
+# 4 required arguments. 11 optional git arguments — their presence
+# indicates the shell is inside a git repository.
+#
+
+import terminal
+
+prompt-render() {
+  local -
+  set -euo pipefail
+
+  local exit_code="${1}"
+  local directory="${2}"
+  local host="${3}"
+
+  local result=''
+
+  # Exit code
+  local padded_exit
+  printf -v padded_exit '%3d' "${exit_code}"
+  if [[ "${exit_code}" -ne 0 ]]; then
+    result+="$(terminal-write escape=tmux foreground=red)"
+    result+="${padded_exit}"
+    result+="$(terminal-write escape=tmux reset ' ')"
+  else
+    result+="$(terminal-write escape=tmux dim)"
+    result+="${padded_exit}"
+    result+="$(terminal-write escape=tmux reset ' ')"
+  fi
+
+  # Working directory with hostname
+  result+="$(terminal-write escape=tmux '[ ' foreground=yellow)"
+  result+="${host}"
+  result+="$(terminal-write escape=tmux reset ' ' foreground=green)"
+  result+="${directory}"
+  result+="$(terminal-write escape=tmux reset ' ]')"
+
+  # Git (present when more than 4 arguments)
+  if [[ $# -gt 4 ]]; then
+    local branch="${4:-}"
+    local commit="${5:-}"
+    local operation="${6:-}"
+    local upstream="${7:-}"
+    local conflicted="${8:-}"
+    local staged="${9:-}"
+    local unstaged="${10:-}"
+    local untracked="${11:-}"
+    local stashed="${12:-0}"
+    local ahead="${13:-0}"
+    local behind="${14:-0}"
+
+    result+=" $(terminal-format ± escape=tmux foreground=yellow)"
+
+    if [[ -n "${operation}" ]]; then
+      result+=" $(terminal-write escape=tmux foreground=magenta)"
+      result+="${operation}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+
+    local indicators=''
+    [[ "${conflicted}" == "true" ]] && indicators+="$(terminal-write escape=tmux foreground=red '!' reset)"
+    [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write escape=tmux foreground=green '•' reset)"
+    [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write escape=tmux foreground=magenta '*' reset)"
+    [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write escape=tmux foreground=blue '?' reset)"
+    [[ "${stashed}" -ne 0 ]] 2>/dev/null && indicators+="$(terminal-write escape=tmux foreground=cyan '⊙' reset)"
+
+    if [[ -n "${indicators}" ]]; then
+      result+=" ${indicators}"
+    fi
+
+    if [[ -n "${commit}" ]]; then
+      result+=" $(terminal-write escape=tmux dim foreground=cyan)"
+      result+="${commit}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+
+    if [[ -n "${branch}" ]]; then
+      result+=" $(terminal-write escape=tmux bright)"
+      result+="${branch}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+
+    if [[ -n "${upstream}" ]]; then
+      result+=" $(terminal-write escape=tmux dim)"
+      result+="${upstream}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+
+    if [[ "${ahead}" -gt 0 ]] 2>/dev/null; then
+      result+=" $(terminal-write escape=tmux foreground=green)"
+      result+="+${ahead}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+    if [[ "${behind}" -gt 0 ]] 2>/dev/null; then
+      result+=" $(terminal-write escape=tmux foreground=red)"
+      result+="-${behind}"
+      result+="$(terminal-write escape=tmux reset)"
+    fi
+  fi
+
+  printf '%s' "${result}"
+}
