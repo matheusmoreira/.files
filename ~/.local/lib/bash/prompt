@@ -89,7 +89,7 @@ prompt-render() {
     [[ "${staged}" == "true" ]]     && indicators+="$(terminal-write "${e}" foreground=green '•' reset)"
     [[ "${unstaged}" == "true" ]]   && indicators+="$(terminal-write "${e}" foreground=magenta '*' reset)"
     [[ "${untracked}" == "true" ]]  && indicators+="$(terminal-write "${e}" foreground=blue '?' reset)"
-    [[ "${stashed}" -ne 0 ]] 2>/dev/null && indicators+="$(terminal-write "${e}" foreground=cyan '⊙' reset)"
+    [[ "${stashed}" -ne 0 ]] 2>/dev/null && indicators+="$(terminal-write "${e}" foreground=cyan "${stashed}" reset)"
 
     if [[ -n "${indicators}" ]]; then
       git_part+=" ${indicators}"
