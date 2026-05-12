@@ -283,8 +283,10 @@ prompt-git-data() {
 
 # Build the prompt arguments array for prompt-render.
 # Both the local tmux path and the remote status path use this.
+# First argument is the name of the caller's array variable.
 prompt-build-args() {
-  local exit_code="$1"
+  local -n _build_args_ref="${1}"
+  local exit_code="${2}"
 
   local directory
   case "${PWD}" in
@@ -293,21 +295,22 @@ prompt-build-args() {
     *)            directory="${PWD}" ;;
   esac
 
-  _prompt_args=("${exit_code}" "${directory}" "${HOSTNAME%%.*}")
+  _build_args_ref=("${exit_code}" "${directory}" "${HOSTNAME%%.*}")
 
   if prompt-git-data; then
-    _prompt_args+=("${_git_branch}" "${_git_commit}" "${_git_operation}"
-                   "${_git_upstream}" "${_git_conflicted}" "${_git_staged}"
-                   "${_git_unstaged}" "${_git_untracked}" "${_git_stashed}"
-                   "${_git_ahead}" "${_git_behind}")
+    _build_args_ref+=("${_git_branch}" "${_git_commit}" "${_git_operation}"
+                      "${_git_upstream}" "${_git_conflicted}" "${_git_staged}"
+                      "${_git_unstaged}" "${_git_untracked}" "${_git_stashed}"
+                      "${_git_ahead}" "${_git_behind}")
   fi
 }
 
 # Serialize prompt args as a Unit Separator (0x1F) delimited record.
 prompt-status-record() {
+  local -n _record_args_ref="${1}"
   local sep=$'\x1f'
   local IFS="${sep}"
-  printf '1%s%s\n' "${sep}" "${_prompt_args[*]}"
+  printf '1%s%s\n' "${sep}" "${_record_args_ref[*]}"
 }
 
 # Persistent status socket connection management.
@@ -339,12 +342,14 @@ prompt-command() {
   local status="$?"
 
   if [[ -n "${TMUX}" ]]; then
-    prompt-build-args "${status}"
-    tmux set-option -pq @shell_status "$(prompt-render "${_prompt_args[@]}")" 2>/dev/null || true
+    local -a prompt_args=()
+    prompt-build-args prompt_args "${status}"
+    tmux set-option -pq @shell_status "$(prompt-render "${prompt_args[@]}")" 2>/dev/null || true
     PS1='\$ '
   elif [[ -n "${VIRTDEV_STATUS_SOCKET:-}" ]]; then
-    prompt-build-args "${status}"
-    _virtdev_status_write "$(prompt-status-record)"
+    local -a prompt_args=()
+    prompt-build-args prompt_args "${status}"
+    _virtdev_status_write "$(prompt-status-record prompt_args)"
     PS1='\$ '
   else
     PS1="$(prompt-working-directory; prompt-git; printf '%s' '\n'; prompt-error-code "${status}")"
