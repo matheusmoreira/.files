@@ -74,7 +74,9 @@ prompt-render() {
     local ahead="${10:-0}"
     local behind="${11:-0}"
 
-    git_part+="$(terminal-format ± "${e}" foreground=yellow)"
+    git_part+=" $(terminal-write "${e}" foreground=yellow)"
+    git_part+="±"
+    git_part+="$(terminal-write "${e}" reset)"
 
     if [[ -n "${operation}" ]]; then
       git_part+=" $(terminal-write "${e}" foreground=magenta)"
@@ -112,12 +114,14 @@ prompt-render() {
     fi
 
     if [[ "${ahead}" -gt 0 ]] 2>/dev/null; then
-      git_part+="$(terminal-format + "${e}" foreground=green)"
-      git_part+="${ahead}"
+      git_part+=" $(terminal-write "${e}" foreground=green)"
+      git_part+="+${ahead}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
     if [[ "${behind}" -gt 0 ]] 2>/dev/null; then
-      git_part+="$(terminal-format - "${e}" foreground=red)"
-      git_part+="${behind}"
+      git_part+=" $(terminal-write "${e}" foreground=red)"
+      git_part+="-${behind}"
+      git_part+="$(terminal-write "${e}" reset)"
     fi
   fi
 
