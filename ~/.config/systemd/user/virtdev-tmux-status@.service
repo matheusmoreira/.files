@@ -13,5 +13,6 @@ ProtectSystem=strict
 ReadWritePaths=%t/virtdev/socket
 ProtectHome=read-only
 PrivateTmp=yes
+BindPaths=/tmp/tmux-%U
 MemoryMax=128M
 TasksMax=8
