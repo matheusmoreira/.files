@@ -10,6 +10,7 @@ ExecStart=socat UNIX-LISTEN:%t/virtdev/socket/status-%i.sock,fork,max-children=2
 # These directives limit what a compromised handler can do.
 NoNewPrivileges=yes
 ProtectSystem=strict
+ReadWritePaths=%t/virtdev/socket
 ProtectHome=read-only
 PrivateTmp=yes
 MemoryMax=128M
