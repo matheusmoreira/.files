@@ -297,7 +297,7 @@ phony += email msmtp
 email : msmtp
 msmtp : ~/.msmtprc
 
-claude := $(call ~.dotfiles_to_user,.claude/*.json .claude/status-line .claude/themes/*.json)
+claude := $(call ~.dotfiles_to_user,$(addprefix .claude/,status-line CLAUDE.md *.json themes/*.json))
 claude.skill = $(call ~.dotfiles_to_user,$(addprefix .claude/skills/,$(1)))
 claude.skills :=
 claude.skills.scrutinize := $(call claude.skill,scrutinize/SKILL.md scrutinize/critics/programming/*.md scrutinize/critics/writing/*.md scrutinize/critics/electronics/*.md)
