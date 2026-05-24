@@ -282,6 +282,7 @@ ENV_SET = {
     'CLAUDE_STREAM_IDLE_TIMEOUT_MS':    '300000',
     'DISABLE_TELEMETRY':                '1',     # no background phone-home
     'DISABLE_ERROR_REPORTING':          '1',
+    'DISABLE_GROWTHBOOK':               '1',     # block feature flag SDK (remote prompt injection vector)
     'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC': '1', # also blocks metrics pipeline
 }
 
