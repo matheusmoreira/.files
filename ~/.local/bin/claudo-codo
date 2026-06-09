@@ -172,9 +172,9 @@ PATCHES = [
           old="Match the scope of your actions to what was actually requested.",
           new="Match scope to the request; address related issues you find."),
 
-    Patch("#8  thinking suppression — remove anti-thinking bias",
-          old="on simpler user messages, it's best to respond or act directly without thinking unless further reasoning is necessary. On more complex tasks, you should feel free to reason as much as needed for best results but without overthinking. Avoid unnecessary thinking in response to simple user messages.",
-          new="on every user message, you should reason as much as needed for best results. Use thinking to plan, anticipate problems, catch errors, and verify your work before acting. More thinking leads to better outcomes. Always think before acting on non-trivial work or when correctness matters most."),
+    Patch("#8  neuter heron_brook — remote prompt injection vector",
+          old='function Ytf(){let H=S$().clientDataCache?.tengu_heron_brook;if(typeof H==="string"&&H.trim()!=="")return H.trim();let $=M$("tengu_heron_brook","");if($.trim()!=="")return $.trim();return null}',
+          new='function Ytf(){return null                                                                                                                                                                      }'),
 
     Patch("#9  end-of-turn summary — scale to complexity",
           old="End-of-turn summary: one or two sentences. What changed and what's next. Nothing else.\n\nMatch responses to the task: a simple question gets a direct answer, not headers and sections.",
@@ -326,8 +326,20 @@ def report_binary(path: Path, results: list[Result], ok: bool) -> None:
 # Model shorthand
 # ---------------------------------------------------------------------------
 
+NAMED_MODELS = {
+    'fable': 'claude-fable-5',
+    '5':     'claude-fable-5',
+}
+
+
 def expand_model(name: str) -> str:
-    """Expand a bare version like '4-7' or '4.7' to 'claude-opus-4-7[1m]'."""
+    """Expand a model shorthand to a full model ID.
+
+    Named shorthands:  fable, 5  → claude-fable-5
+    Numeric shorthands: 4.6, 4-7 → claude-opus-4-6[1m], etc.
+    """
+    if name in NAMED_MODELS:
+        return NAMED_MODELS[name]
     normalized = name.replace('.', '-')
     if re.fullmatch(r'\d+-\d+', normalized):
         return f'claude-opus-{normalized}[1m]'
