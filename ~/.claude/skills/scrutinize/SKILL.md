@@ -39,7 +39,8 @@ consistency, maintainability, performance, duplication, rigor,
 tests, documentation
 
 **Writing** (in `critics/writing/`):
-accuracy, clarity, completeness, freshness, flow, voice
+accuracy, clarity, code, completeness, freshness, flow,
+narrative, references, voice
 
 **Electronics** (in `critics/electronics/`):
 electrical, cascade, safety, sourcing
