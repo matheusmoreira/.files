@@ -36,7 +36,7 @@ If no arguments provided, list available types and ask.
 **Programming** (in `critics/programming/`):
 quality, correctness, design, integration, security,
 consistency, maintainability, performance, duplication, rigor,
-tests, documentation
+tests, documentation, robustness, auditor
 
 **Writing** (in `critics/writing/`):
 accuracy, clarity, code, completeness, freshness, flow,
@@ -212,6 +212,8 @@ Include these supplementary guidelines per critic type:
 | **Quality** | General sweep. Prioritize by impact. If clean, say so. |
 | **Tests** | Cross-reference tests against source. Flag assertions that encode failure as expected behavior. Verify edge case coverage. Check mock fidelity. |
 | **Documentation** | Coordinator provides doc inventory. Cross-reference docs against code. Verify examples compile/run. Check for stale references to removed/renamed symbols. |
+| **Robustness** | Hostile input and resource exhaustion. Construct and RUN repros. Distinguish honest aborts (policy) from corruption (bug). |
+| **Auditor** | Receives code but NOT design documents. Derives the contract from first principles; coordinator diffs it against the spec. Not part of routine sweeps — deploy once per convention or subsystem design. |
 
 ### 5. Handle interruptions and resume
 
@@ -362,32 +364,111 @@ The history critic reviews commits, not files. The coordinator:
 2. Provides `git log --stat -p` output for the range
 3. Skips file/directory scope — history is always commit-based
 
-### Spawn review agent
+### Round zero — deterministic checks before any agent
 
-1. Resolve critic definition: search `${CLAUDE_SKILL_DIR}/critics/programming/$0.md`,
-   then `critics/writing/$0.md`, then `critics/electronics/$0.md`,
-   then `critics/git/$0.md`
-2. Read project conventions from CLAUDE.md (frame as claims to verify)
-3. Spawn one opus agent with: diff/files + critic persona + conventions
+Scripts first; agents only get what scripts cannot decide.
+
+1. Run the project's own gates: clean build and full test suite.
+   The suite is the project's accumulated checker — invariant
+   tests live there (lone: `suite/leaf-invariant`,
+   `suite/import-usage`). Record baselines (suite count, total
+   compiler warnings) so later delta claims have a denominator.
+2. Run the generic checks in `${CLAUDE_SKILL_DIR}/checks/`
+   (git hygiene: whitespace, subject lengths, fixup leftovers,
+   added TODOs).
+3. Triage anything red before launching critics. Round-zero
+   findings are coordinator work, not critic work.
+4. **Tree freeze:** from first agent launch until the last
+   report lands, do not mutate the reviewed tree — no commits,
+   no checkouts, no edits, no builds in shared build trees.
+   Concurrent mutation manufactures phantom findings.
+
+When a round uncovers a class of finding a script could catch,
+write the check before closing the round: prefer the project's
+own test suite (it outlives the skill and runs in CI); use
+`checks/` only for project-independent git hygiene.
+
+### Spawn review agents
+
+Fleet size follows novelty, not habit:
+
+- **First review of new work:** 6-9 dedicated critics. Default
+  set: correctness, rigor, consistency, tests, documentation,
+  design, quality; add history for unpushed branches, and
+  robustness when input handling or memory management changed.
+- **Re-review after fixes:** only the critics that flagged the
+  fixed findings — typically correctness + tests + consistency.
+- **Mechanical confirmation:** one verifier agent over the delta.
+- **Deliberate usage burn** (user opt-in only): full fleet plus
+  auditor.
+
+One agent per critic — dedicated critics find 2-3x more than one
+agent wearing every hat. Resolve critic definitions from
+`${CLAUDE_SKILL_DIR}/critics/<category>/<name>.md`. Each agent
+prompt includes:
+
+- project context (CLAUDE.md), framed as claims to verify
+- exact scope (commit range, files) and read-only constraints
+- context documents (spec, execution notes, prior findings)
+  framed verify-don't-trust
+- the suppression list: known issues, tracked todos, the
+  standing dismissal ledger, the implementer's recorded judgment
+  calls — re-report only if actually wrong, not merely debatable
+- output protocol: write findings to a file incrementally
+  (sessions die; the file is the deliverable), return a terse
+  summary
+
+Agents never run the full suite or build in shared trees — the
+coordinator ran the suite in round zero; agents run individual
+tests and build only archived copies under /tmp.
+
+**The auditor is special:** it receives the code but NOT the
+design documents — list the withheld paths explicitly in its
+prompt so it does not wander into them. Deploy once per new
+convention or subsystem design, not per branch. The coordinator
+diffs its derived contract against the real spec; divergences
+are spec bugs, code drift, or missing documentation.
 
 ### Review loop
 
-1. Collect findings. Triage real issues vs false positives.
-2. Report false positives honestly.
-3. Real issues exist:
-   a. **Only fix unambiguous issues.** Surface design choices to user.
-   b. Fix with discrete logical commits.
-   c. Re-spawn agent on updated code.
-   d. Repeat until zero issues found.
-4. Zero issues → final report.
+1. Collect findings. Triage: real / false positive / design
+   choice to surface.
+2. **Convergence raises priority, never truth.** Critics sharing
+   a blind spot converge on the same wrong fix. Verify every fix
+   premise personally against the nearest precedent before
+   editing — in-file precedent beats cross-module symmetry.
+3. **Only fix unambiguous issues.** Surface design choices to
+   the user, each with a recommendation.
+4. Fix protocol on unpushed branches: backup branch first
+   (`backup/<branch>-pre-<purpose>`); one fixup commit per
+   finding against its originating commit; autosquash rebase;
+   verify tree identity against the backup (the diff must be
+   exactly the intended changes); clean test at the tip;
+   spot-build rewritten commits from `git archive` copies under
+   /tmp — never check out inside the repo; reword commit
+   messages the fold invalidated (renamed operands, test
+   enumerations) in the same rebase.
+5. Record dismissals with reasons beside the fixes; append
+   settled judgments to the project's dismissal ledger
+   (project-local: beside the project's todo/notes if it has
+   them, else the review worktree) so future rounds inherit
+   them instead of re-litigating.
+6. Close the round with one verifier agent over the final
+   delta: confirm each fix landed, fresh eyes on the changed
+   material.
+7. Repeat. **Two consecutive clean rounds end the loop** —
+   further rounds are usage, not value.
 
 ### Final report
 
-- Round count and findings per round
-- What was fixed (commit subjects)
-- False positives and why dismissed
-- Test results if available
-- Observations worth human consideration
+- Rounds and findings per round (the convergence trajectory)
+- What was fixed (commit subjects) and what folded where
+- Dismissals and why — a false positive explained is worth as
+  much as a defect fixed
+- Design choices surfaced for the user, each with a
+  recommendation
+- Verification evidence: suite counts, warning deltas,
+  architecture coverage, tree-identity result
 - `git log --oneline` of commits made
 
 Do NOT push. Wait for human review.
