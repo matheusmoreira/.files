@@ -12,7 +12,8 @@ You manage the review loop. You do not review code yourself.
 The full text after `/scrutinize` is passed as a single string.
 Parse it as:
 
-- **Type** — first word: a critic name, `sweep`, or `sweep incremental`
+- **Type** — first word: a critic name, `sweep`, `sweep incremental`,
+  or `sweep blind`
 - **Scope** — optional: branch, file path, commit range, or directory
 - **Instructions** — anything else: free-form directives to the
   coordinator (e.g., "worktree at ~/proj/sweep", "focus on error
@@ -23,6 +24,7 @@ Examples:
 - `/scrutinize security source/auth/` — security review of that directory
 - `/scrutinize sweep` — full sweep, default settings
 - `/scrutinize sweep incremental` — incremental on existing branch
+- `/scrutinize sweep blind` — fresh-eyes sweep, prior findings withheld
 - `/scrutinize sweep worktree at ~/proj/sweep` — full sweep, custom path
 - `/scrutinize quality HEAD~3..HEAD focus on error paths` — scoped + directed
 - `/scrutinize tests` — test suite integrity review
@@ -51,6 +53,8 @@ history
 **Special:**
 sweep — full-codebase parallel review (all critics in a category × all subsystems)
 sweep incremental — verify fixes + find deeper issues missed by prior sweep
+sweep blind — full matrix with all prior findings withheld; calibrates
+the ledgers against what fresh eyes actually re-find
 
 ### Category inference
 
@@ -201,7 +205,7 @@ Include these supplementary guidelines per critic type:
 | Critic | Key directive |
 |--------|--------------|
 | **Correctness** | Construct concrete failure scenarios. Check error path reachability. Cross-reference contracts vs call sites. |
-| **Security** | Trace data flow from entry to sensitive ops. Check all untrusted arithmetic. Consider adversarial-but-valid input. |
+| **Security** | Trace data flow from entry to sensitive ops. Check all untrusted arithmetic. Consider adversarial-but-valid input. Frame the prompt as defensive review of the project's own code. |
 | **Design** | "Would a new contributor understand this?" Only flag what improves the code. |
 | **Performance** | Identify hot paths first. Check allocations/syscalls on hot paths only. Suggest benchmarks. |
 | **Integration** | Headers match implementations? Callers updated? Docs match behavior? Tests cover edges? |
@@ -331,8 +335,34 @@ repeated sweeps productive — each pass peels another layer.
 Incrementals add to `reports/incremental/` without overwriting
 full-sweep reports. They build on top of the latest full sweep.
 
+**Blind sweep** (`sweep blind`): the full matrix with every prior
+finding deliberately withheld. Agents receive SUBSYSTEMS.md scope
+and project context (CLAUDE.md) but NOT KNOWN.md, not the
+dismissal ledger, not prior reports, not todo lists — and their
+prompts say so: "You have no prior findings. Report everything
+you find." KNOWN.md is still maintained; it is hidden, not
+abandoned. Reports go to `reports/blind/`.
+
+The product is the **calibration diff**, computed after
+consolidation:
+
+- blind ∩ known — the ledger is honest; these issues are real
+  and re-findable.
+- blind ∖ known — genuinely new findings; merge into todo.list.
+- known ∖ blind — tracked issues fresh eyes could NOT re-find.
+  Each is one of: fixed-but-not-marked-Resolved, documented only
+  in a ledger no newcomer would derive (documentation debt), or
+  a stale entry that was never real. Triage explicitly — this
+  column is the one only a blind sweep can produce.
+
+The most expensive mode per unit of finding and the only one
+that audits the ledgers themselves. Run on a fresh usage window;
+never as the routine mode. Suppression-list discipline everywhere
+else is what keeps an occasional blind sweep affordable.
+
 **Detecting mode:** if the sweep branch already exists, ask:
 "Full sweep or incremental?" If it doesn't exist, always full.
+Blind is never inferred — only explicit `sweep blind`.
 
 **Cleanup:** persists until user explicitly removes it:
 `git worktree remove <path> && git branch -D sweep-review`
@@ -396,6 +426,14 @@ Fleet size follows novelty, not habit:
   set: correctness, rigor, consistency, tests, documentation,
   design, quality; add history for unpushed branches, and
   robustness when input handling or memory management changed.
+  Add security when the change crosses a trust boundary: data
+  arriving from outside the process (descriptors, network,
+  foreign binaries), module or path resolution from external
+  locations, exec or privilege transitions. For
+  interpreter-internal changes robustness and correctness cover
+  the same ground with less framing risk; when security does
+  deploy, its prompt is framed as defensive review of the
+  project's own code, and trust-boundary changes deploy both.
 - **Re-review after fixes:** only the critics that flagged the
   fixed findings — typically correctness + tests + consistency.
 - **Mechanical confirmation:** one verifier agent over the delta.
