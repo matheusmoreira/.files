@@ -139,8 +139,62 @@ class Patch:
 #
 # Patches are plain str.  Em-dashes (—) are encoded per ENCODINGS above.
 #
-# To find new targets in a binary:
-#   strings <binary> | grep -E '<suspect phrase>'
+# ===========================================================================
+# UPGRADE / RE-AUDIT RUNBOOK   (last run: 2.1.170 -> 2.1.220, 2026-07-24)
+# ===========================================================================
+# Claude Code is a Bun single-file ELF with the app bundled as MINIFIED JS in
+# two encodings (ASCII with — for the em-dash + UTF-16LE). Bun RE-MINIFIES
+# every build, so identifiers rotate: prose patches survive verbatim, but any
+# patch matching a minified NAME (currently only #8) must be re-derived each
+# upgrade. Still Bun as of 2.1.220 (Bun 1.4) — not a Rust rewrite, so this
+# same-length byte-replacement approach stays valid.
+#
+# 1. DOWNLOAD + VERIFY (does not touch the running install):
+#      BASE=https://downloads.claude.ai/claude-code-releases
+#      VER=$(curl -fsSL $BASE/latest)                     # or .../stable
+#      curl -fsSL $BASE/$VER/manifest.json                # per-platform sha256
+#      curl -fsSL $BASE/$VER/linux-x64/claude -o claude-$VER
+#      sha256sum claude-$VER   # == manifest .platforms["linux-x64"].checksum
+#
+# 2. DISSECT. Strings dump WITH byte offsets is the primary search surface:
+#      strings -a -t d -n 6 claude-$VER > strings.txt     # ~40MB, greppable
+#    Token -> offset:  grep -n 'PHRASE' strings.txt  (number after lineno = byte offset)
+#    Read minified code around an offset (the bundle is on 40MB+ single lines,
+#    so `grep -oE '.{0,N}'` backtracks/OOMs — use dd instead):
+#      dd if=claude-$VER bs=1 skip=$((OFF-300)) count=800 status=none \
+#        | tr -c '[:print:]' '\n' | grep -av '^$'
+#    (System grep is ugrep; for raw-binary work use LC_ALL=C + grep -F/-aob.)
+#
+# 3. DRY-RUN classify every patch below BEFORE editing: import PATCHES from this
+#    file, call p.classify(data) per patch. APPLICABLE=present, MISSING=renamed/
+#    reworded. Any MISSING -> the on-launch patcher refuses to exec (safety).
+#
+# 4. RE-DERIVE name-based patches (#8 heron_brook getter; Ytf -> nO_ in 2.1.220):
+#      grep -n tengu_heron_brook strings.txt   # find the accessor's code site
+#    It returns a server-injected system-prompt string from clientDataCache/config.
+#    2.1.220 added a 3rd branch returning a HARDCODED anti-proactivity directive
+#    for Opus-5/Fable-5 with NO env kill-switch -> the patch is mandatory. Neuter =
+#    replace the whole body with `return null` padded to the original byte length;
+#    re-confirm occurrence count == 1.
+#
+# 5. RE-CHECK env/settings (see ENV_SET/ENV_CLEAR): telemetry/traffic master gate
+#    is process.env-driven (DISABLE_TELEMETRY / DO_NOT_TRACK / DISABLE_GROWTHBOOK /
+#    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC / DISABLE_ERROR_REPORTING — confirm
+#    each still exists). Injection vectors stay env-killable: GrowthBook SDK
+#    (DISABLE_GROWTHBOOK) + clientDataCache bootstrap fetch (NONESSENTIAL_TRAFFIC);
+#    only heron_brook needs a patch. Watch for new brevity/"simple"/"fast" behavior
+#    vars (-> ENV_CLEAR); confirm effort/thinking/[1m]-suffix vars still resolve.
+#
+# 6. VERIFY end-to-end: apply PATCHES to a COPY, re-classify (all ALREADY =
+#    idempotent), confirm size byte-identical and neutered JS neighbors intact.
+#
+# 7. INSTALL: put the binary at ~/.local/share/claude/versions/<VER>, point the
+#    ~/.local/bin/claude symlink at it (keep the previous version + its .original
+#    for rollback). First `claudo-codo <model>` patches it (backs up .original).
+#
+# The reusable dryrun/verify harnesses from the last pass live in
+# ~/.cache/claudo-codo-audit/ (dryrun.py, verify_new.py, win.sh, AUDIT-REPORT.md).
+# ===========================================================================
 # ---------------------------------------------------------------------------
 
 PATCHES = [
@@ -172,9 +226,17 @@ PATCHES = [
           old="Match the scope of your actions to what was actually requested.",
           new="Match scope to the request; address related issues you find."),
 
-    Patch("#8  neuter heron_brook — remote prompt injection vector",
-          old='function Ytf(){let H=S$().clientDataCache?.tengu_heron_brook;if(typeof H==="string"&&H.trim()!=="")return H.trim();let $=M$("tengu_heron_brook","");if($.trim()!=="")return $.trim();return null}',
-          new='function Ytf(){return null                                                                                                                                                                      }'),
+    # Renamed Ytf→nO_ in 2.1.220 (Bun re-minifies every build) and gained a THIRD
+    # branch: a hardcoded fallback `Kep` (["Do not call the AgentTool unless the user
+    # requested it", "Do not use workflows or deep-research unless the user requested
+    # it"]) injected into the system prompt for Opus-5/Fable-5 (model capability
+    # `opus_5_prompt_bundle`) with NO env kill-switch. Branches 1-2 (server clientData
+    # / config) are already covered by DISABLE_NONESSENTIAL_TRAFFIC + DISABLE_GROWTHBOOK;
+    # branch 3 makes this binary patch REQUIRED, not just defense-in-depth. Neutering
+    # nO_ to return null also makes `Kep` unreachable.
+    Patch("#8  neuter heron_brook — remote + hardcoded prompt injection vector",
+          old='function nO_(e){let t=Jx()?.tengu_heron_brook;if(typeof t==="string"&&t.trim()!==""){let n=t.trim();return O("tengu_heron_brook_applied",{len:n.length,fromClientData:!0}),n}let r=Ke("tengu_heron_brook","");if(r.trim()!==""){let n=r.trim();return O("tengu_heron_brook_applied",{len:n.length,fromClientData:!1}),n}if(ZXn(e))return O("tengu_heron_brook_applied",{len:Kep.length,fromClientData:!1}),Kep;return null}',
+          new='function nO_(e){return null' + ' ' * 383 + '}'),
 
     Patch("#9  end-of-turn summary — scale to complexity",
           old="End-of-turn summary: one or two sentences. What changed and what's next. Nothing else.\n\nMatch responses to the task: a simple question gets a direct answer, not headers and sections.",
@@ -187,6 +249,28 @@ PATCHES = [
     Patch("#11 subagent report — richer reports",
           old="the caller will relay this to the user, so it only needs the essentials.",
           new="the caller will relay this; include essentials and useful caveats."),
+
+    # --- New in 2.1.220 (found by binary audit; not present in 2.1.170) ---
+
+    Patch("#12 text output — drop the one-sentence-per-update cap",
+          old="One sentence per update is almost always enough.",
+          new="Use as many sentences as the update needs."),
+
+    Patch("#13 text output — completeness over tightness",
+          old="But keep it tight — a clear sentence is better than a clear paragraph.",
+          new="Be complete — a clear paragraph beats a cryptic sentence."),
+
+    Patch("#14 doing tasks — drop the 2-3 sentence cap on design questions",
+          old="respond in 2-3 sentences with a recommendation and the main tradeoff.",
+          new="respond with a recommendation and the key tradeoffs at play."),
+
+    Patch("#15 code comments — judgment, not blanket ban (second variant)",
+          old="Default to writing no comments. Only add one when the WHY is non-obvious: a hidden constraint, a subtle invariant, a workaround for a specific bug, behavior that would surprise a reader. If removing the comment wouldn't confuse a future reader, don't write it.",
+          new="Prefer self-documenting code; add a comment when the WHY is non-obvious: a hidden constraint, a subtle invariant, a workaround for a specific bug, behavior that would surprise a reader. If a comment gives a future reader context they lack, write it."),
+
+    Patch("#16 explore agent desc — no 'only the conclusion' nudge",
+          old="you only need the conclusion, not the file dumps",
+          new="you want the findings across many files at once"),
 ]
 
 
@@ -281,12 +365,21 @@ ENV_SET = {
     'API_TIMEOUT_MS':                   '600000',
     'CLAUDE_STREAM_IDLE_TIMEOUT_MS':    '300000',
     'DISABLE_TELEMETRY':                '1',     # no background phone-home
+    'DO_NOT_TRACK':                     '1',     # redundant alias of DISABLE_TELEMETRY (Yt()-checked)
     'DISABLE_ERROR_REPORTING':          '1',
     'DISABLE_GROWTHBOOK':               '1',     # block feature flag SDK (remote prompt injection vector)
     'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC': '1', # also blocks metrics pipeline
+    # Deliberately NOT set here (verified against 2.1.220):
+    #   OTEL_LOG_* content-logging vars: never SET — they're read bare-truthy on the
+    #     string (e.g. OTEL_LOG_ASSISTANT_RESPONSES via `Z.X ?? Z.OTEL_LOG_USER_PROMPTS`),
+    #     so "0" is truthy and would ENABLE logging. Handled by UNSETTING the whole
+    #     family in ENV_CLEAR instead (defense-in-depth under DISABLE_TELEMETRY).
+    #   CLAUDE_CODE_DISABLE_FAST_MODE: only turns off /fast (same model, no
+    #     thinking/effort change); the GrowthBook remote-enable path is already blocked.
 }
 
 ENV_CLEAR = [
+    # capability suppressors — never let these dumb the model down
     'CLAUDE_CODE_DISABLE_THINKING',
     'CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING',
     'DISABLE_INTERLEAVED_THINKING',
@@ -294,11 +387,22 @@ ENV_CLEAR = [
     'CLAUDE_CODE_BRIEF_UPLOAD',
     'CLAUDE_CODE_SIMPLE',
     'CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT',
+    # telemetry content-logging hygiene — each is read bare-truthy on its string
+    # value, and OTEL_LOG_ASSISTANT_RESPONSES falls back to OTEL_LOG_USER_PROMPTS
+    # via `??`, so clearing the whole family is the only complete way to guarantee
+    # no conversation / raw API body / tool content is exported. Redundant under
+    # DISABLE_TELEMETRY (the OTEL exporter never starts) — kept as defense-in-depth
+    # for the case where telemetry is ever re-enabled with one of these left set.
+    'OTEL_LOG_USER_PROMPTS',
+    'OTEL_LOG_ASSISTANT_RESPONSES',
+    'OTEL_LOG_RAW_API_BODIES',
+    'OTEL_LOG_TOOL_CONTENT',
+    'OTEL_LOG_TOOL_DETAILS',
 ]
 
 
 def configure_env() -> None:
-    """Set capability env vars and clear any that would suppress features."""
+    """Set capability env vars; clear feature-suppressors + telemetry content-logging vars."""
     os.environ.update(ENV_SET)
     for var in ENV_CLEAR:
         os.environ.pop(var, None)
@@ -328,14 +432,14 @@ def report_binary(path: Path, results: list[Result], ok: bool) -> None:
 
 NAMED_MODELS = {
     'fable': 'claude-fable-5',
-    '5':     'claude-fable-5',
+    '5':     'claude-opus-5[1m]',   # Opus 5 (shipped 2.1.219); Fable 5 via `fable`
 }
 
 
 def expand_model(name: str) -> str:
     """Expand a model shorthand to a full model ID.
 
-    Named shorthands:  fable, 5  → claude-fable-5
+    Named shorthands:  fable → claude-fable-5, 5 → claude-opus-5[1m]
     Numeric shorthands: 4.6, 4-7 → claude-opus-4-6[1m], etc.
     """
     if name in NAMED_MODELS:
